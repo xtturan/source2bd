@@ -1,17 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import type { ProductSummary } from "@/lib/products/types";
-import { currencySymbol, marketplaceLabels } from "@/lib/products/types";
+import { marketplaceLabels } from "@/lib/products/types";
+import { bdtLabel } from "@/lib/products/pricing";
 import { productQuote } from "@/lib/whatsapp";
 import { productImage } from "@/lib/images";
 import { Badge } from "./primitives";
 import { WhatsAppIcon } from "./button";
 
 function priceLabel(p: ProductSummary) {
-  const sym = currencySymbol(p.currency);
-  if (p.priceMin == null) return "Ask for price";
-  if (p.priceMax != null && p.priceMax !== p.priceMin)
-    return `${sym}${p.priceMin} to ${sym}${p.priceMax}`;
-  return `${sym}${p.priceMin}`;
+  return bdtLabel(p.priceMin, p.priceMax, p.currency);
 }
 
 export function ProductCard({ product }: { product: ProductSummary }) {
