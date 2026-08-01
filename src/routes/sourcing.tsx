@@ -158,10 +158,13 @@ function SearchPanel() {
 
       <div className="mt-8">
         {mutation.isPending ? (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="aspect-[3/4]" />
-            ))}
+          <div>
+            <LiveProgress label="Pulling live listings from the marketplace" />
+            <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-[3/4]" />
+              ))}
+            </div>
           </div>
         ) : mutation.isError ? (
           <EmptyState
