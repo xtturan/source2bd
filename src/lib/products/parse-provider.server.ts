@@ -425,7 +425,7 @@ export function createParseProvider(): ProductProvider {
     name: "parse",
 
     async search(query, opts): Promise<SearchResult> {
-      const marketplace = opts?.marketplace ?? "global";
+      const marketplace = opts?.marketplace ?? "1688";
       const page = opts?.page ?? 1;
 
       if (marketplace === "global") {

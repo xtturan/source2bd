@@ -17,7 +17,7 @@ export const Route = createFileRoute("/api/products/search")({
         const url = new URL(request.url);
         const parsed = schema.safeParse({
           q: url.searchParams.get("q") ?? "",
-          marketplace: url.searchParams.get("marketplace") ?? "global",
+          marketplace: url.searchParams.get("marketplace") ?? "1688",
           page: url.searchParams.get("page") ?? 1,
         });
         if (!parsed.success) return Response.json({ error: "Invalid query" }, { status: 400 });
