@@ -1,7 +1,7 @@
-import type { ProductDetail } from "./types";
+import type { Marketplace, ProductDetail } from "./types";
 
 function img(seed: string, i = 1) {
-  return `https://picsum.photos/seed/twt-${seed}-${i}/800/800`;
+  return `https://picsum.photos/seed/s2b-${seed}-${i}/800/800`;
 }
 
 function make(
@@ -21,7 +21,7 @@ function make(
 ): ProductDetail {
   return {
     id,
-    source: "1688",
+    marketplace: "1688",
     title,
     titleBn,
     category,
@@ -45,7 +45,7 @@ function make(
   };
 }
 
-export const mockProducts: ProductDetail[] = [
+const base1688: ProductDetail[] = [
   make(
     "681204551903",
     "usb-c-cable",
@@ -80,11 +80,11 @@ export const mockProducts: ProductDetail[] = [
     "48k+ ordered",
     [
       { label: "Sizes", value: "A000 to A9" },
-      { label: "Print", value: "1–2 colour logo from 3000 pcs" },
+      { label: "Print", value: "1-2 colour logo from 3000 pcs" },
       { label: "Sealing", value: "Self-adhesive strip" },
       { label: "Packing", value: "500 pcs / bale" },
     ],
-    "Everyday e-commerce packaging. Cheap per unit but bulky — sea freight is almost always the right mode here.",
+    "Everyday e-commerce packaging. Cheap per unit but bulky, sea freight is almost always the right mode here.",
   ),
   make(
     "593280114427",
@@ -164,7 +164,7 @@ export const mockProducts: ProductDetail[] = [
       { label: "Packing", value: "Foam brick, 10 pcs per box" },
       { label: "Warranty", value: "Supplier DOA replacement policy" },
     ],
-    "Fragile and high value — hand carry is the usual pick for repair shops that cannot risk crush damage.",
+    "Fragile and high value, hand carry is the usual pick for repair shops that cannot risk crush damage.",
   ),
   make(
     "705523118644",
@@ -229,7 +229,7 @@ export const mockProducts: ProductDetail[] = [
   make(
     "618230997741",
     "building-blocks",
-    "Generic building block sets, 300–1200 pcs, ASTM-style plastic",
+    "Generic building block sets, 300-1200 pcs, ASTM-style plastic",
     "বিল্ডিং ব্লক সেট (জেনেরিক)",
     "toys",
     9.5,
@@ -264,7 +264,7 @@ export const mockProducts: ProductDetail[] = [
       { label: "Standard", value: "UK / universal socket options" },
       { label: "Carton", value: "40 pcs / carton" },
     ],
-    "Confirm UK-standard pins for the Bangladesh market — universal sockets sell slower in retail.",
+    "Confirm UK-standard pins for the Bangladesh market, universal sockets sell slower in retail.",
   ),
   make(
     "651789003324",
@@ -282,7 +282,7 @@ export const mockProducts: ProductDetail[] = [
       { label: "Board", value: "E-flute / 3-ply corrugated" },
       { label: "Print", value: "CMYK offset, matt lamination" },
       { label: "Proof", value: "Digital dieline before production" },
-      { label: "Lead time", value: "8–12 days production" },
+      { label: "Lead time", value: "8-12 days production" },
     ],
     "Add production lead time on top of shipping time. Plan roughly 6 weeks total if you go by sea.",
   ),
@@ -344,12 +344,12 @@ export const mockProducts: ProductDetail[] = [
       { label: "Case", value: "PP blow case with handle" },
       { label: "Carton", value: "12 kits / carton, 26 kg" },
     ],
-    "Heavy metal goods — sea freight is nearly always cheaper unless you need it for a specific tender date.",
+    "Heavy metal goods, sea freight is nearly always cheaper unless you need it for a specific tender date.",
   ),
   make(
     "645220119983",
     "solar-light",
-    "Solar street light 100W–300W, IP65, remote + motion sensor",
+    "Solar street light 100W-300W, IP65, remote + motion sensor",
     "সোলার স্ট্রিট লাইট · আইপি৬৫",
     "lights",
     96,
@@ -364,7 +364,7 @@ export const mockProducts: ProductDetail[] = [
       { label: "Pole", value: "Optional, sold separately" },
       { label: "Carton", value: "1 pc / carton" },
     ],
-    "Lithium battery goods have shipping restrictions. Talk to us before paying — the lane matters here.",
+    "Lithium battery goods have shipping restrictions. Talk to us before paying, the lane matters here.",
   ),
   make(
     "679413550028",
@@ -406,4 +406,112 @@ export const mockProducts: ProductDetail[] = [
     ],
     "Popular corporate gift item. Send your artwork as vector so the factory can proof it quickly.",
   ),
+];
+
+
+function retarget(p: ProductDetail, marketplace: Marketplace): ProductDetail {
+  if (marketplace === "alibaba") {
+    return {
+      ...p,
+      marketplace,
+      currency: "USD",
+      priceMin: p.priceMin ? Number((p.priceMin / 6.9).toFixed(2)) : undefined,
+      priceMax: p.priceMax ? Number((p.priceMax / 6.9).toFixed(2)) : undefined,
+      priceTiers: p.priceTiers?.map((t) => ({
+        minQty: t.minQty,
+        price: Number((t.price / 6.9).toFixed(2)),
+      })),
+      productUrl: `https://www.alibaba.com/product-detail/${p.id}.html`,
+    };
+  }
+  return { ...p, marketplace };
+}
+
+function amazon(
+  asin: string,
+  seed: string,
+  title: string,
+  titleBn: string,
+  category: string,
+  priceMin: number,
+  priceMax: number,
+  shopName: string,
+  attributes: { label: string; value: string }[],
+  description: string,
+): ProductDetail {
+  return {
+    id: asin,
+    marketplace: "amazon",
+    title,
+    titleBn,
+    category,
+    priceMin,
+    priceMax,
+    currency: "USD",
+    moq: 1,
+    imageUrl: img(seed, 1),
+    images: [img(seed, 1), img(seed, 2), img(seed, 3)],
+    shopName,
+    city: "US warehouse",
+    ordersHint: "Amazon listing",
+    productUrl: `https://www.amazon.com/dp/${asin}`,
+    attributes,
+    description,
+  };
+}
+
+const amazonProducts: ProductDetail[] = [
+  amazon(
+    "B0C7KND8LM",
+    "amz-monitor-arm",
+    "Single monitor desk mount arm, gas spring, up to 32 inch",
+    "মনিটর ডেস্ক মাউন্ট আর্ম",
+    "office equipment",
+    38.99,
+    58.0,
+    "HuAnuo Store",
+    [
+      { label: "Fits", value: "17 to 32 inch, up to 19.8 lbs" },
+      { label: "Mount", value: "Clamp or grommet" },
+      { label: "Ship weight", value: "3.1 kg boxed" },
+    ],
+    "Common Amazon buy for Dhaka office fitouts. We buy on your behalf, receive at our US forwarder, then air freight to Dhaka.",
+  ),
+  amazon(
+    "B08N5WRWNW",
+    "amz-baby-monitor",
+    "Video baby monitor with 5 inch screen and night vision",
+    "ভিডিও বেবি মনিটর",
+    "baby products",
+    89.99,
+    119.0,
+    "Nannio Official",
+    [
+      { label: "Range", value: "300m open field" },
+      { label: "Battery", value: "12 hour standby" },
+      { label: "Ship weight", value: "1.2 kg boxed" },
+    ],
+    "Brand item not reliably available on local shelves. Personal import quantities only, duty applies on landing.",
+  ),
+  amazon(
+    "B09XJ6FZ4T",
+    "amz-espresso",
+    "Semi automatic espresso machine, 20 bar, stainless body",
+    "এসপ্রেসো মেশিন · ২০ বার",
+    "kitchen appliances",
+    169.0,
+    239.0,
+    "Casabrews",
+    [
+      { label: "Voltage", value: "110V, needs a converter in BD" },
+      { label: "Ship weight", value: "9.4 kg boxed" },
+      { label: "Mode", value: "Air freight or sea consolidation" },
+    ],
+    "Heavy and voltage sensitive. Ask us about a 220V equivalent from 1688 before you commit to the US listing.",
+  ),
+];
+
+export const mockProducts: ProductDetail[] = [
+  ...base1688.map((p, i) => retarget(p, i % 5 === 3 ? "alibaba" : "1688")),
+  ...amazonProducts,
 ];

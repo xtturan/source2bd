@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { getProductProvider } from "@/lib/products/provider.server";
+import { getProductProvider, providerFallbackMessage } from "@/lib/products/provider.server";
 import { cached, rateLimited, tooMany } from "@/lib/api/guard.server";
 
 const schema = z.object({ url: z.string().trim().url().max(600) });
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/products/by-url")({
         const parsed = schema.safeParse({ url: reqUrl.searchParams.get("url") ?? "" });
         if (!parsed.success)
           return Response.json(
-            { error: "That doesn't look like a full product link. Paste the whole URL." },
+            { error: "That does not look like a full product link. Paste the whole URL." },
             { status: 400 },
           );
 
@@ -24,8 +24,9 @@ export const Route = createFileRoute("/api/products/by-url")({
           );
           if (!item) return Response.json({ error: "Could not read that link" }, { status: 404 });
           return Response.json({ item });
-        } catch {
-          return Response.json({ error: "Link lookup is unavailable right now." }, { status: 502 });
+        } catch (err) {
+          console.error("by-url failed", err);
+          return Response.json({ error: providerFallbackMessage }, { status: 502 });
         }
       },
     },

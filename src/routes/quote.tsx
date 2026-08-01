@@ -1,155 +1,137 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle } from "lucide-react";
-import { z } from "zod";
-import { Container, Section, Badge } from "@/components/twt/primitives";
-import { ExternalButton, Field, Input, Select, Textarea } from "@/components/twt/button";
-import { services } from "@/config/site";
+import { useState } from "react";
+import { Container, Section, SectionHeading, Card } from "@/components/s2b/primitives";
+import { ButtonAnchor, WhatsAppIcon } from "@/components/s2b/button";
+import { services, siteConfig } from "@/config/site";
 import { serviceQuote } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/quote")({
   head: () => ({
     meta: [
-      { title: "Request a cargo quote — TWT International" },
+      { title: "Get a cargo and sourcing quote | Source2BD" },
       {
         name: "description",
         content:
-          "Tell us your shipping mode, weight and delivery city. We build the WhatsApp message for you and reply with a China to Bangladesh path quote.",
+          "Tell us the lane, the weight or volume and your delivery city. The form builds a complete WhatsApp message so our desk can price it in one reply.",
       },
-      { property: "og:title", content: "Request a quote — TWT International" },
+      { property: "og:title", content: "Get a Source2BD quote" },
       {
         property: "og:description",
-        content: "Build your cargo enquiry in seconds and send it straight to our WhatsApp desk.",
+        content: "Build a complete quote request in under a minute and send it straight to WhatsApp.",
       },
-      { property: "og:url", content: "/quote" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/quote" }],
   }),
   component: QuotePage,
 });
 
-const schema = z.object({
-  mode: z.string().min(1, "Choose a shipping mode"),
-  weight: z.string().trim().max(60).optional(),
-  city: z.string().trim().max(60).optional(),
-  notes: z.string().trim().max(600).optional(),
-});
+const inputClass =
+  "mt-1.5 h-11 w-full rounded-[11px] border border-input bg-background/60 px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent";
 
 function QuotePage() {
-  const [mode, setMode] = useState(services[0]?.title ?? "Air Freight");
+  const [mode, setMode] = useState(services[0]!.title);
   const [weight, setWeight] = useState("");
   const [city, setCity] = useState("");
   const [notes, setNotes] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const parsed = schema.safeParse({ mode, weight, city, notes });
-  const href = parsed.success
-    ? serviceQuote({
-        mode,
-        weight: weight || undefined,
-        city: city || undefined,
-        notes: notes || undefined,
-      })
-    : "#";
+  const href = serviceQuote({ mode, weight, city, notes });
 
   return (
-    <>
-      <div className="grid-lines bg-navy py-14 text-white">
-        <Container>
-          <Badge tone="outline">Quote request</Badge>
-          <h1 className="mt-4 max-w-2xl text-4xl font-bold leading-[1.05] sm:text-5xl">
-            Build your enquiry, send it in one tap.
-          </h1>
-          <p className="font-bn mt-3 text-white/70">কোট রিকোয়েস্ট করুন</p>
-        </Container>
-      </div>
+    <Section>
+      <Container className="grid gap-12 lg:grid-cols-[1fr_0.85fr]">
+        <div>
+          <SectionHeading
+            eyebrow="Quote request"
+            title="Give us four details and we can price it"
+            titleBn="চারটি তথ্য দিলেই কোট পাবেন"
+            intro="Nothing is stored on a server here. The form assembles a message and hands it to WhatsApp, so you keep the record in your own chat."
+          />
 
-      <Section>
-        <Container className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)]">
-          <form
-            className="space-y-5"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const result = schema.safeParse({ mode, weight, city, notes });
-              if (!result.success) {
-                const next: Record<string, string> = {};
-                for (const issue of result.error.issues) {
-                  next[String(issue.path[0])] = issue.message;
-                }
-                setErrors(next);
-                return;
-              }
-              setErrors({});
-              window.open(href, "_blank", "noopener,noreferrer");
-            }}
-          >
-            <Field label="Shipping mode" error={errors["mode"]}>
-              <Select value={mode} onChange={(e) => setMode(e.target.value)}>
+          <form className="mt-10 grid gap-5" onSubmit={(e) => e.preventDefault()}>
+            <div>
+              <label htmlFor="mode" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Service
+              </label>
+              <select id="mode" value={mode} onChange={(e) => setMode(e.target.value)} className={inputClass}>
                 {services.map((s) => (
-                  <option key={s.key} value={s.title}>
+                  <option key={s.key} value={s.title} className="bg-background">
                     {s.title}
                   </option>
                 ))}
-              </Select>
-            </Field>
-
-            <Field label="Weight or volume" hint="optional" error={errors["weight"]}>
-              <Input
-                value={weight}
-                maxLength={60}
-                onChange={(e) => setWeight(e.target.value)}
-                placeholder="e.g. 65 kg, 4 cartons, ~0.8 CBM"
-              />
-            </Field>
-
-            <Field label="Delivery city in Bangladesh" hint="optional" error={errors["city"]}>
-              <Input
-                value={city}
-                maxLength={60}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Dhaka, Chattogram, Sylhet…"
-              />
-            </Field>
-
-            <Field label="What are you shipping?" hint="optional" error={errors["notes"]}>
-              <Textarea
-                value={notes}
-                maxLength={600}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Product type, supplier city, deadline, anything else we should know."
-              />
-            </Field>
-
-            <button
-              type="submit"
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-signal px-6 font-semibold text-white shadow-[var(--shadow-lift)] transition-all hover:-translate-y-0.5 hover:bg-signal-600"
-            >
-              <MessageCircle className="size-5" /> Send on WhatsApp
-            </button>
-            <p className="text-xs text-steel">
-              This opens WhatsApp with your details pre-written. Nothing is stored on this site.
-            </p>
-          </form>
-
-          <aside className="h-fit matte rounded-2xl border border-navy/8 bg-mist/60 p-6 backdrop-blur-md">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-steel">
-              Message preview
-            </h2>
-            <pre className="mt-4 whitespace-pre-wrap break-words rounded-xl border border-navy/8 bg-white/70 p-4 backdrop-blur-md text-sm leading-relaxed text-navy">
-              {decodeURIComponent((href.split("text=")[1] ?? "").replace(/\+/g, " "))}
-            </pre>
-            <p className="mt-4 text-xs leading-relaxed text-steel">
-              We handle legal, permitted goods only. Duty and taxes are assessed by Bangladesh
-              customs and quoted separately from freight.
-            </p>
-            <div className="mt-5">
-              <ExternalButton href={href} variant="outline" className="w-full">
-                Open WhatsApp
-              </ExternalButton>
+              </select>
             </div>
-          </aside>
-        </Container>
-      </Section>
-    </>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="weight" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Approx weight or volume
+                </label>
+                <input
+                  id="weight"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  placeholder="45 kg, or 0.8 CBM"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="city" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Delivery city in Bangladesh
+                </label>
+                <input
+                  id="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Dhaka"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                What are you shipping
+              </label>
+              <textarea
+                id="notes"
+                rows={5}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Product links, carton count, target date, anything else that helps"
+                className="mt-1.5 w-full rounded-[11px] border border-input bg-background/60 p-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
+              />
+            </div>
+
+            <ButtonAnchor href={href} target="_blank" rel="noopener noreferrer" variant="green" size="lg">
+              <WhatsAppIcon /> Send this to WhatsApp
+            </ButtonAnchor>
+          </form>
+        </div>
+
+        <Card className="h-fit p-6">
+          <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">
+            What we send back
+          </h2>
+          <ul className="mt-5 space-y-4 text-sm text-muted-foreground">
+            {[
+              "Supplier or retail cost, with tier pricing where it applies",
+              "Freight by the lane that suits your volume, not the one we prefer",
+              "A duty exposure indication so the landed number is not a surprise",
+              "A realistic transit window, stated as an estimate",
+            ].map((t) => (
+              <li key={t} className="flex gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
+                {t}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 border-t border-border pt-5 text-xs text-muted-foreground">
+            Desk hours {siteConfig.hours}. Messages outside those hours are answered the next working
+            morning.
+          </p>
+        </Card>
+      </Container>
+    </Section>
   );
 }
