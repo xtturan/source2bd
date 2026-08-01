@@ -115,7 +115,7 @@ function TrustStrip() {
 
 function OriginRail() {
   return (
-    <Section className="pt-6">
+    <Section className="pt-0">
       <Container>
         <SectionHeading
           title="Three origins, one landed price"
