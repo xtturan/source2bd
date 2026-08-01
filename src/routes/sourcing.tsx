@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Container, Section, SectionHeading, Badge, EmptyState, Skeleton, Card } from "@/components/s2b/primitives";
 import { Button, ButtonAnchor, WhatsAppIcon } from "@/components/s2b/button";
 import { ProductCard } from "@/components/s2b/product-card";
+import { IconMic, IconSearch } from "@/components/s2b/big-action";
 import { searchProducts, productByUrl } from "@/lib/products/queries.functions";
 import type { Marketplace, ProductDetail, ProductSummary } from "@/lib/products/types";
 import { currencySymbol, marketplaceLabels } from "@/lib/products/types";
