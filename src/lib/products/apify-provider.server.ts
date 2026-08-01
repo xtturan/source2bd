@@ -58,29 +58,56 @@ async function runActor<T>(actorId: string, input: unknown, limit = 12): Promise
     );
   }
 
-  const res = await fetch(
-    `${API}/acts/${encodeURIComponent(actorId)}/run-sync-get-dataset-items?limit=${limit}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(input),
-      signal: AbortSignal.timeout(120_000),
-    },
-  );
+  const auth = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
 
-  if (!res.ok) {
-    const body = await res.text();
-    console.error(`Apify actor ${actorId} failed [${res.status}]: ${body}`);
-    if (res.status === 402)
+  const started = await fetch(`${API}/acts/${encodeURIComponent(actorId)}/runs`, {
+    method: "POST",
+    headers: auth,
+    body: JSON.stringify(input),
+    signal: AbortSignal.timeout(20_000),
+  });
+
+  if (!started.ok) {
+    const body = await started.text();
+    console.error(`Apify actor ${actorId} failed to start [${started.status}]: ${body}`);
+    if (started.status === 402)
       throw new ProviderUnavailableError(
         "The live sourcing credit for this month is used up. WhatsApp us and we will pull the listing by hand.",
       );
-    if (res.status === 429)
+    if (started.status === 429)
       throw new ProviderUnavailableError("Live search is busy right now. Try again in a minute.");
     throw new ProviderUnavailableError("Live marketplace search failed. Use WhatsApp for now.");
   }
 
-  const json = (await res.json()) as unknown;
+  const run = ((await started.json()) as { data?: { id?: string; defaultDatasetId?: string } }).data;
+  if (!run?.id || !run.defaultDatasetId) {
+    throw new ProviderUnavailableError("Live marketplace search failed. Use WhatsApp for now.");
+  }
+
+  // Poll instead of run-sync: the sync endpoint adds a large fixed wait.
+  const deadline = Date.now() + 100_000;
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 2500));
+    const statusRes = await fetch(`${API}/actor-runs/${run.id}`, {
+      headers: auth,
+      signal: AbortSignal.timeout(15_000),
+    });
+    const status = statusRes.ok
+      ? ((await statusRes.json()) as { data?: { status?: string } }).data?.status
+      : undefined;
+    if (status === "SUCCEEDED" || status === "FAILED" || status === "ABORTED") break;
+  }
+
+  const itemsRes = await fetch(
+    `${API}/datasets/${run.defaultDatasetId}/items?limit=${limit}&clean=true`,
+    { headers: auth, signal: AbortSignal.timeout(30_000) },
+  );
+  if (!itemsRes.ok) {
+    console.error(`Apify dataset read failed [${itemsRes.status}]: ${await itemsRes.text()}`);
+    throw new ProviderUnavailableError("Live marketplace search failed. Use WhatsApp for now.");
+  }
+
+  const json = (await itemsRes.json()) as unknown;
   return Array.isArray(json) ? (json as T[]) : [];
 }
 
