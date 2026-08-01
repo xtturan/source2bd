@@ -58,32 +58,34 @@ function SourcingPage() {
                 We quote it landed in Bangladesh.
               </>
             }
-            titleBn="সার্চ করুন, লিংক দিন, অথবা ছবি পাঠান"
-            intro="Demo catalogue is live now at zero API cost. Live marketplace lookup switches on behind the same interface when you enable a provider key."
+            titleBn="পণ্য খুঁজুন, লিংক দিন, অথবা ছবি পাঠান"
+            intro="Type the product name in English or Banglish, or just press the microphone and say it."
           />
 
           <div className="glass matte mt-10 rounded-[18px] p-2">
             <div role="tablist" aria-label="Sourcing method" className="grid grid-cols-3 gap-1">
               {(
                 [
-                  ["search", "Search catalogue"],
-                  ["link", "Paste a link"],
-                  ["photo", "Photo search"],
+                  ["search", "পণ্য খুঁজুন", "Search"],
+                  ["link", "লিংক দিন", "Paste link"],
+                  ["photo", "ছবি পাঠান", "Send photo"],
                 ] as const
-              ).map(([key, label]) => (
+              ).map(([key, bn, en]) => (
                 <button
                   key={key}
                   role="tab"
                   aria-selected={mode === key}
+                  aria-label={en}
                   onClick={() => setMode(key)}
                   className={cn(
-                    "h-11 rounded-[12px] text-sm font-semibold transition-colors duration-150",
+                    "flex min-h-[60px] flex-col items-center justify-center gap-0.5 rounded-[12px] px-1 transition-colors duration-150",
                     mode === key
                       ? "bg-foreground/10 text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.1)]"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  {label}
+                  <span className="font-bn text-base font-bold leading-none">{bn}</span>
+                  <span className="text-[11px] font-semibold opacity-70">{en}</span>
                 </button>
               ))}
             </div>
