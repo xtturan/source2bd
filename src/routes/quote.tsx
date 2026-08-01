@@ -131,11 +131,11 @@ function QuotePage() {
             </p>
           </form>
 
-          <aside className="h-fit rounded-2xl border border-border bg-[#f8fafb] p-6">
+          <aside className="h-fit matte rounded-2xl border border-navy/8 bg-mist/60 p-6 backdrop-blur-md">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-steel">
               Message preview
             </h2>
-            <pre className="mt-4 whitespace-pre-wrap break-words rounded-xl bg-white p-4 text-sm leading-relaxed text-navy">
+            <pre className="mt-4 whitespace-pre-wrap break-words rounded-xl border border-navy/8 bg-white/70 p-4 backdrop-blur-md text-sm leading-relaxed text-navy">
               {decodeURIComponent((href.split("text=")[1] ?? "").replace(/\+/g, " "))}
             </pre>
             <p className="mt-4 text-xs leading-relaxed text-steel">

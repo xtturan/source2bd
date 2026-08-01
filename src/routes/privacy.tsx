@@ -70,7 +70,7 @@ function PrivacyPage() {
               <p className="mt-3 text-[15px] leading-relaxed text-steel">{s.b}</p>
             </div>
           ))}
-          <p className="border-t border-border pt-8 text-sm text-steel">
+          <p className="border-t border-navy/8 pt-8 text-sm text-steel">
             Questions about any of this? Call {siteConfig.phoneDisplay} or visit{" "}
             {siteConfig.officeLine2}.
           </p>

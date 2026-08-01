@@ -11,8 +11,8 @@ export function Section({
   ...props
 }: HTMLAttributes<HTMLElement> & { tone?: "light" | "muted" | "navy" | "charcoal" }) {
   const tones = {
-    light: "bg-background text-navy",
-    muted: "bg-[#f4f6f8] text-navy",
+    light: "text-navy",
+    muted: "bg-mist/70 text-navy",
     navy: "bg-navy text-white",
     charcoal: "bg-charcoal text-white",
   } as const;
@@ -103,11 +103,11 @@ export function Badge({
   tone?: "neutral" | "green" | "navy" | "signal" | "outline";
 }) {
   const tones = {
-    neutral: "bg-[#f1f4f7] text-steel",
-    green: "bg-green/10 text-green-600",
+    neutral: "bg-navy/6 text-steel ring-1 ring-inset ring-navy/8",
+    green: "bg-green/10 text-green-600 ring-1 ring-inset ring-green/15",
     navy: "bg-navy text-white",
-    signal: "bg-signal/10 text-signal",
-    outline: "border border-white/15 text-white/80",
+    signal: "bg-signal/10 text-signal ring-1 ring-inset ring-signal/15",
+    outline: "border border-white/15 text-white/80 backdrop-blur-sm",
   } as const;
   return (
     <span
@@ -126,7 +126,7 @@ export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border bg-white shadow-[var(--shadow-lift)]",
+        "glass matte rounded-2xl",
         className,
       )}
       {...props}
@@ -135,7 +135,7 @@ export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-lg bg-[#e8ecf0]", className)} />;
+  return <div className={cn("animate-pulse rounded-lg bg-navy/8", className)} />;
 }
 
 export function EmptyState({
@@ -148,7 +148,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-border bg-[#fafbfc] px-6 py-14 text-center">
+    <div className="matte rounded-2xl border border-dashed border-navy/12 bg-white/50 px-6 py-14 text-center backdrop-blur-sm">
       <h3 className="text-lg font-semibold text-navy">{title}</h3>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-steel">{body}</p>
       {action ? <div className="mt-6 flex justify-center">{action}</div> : null}

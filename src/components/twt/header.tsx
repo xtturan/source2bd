@@ -11,8 +11,8 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-white/85 backdrop-blur-md">
-      <div className="hidden bg-navy py-1.5 text-white lg:block">
+    <header className="sticky top-0 z-50 border-b border-navy/8 bg-white/65 backdrop-blur-xl backdrop-saturate-150">
+      <div className="hidden bg-navy/95 py-1.5 text-white backdrop-blur-xl lg:block">
         <Container className="flex items-center justify-between text-xs">
           <p className="text-white/70">
             {siteConfig.office} · {siteConfig.hours}
@@ -63,14 +63,14 @@ export function Header() {
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
-          className="inline-flex size-11 items-center justify-center rounded-xl border border-border text-navy lg:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-xl border border-navy/12 bg-white/60 text-navy backdrop-blur-md lg:hidden"
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
       </Container>
 
       {open ? (
-        <div className="border-t border-border bg-white lg:hidden">
+        <div className="border-t border-navy/8 bg-white/80 backdrop-blur-xl lg:hidden">
           <Container className="flex flex-col py-3">
             {navLinks.map((link) => (
               <Link

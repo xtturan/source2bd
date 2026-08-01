@@ -19,8 +19,21 @@
   --color-steel: #5a6570;
   --color-charcoal: #141414;
 
-  --shadow-lift: 0 1px 2px rgb(10 37 64 / 0.06), 0 8px 24px -12px rgb(10 37 64 / 0.18);
-  --shadow-lift-lg: 0 2px 4px rgb(10 37 64 / 0.06), 0 24px 48px -24px rgb(10 37 64 / 0.28);
+  --color-mist: #eef1f5;
+  --color-fog: #f7f9fb;
+
+  /* Elevation: exactly three levels, site-wide. */
+  --shadow-lift: 0 1px 2px rgb(10 37 64 / 0.05), 0 6px 20px -14px rgb(10 37 64 / 0.22);
+  --shadow-lift-lg: 0 1px 3px rgb(10 37 64 / 0.05), 0 28px 56px -32px rgb(10 37 64 / 0.32);
+  --shadow-inset-hairline: inset 0 1px 0 rgb(255 255 255 / 0.65);
+}
+
+/* Matte glass surface system */
+:root {
+  --glass-tint: 255 255 255;
+  --glass-alpha: 0.62;
+  --glass-border: rgb(10 37 64 / 0.08);
+  --glass-blur: 22px;
 }
 
 /*
@@ -82,9 +95,9 @@
 
 :root {
   --radius: 0.875rem;
-  --background: oklch(1 0 0);
+  --background: #f6f8fa;
   --foreground: #0a2540;
-  --card: oklch(1 0 0);
+  --card: #ffffff;
   --card-foreground: #0a2540;
   --popover: oklch(1 0 0);
   --popover-foreground: #0a2540;
@@ -161,6 +174,19 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Soft ambient wash behind the matte glass surfaces. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(60rem 40rem at 12% -10%, rgb(31 166 74 / 0.07), transparent 60%),
+      radial-gradient(52rem 36rem at 92% 4%, rgb(10 37 64 / 0.09), transparent 62%);
   }
 
   h1,
@@ -192,5 +218,37 @@
   &:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lift-lg);
+  }
+}
+
+/* Frosted, matte translucent panel on light ground. */
+@utility glass {
+  background-color: rgb(var(--glass-tint) / var(--glass-alpha));
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-lift), var(--shadow-inset-hairline);
+}
+
+/* Same treatment over navy/charcoal sections. */
+@utility glass-dark {
+  background-color: rgb(255 255 255 / 0.06);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+/* Fine matte grain that kills the plastic sheen. */
+@utility matte {
+  position: relative;
+  isolation: isolate;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
   }
 }

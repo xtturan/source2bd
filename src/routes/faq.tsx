@@ -89,7 +89,7 @@ function FaqPage() {
 
       <Section>
         <Container className="max-w-3xl">
-          <div className="divide-y divide-border border-y border-border">
+          <div className="divide-y divide-navy/8 border-y border-navy/8">
             {faqs.map((f) => (
               <details key={f.q} className="group py-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-lg font-semibold text-navy">

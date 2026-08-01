@@ -76,7 +76,7 @@ function ProductPage() {
       <Section className="pb-12 pt-10">
         <Container className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div>
-            <div className="overflow-hidden rounded-2xl border border-border bg-[#f1f4f7]">
+            <div className="overflow-hidden rounded-2xl border border-navy/8 bg-navy/5">
               <img
                 src={item.images[active] ?? item.imageUrl}
                 alt={item.title}
@@ -91,7 +91,7 @@ function ProductPage() {
                     type="button"
                     onClick={() => setActive(i)}
                     aria-label={`View image ${i + 1}`}
-                    className={`size-16 overflow-hidden rounded-xl border-2 transition-colors ${i === active ? "border-green" : "border-border"}`}
+                    className={`size-16 overflow-hidden rounded-xl border-2 transition-colors ${i === active ? "border-green" : "border-navy/8"}`}
                   >
                     <img src={src} alt="" loading="lazy" className="size-full object-cover" />
                   </button>
@@ -114,7 +114,7 @@ function ProductPage() {
               <p className="font-bn mt-2 text-steel">{item.titleBn}</p>
             ) : null}
 
-            <div className="mt-5 rounded-2xl border border-border bg-[#f8fafb] p-5">
+            <div className="mt-5 matte rounded-2xl border border-navy/8 bg-mist/60 p-5 backdrop-blur-md">
               <p className="font-display text-3xl font-bold text-navy">{priceLabel(item)}</p>
               <p className="mt-1 text-sm text-steel">
                 CNY marketplace price · MOQ {item.moq ?? "—"} pcs
@@ -132,7 +132,7 @@ function ProductPage() {
                 </h2>
                 <div className="mt-3 grid grid-cols-3 gap-3">
                   {item.priceTiers.map((t) => (
-                    <div key={t.minQty} className="rounded-xl border border-border p-3 text-center">
+                    <div key={t.minQty} className="rounded-xl border border-navy/8 p-3 text-center">
                       <p className="text-xs text-steel">{t.minQty}+ pcs</p>
                       <p className="mt-1 font-display text-lg font-bold text-navy">¥{t.price}</p>
                     </div>
@@ -180,7 +180,7 @@ function ProductPage() {
             </div>
 
             {item.attributes?.length ? (
-              <dl className="mt-6 divide-y divide-border rounded-2xl border border-border">
+              <dl className="mt-6 divide-y divide-navy/8 rounded-2xl border border-navy/8">
                 {item.attributes.map((a) => (
                   <div key={a.label} className="flex gap-4 px-4 py-3 text-sm">
                     <dt className="w-36 shrink-0 text-steel">{a.label}</dt>
@@ -210,7 +210,7 @@ function ProductPage() {
         </Section>
       ) : null}
 
-      <div className="fixed inset-x-0 bottom-14 z-40 border-t border-border bg-white p-3 md:hidden">
+      <div className="fixed inset-x-0 bottom-14 z-40 border-t border-navy/8 bg-white/80 p-3 backdrop-blur-xl md:hidden">
         <a
           href={quoteHref}
           target="_blank"
