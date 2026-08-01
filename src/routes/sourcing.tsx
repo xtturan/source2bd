@@ -115,7 +115,7 @@ function LiveProgress({ label }: { label: string }) {
       <span className="h-2 w-2 animate-pulse rounded-full bg-accent" aria-hidden />
       <span className="font-medium">{label}</span>
       <span className="text-muted-foreground">
-        live scrape, usually 30 to 60 seconds. {sec}s elapsed
+        live scrape, usually 15 to 30 seconds. {sec}s elapsed
       </span>
     </div>
   );
