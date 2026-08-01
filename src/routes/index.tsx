@@ -1,6 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Container, Section, SectionHeading, Badge, Card, Stat, Eyebrow } from "@/components/s2b/primitives";
+import { Container, Section, SectionHeading, Badge, Card, Stat } from "@/components/s2b/primitives";
 import { ButtonAnchor, ButtonLink, WhatsAppIcon } from "@/components/s2b/button";
+import {
+  BigActionAnchor,
+  BigActionLink,
+  IconBox,
+  IconCamera,
+  IconPhone,
+  IconSearch,
+  IconTruck,
+} from "@/components/s2b/big-action";
 import { ProductCard } from "@/components/s2b/product-card";
 import { featuredProducts } from "@/lib/products/mock-provider";
 import { origins, services, siteConfig, trustStats } from "@/config/site";
@@ -35,6 +44,8 @@ function HomePage() {
   return (
     <>
       <Hero />
+      <BigChoices />
+      <SimpleSteps />
       <TrustStrip />
       <OriginRail />
       <FeaturedCatalogue products={products} />
@@ -49,39 +60,19 @@ function Hero() {
   return (
     <section className="relative overflow-hidden">
       <div className="grid-lines pointer-events-none absolute inset-0 opacity-60" aria-hidden />
-      <Container className="relative grid gap-12 pb-20 pt-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-24 lg:pt-20">
+      <Container className="relative grid gap-10 pb-14 pt-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-20 lg:pt-16">
         <div className="reveal">
-          <Eyebrow>China · Amazon · Global</Eyebrow>
-          <h1 className="mt-5 text-[2.5rem] font-extrabold leading-[1.02] sm:text-5xl lg:text-6xl">
-            Source anything.
+          <h1 className="font-bn text-[2.2rem] font-extrabold leading-[1.15] sm:text-[2.9rem]">
+            চীন থেকে পণ্য আনুন,
             <br />
-            Land it in{" "}
-            <span className="relative whitespace-nowrap text-accent">
-              Bangladesh
-              <span className="absolute inset-x-0 -bottom-1 h-[3px] rounded-full bg-accent/40" aria-hidden />
-            </span>
-            .
+            <span className="text-accent">বাসায় পৌঁছে দেব</span>
           </h1>
-          <p className="font-bn mt-4 text-lg text-muted-foreground">{siteConfig.taglineBn}</p>
-          <p className="mt-5 max-w-[52ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
-            One desk buys it, consolidates the cartons and lands them in Dhaka or Chattogram. One
-            price, one person on WhatsApp.
+          <p className="mt-3 text-lg font-semibold text-muted-foreground">
+            Buy from China, Amazon or any shop. We deliver to your door in Bangladesh.
           </p>
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink to="/sourcing" size="lg">
-              Start sourcing
-            </ButtonLink>
-            <ButtonAnchor
-              href={generalInquiry()}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="glass"
-              size="lg"
-            >
-              <WhatsAppIcon /> WhatsApp {siteConfig.phoneDisplay}
-            </ButtonAnchor>
-          </div>
+          <p className="font-bn mt-4 text-base leading-relaxed text-muted-foreground">
+            কোনো ইংরেজি জানার দরকার নেই। শুধু ছবি বা লিংক পাঠান, আমরা দাম বলে দেব।
+          </p>
         </div>
 
         <figure className="relative overflow-hidden rounded-[18px] border border-foreground/8 shadow-[var(--shadow-3)]">
@@ -95,6 +86,86 @@ function Hero() {
         </figure>
       </Container>
     </section>
+  );
+}
+
+/**
+ * The first real screen decision. Three picture buttons, Bangla first,
+ * so a user who cannot read English still knows where to tap.
+ */
+function BigChoices() {
+  return (
+    <Container className="pb-4">
+      <p className="font-bn text-center text-xl font-bold">আপনি কী করতে চান?</p>
+      <p className="mt-1 text-center text-sm text-muted-foreground">What do you want to do?</p>
+      <div className="mt-6 grid gap-3 lg:grid-cols-3">
+        <BigActionLink
+          to="/sourcing"
+          tone="accent"
+          icon={<IconSearch />}
+          bn="পণ্য খুঁজুন"
+          en="Search for a product"
+        />
+        <BigActionAnchor
+          href={generalInquiry("I want to send a product photo")}
+          target="_blank"
+          rel="noopener noreferrer"
+          tone="ink"
+          icon={<IconCamera />}
+          bn="ছবি পাঠান"
+          en="Send a photo on WhatsApp"
+        />
+        <BigActionAnchor
+          href={`tel:${siteConfig.phoneTel}`}
+          icon={<IconPhone />}
+          bn="ফোন করুন"
+          en={`Call ${siteConfig.phoneDisplay}`}
+        />
+      </div>
+    </Container>
+  );
+}
+
+const simpleSteps = [
+  {
+    bn: "১. ছবি বা লিংক পাঠান",
+    en: "Send a photo or a link",
+    icon: <IconCamera className="h-9 w-9" />,
+  },
+  {
+    bn: "২. আমরা দাম বলব",
+    en: "We tell you the full price",
+    icon: <IconBox className="h-9 w-9" />,
+  },
+  {
+    bn: "৩. বাসায় ডেলিভারি",
+    en: "We deliver to your door",
+    icon: <IconTruck className="h-9 w-9" />,
+  },
+];
+
+function SimpleSteps() {
+  return (
+    <Section className="py-12 sm:py-14">
+      <Container>
+        <ol className="grid gap-3 sm:grid-cols-3">
+          {simpleSteps.map((s) => (
+            <li key={s.en} className="panel matte flex items-center gap-4 rounded-[18px] p-5">
+              <span
+                aria-hidden
+                className="grid h-14 w-14 shrink-0 place-items-center rounded-[14px] bg-accent/12 text-accent"
+              >
+                {s.icon}
+              </span>
+              <span className="min-w-0">
+                <span className="font-bn block text-lg font-bold leading-tight">{s.bn}</span>
+                <span className="mt-1 block text-sm text-muted-foreground">{s.en}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </Container>
+    </Section>
   );
 }
 
