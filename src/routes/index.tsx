@@ -1,267 +1,270 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  Plane,
-  Ship,
-  Package,
-  Warehouse,
-  ShoppingBag,
-  Briefcase,
-  MessageCircle,
-  ArrowRight,
-  ShieldCheck,
-  Clock,
-  MapPin,
-} from "lucide-react";
-import { Container, Section, SectionHeading, Badge, Card } from "@/components/s2b/primitives";
-import { ExternalButton, LinkButton } from "@/components/s2b/button";
+import { Container, Section, SectionHeading, Badge, Card, Stat, Eyebrow } from "@/components/s2b/primitives";
+import { ButtonAnchor, ButtonLink, WhatsAppIcon } from "@/components/s2b/button";
 import { ProductCard } from "@/components/s2b/product-card";
-import { siteConfig, services, type ServiceKey } from "@/config/site";
-import { generalInquiry } from "@/lib/whatsapp";
 import { featuredProducts } from "@/lib/products/mock-provider";
+import { origins, services, siteConfig, trustStats } from "@/config/site";
+import { generalInquiry } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TWT International — China to Bangladesh cargo & sourcing" },
+      { title: "Source2BD, source from anywhere and land it in Bangladesh" },
       {
         name: "description",
         content:
-          "Air, sea, courier and hand carry cargo from China to Bangladesh, plus 1688 and Alibaba buying agent support. WhatsApp quotes from our Chawkbazar desk.",
+          "Source2BD sources from 1688, Alibaba, Amazon and any global store, then moves it to Dhaka and Chattogram by air, sea, courier or hand carry. WhatsApp quotes same day.",
       },
-      {
-        property: "og:title",
-        content: "TWT International — China to Bangladesh cargo & sourcing",
-      },
+      { property: "og:title", content: "Source2BD, global sourcing and Bangladesh cargo" },
       {
         property: "og:description",
-        content:
-          "Freight, consolidation and sourcing from Guangzhou, Yiwu and Shenzhen to Dhaka and Chattogram.",
+        content: "One desk for sourcing and freight into Bangladesh. Quotes on WhatsApp, same working day.",
       },
-      { property: "og:url", content: "/" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
   }),
   component: HomePage,
 });
 
-const serviceIcons: Record<ServiceKey, typeof Plane> = {
-  "hand-carry": Briefcase,
-  "air-freight": Plane,
-  "sea-freight": Ship,
-  courier: Package,
-  warehouse: Warehouse,
-  "buying-agent": ShoppingBag,
-};
-
 function HomePage() {
-  const featured = featuredProducts(8);
+  const products = featuredProducts(8);
 
   return (
     <>
-      {/* Hero */}
-      <div className="relative overflow-hidden bg-navy text-white">
-        <div className="grid-lines absolute inset-0 opacity-60" aria-hidden />
-        <Container className="relative py-20 sm:py-28">
-          <div className="max-w-3xl">
-            <Badge tone="outline">
-              <span className="size-1.5 rounded-full bg-green" /> Guangzhou · Yiwu · Shenzhen →
-              Dhaka · Chattogram
-            </Badge>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.03] sm:text-6xl">
-              China to Bangladesh cargo, handled end to end.
-            </h1>
-            <p className="font-bn mt-4 text-lg text-white/70">
-              চীন থেকে বাংলাদেশ · কার্গো ও সোর্সিং
-            </p>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/75">
-              Air, sea, courier and hand carry lanes plus a real buying agent for 1688 and Alibaba.
-              You send the link or the carton list — we come back on WhatsApp with a straight
-              answer on mode, timing and what documents you need.
-            </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ExternalButton href={generalInquiry()} size="lg">
-                <MessageCircle className="size-5" /> WhatsApp {siteConfig.phoneDisplay}
-              </ExternalButton>
-              <LinkButton to="/sourcing" variant="white" size="lg">
-                Try the sourcing tool <ArrowRight className="size-4" />
-              </LinkButton>
-            </div>
-            <div className="mt-10 grid gap-4 text-sm text-white/65 sm:grid-cols-3">
-              <p className="flex items-center gap-2">
-                <ShieldCheck className="size-4 text-green" /> Legal goods only, always
-              </p>
-              <p className="flex items-center gap-2">
-                <Clock className="size-4 text-green" /> {siteConfig.hours}
-              </p>
-              <p className="flex items-center gap-2">
-                <MapPin className="size-4 text-green" /> {siteConfig.office}
-              </p>
-            </div>
-          </div>
-        </Container>
-      </div>
-
-      {/* Services */}
-      <Section>
-        <Container>
-          <SectionHeading
-            eyebrow="What we move"
-            title="Six lanes, one WhatsApp thread"
-            titleBn="ছয়টি সার্ভিস · এক জায়গায়"
-            intro="Pick the mode that matches your cargo. Not sure? Send weight and carton size and we'll tell you which lane is actually cheaper."
-          />
-          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {services.map((service) => {
-              const Icon = serviceIcons[service.key];
-              return (
-                <Card key={service.key} className="lift flex flex-col p-6">
-                  <span className="inline-flex size-11 items-center justify-center rounded-xl bg-navy/5 text-navy">
-                    <Icon className="size-5" />
-                  </span>
-                  <h3 className="mt-5 text-lg font-bold text-navy">{service.title}</h3>
-                  <p className="font-bn text-sm text-steel">{service.titleBn}</p>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-steel">{service.short}</p>
-                  <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-green">
-                    {service.eta}
-                  </p>
-                  <Link
-                    to="/services"
-                    hash={service.key}
-                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-navy hover:text-green"
-                  >
-                    Details <ArrowRight className="size-4" />
-                  </Link>
-                </Card>
-              );
-            })}
-          </div>
-        </Container>
-      </Section>
-
-      {/* Sourcing teaser */}
-      <Section tone="charcoal">
-        <Container className="grid items-center gap-12 lg:grid-cols-2">
-          <div>
-            <SectionHeading
-              invert
-              eyebrow="Buying agent"
-              title="Found it on 1688 but can't read the page?"
-              titleBn="লিংক পাঠান · আমরা বাকিটা দেখছি"
-              intro="Paste the link into our sourcing tool. We read the Chinese listing, confirm MOQ and tier pricing with the supplier, and reply with a realistic Bangladesh-landed path — freight mode, rough timing and the documents you'll need."
-            />
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <LinkButton to="/sourcing" size="lg">
-                Open sourcing tool
-              </LinkButton>
-              <ExternalButton href={generalInquiry()} variant="outline" size="lg">
-                <MessageCircle className="size-5" /> Send a link on WhatsApp
-              </ExternalButton>
-            </div>
-          </div>
-          <ul className="space-y-4">
-            {[
-              "Search by English keyword — we handle the Chinese side",
-              "Paste any 1688 or Alibaba product URL",
-              "MOQ and quantity tiers confirmed with the supplier",
-              "Consolidate five suppliers into one freight bill",
-            ].map((line) => (
-              <li
-                key={line}
-                className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-white/80"
-              >
-                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-green" />
-                {line}
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </Section>
-
-      {/* Featured products */}
-      <Section tone="muted">
-        <Container>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <SectionHeading
-              eyebrow="Demo catalogue"
-              title="Products people ask us about"
-              intro="Sample listings from the Chinese wholesale market. Prices are marketplace CNY only — your BD figure comes after we price the freight."
-            />
-            <LinkButton to="/sourcing" variant="outline">
-              Browse all <ArrowRight className="size-4" />
-            </LinkButton>
-          </div>
-          <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {featured.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </Container>
-      </Section>
-
-      {/* How it works */}
-      <Section>
-        <Container>
-          <SectionHeading
-            eyebrow="How it works"
-            title="Four steps, no guesswork"
-            titleBn="চারটি ধাপ"
-          />
-          <ol className="mt-12 grid gap-6 md:grid-cols-4">
-            {[
-              {
-                t: "Send the details",
-                d: "Link, photo or carton list on WhatsApp. Quantity and delivery city help us answer faster.",
-              },
-              {
-                t: "We quote the path",
-                d: "Mode, rough transit window, what documents apply. No hidden line items sprung later.",
-              },
-              {
-                t: "Buy & consolidate",
-                d: "Goods land at our China warehouse. We check counts, repack and combine suppliers.",
-              },
-              {
-                t: "Delivered in BD",
-                d: "Clearance handled, then delivery to your Dhaka or Chattogram address.",
-              },
-            ].map((step, i) => (
-              <li key={step.t} className="border-t-2 border-green pt-5">
-                <span className="font-display text-sm font-bold text-green">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="mt-2 text-lg font-bold text-navy">{step.t}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-steel">{step.d}</p>
-              </li>
-            ))}
-          </ol>
-          <div className="mt-10">
-            <LinkButton to="/how-it-works" variant="outline">
-              Read the full process <ArrowRight className="size-4" />
-            </LinkButton>
-          </div>
-        </Container>
-      </Section>
-
-      {/* CTA */}
-      <Section tone="navy" className="py-20">
-        <Container className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
-          <div>
-            <h2 className="text-3xl font-bold sm:text-4xl">Tell us what you're shipping.</h2>
-            <p className="font-bn mt-2 text-white/70">আজই মেসেজ দিন</p>
-            <p className="mt-3 max-w-xl text-white/70">
-              {siteConfig.office} · {siteConfig.hours}. We only handle legal, permitted goods.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <ExternalButton href={generalInquiry()} size="lg">
-              <MessageCircle className="size-5" /> WhatsApp us
-            </ExternalButton>
-            <LinkButton to="/quote" variant="white" size="lg">
-              Request a quote
-            </LinkButton>
-          </div>
-        </Container>
-      </Section>
+      <Hero />
+      <OriginRail />
+      <FeaturedCatalogue products={products} />
+      <ServiceGrid />
+      <Process />
+      <ClosingCta />
     </>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="relative overflow-hidden">
+      <div className="grid-lines pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+      <Container className="relative grid gap-14 pb-20 pt-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:pb-28 lg:pt-24">
+        <div className="reveal">
+          <Eyebrow>China · Amazon · Global</Eyebrow>
+          <h1 className="mt-5 text-[2.6rem] font-extrabold leading-[0.98] sm:text-6xl lg:text-[4.1rem]">
+            Source anything.
+            <br />
+            Land it in{" "}
+            <span className="relative whitespace-nowrap text-accent">
+              Bangladesh
+              <span className="absolute inset-x-0 -bottom-1 h-[3px] rounded-full bg-signal" aria-hidden />
+            </span>
+            .
+          </h1>
+          <p className="font-bn mt-4 text-lg text-muted-foreground">{siteConfig.taglineBn}</p>
+          <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
+            One desk handles the whole line: finding the supplier, checking the listing, buying it,
+            consolidating cartons and moving them into Dhaka or Chattogram. You get one price and
+            one person answering on WhatsApp.
+          </p>
+
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <ButtonLink to="/sourcing" size="lg">
+              Start sourcing
+            </ButtonLink>
+            <ButtonAnchor
+              href={generalInquiry()}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="glass"
+              size="lg"
+            >
+              <WhatsAppIcon /> WhatsApp {siteConfig.phoneDisplay}
+            </ButtonAnchor>
+          </div>
+
+          <p className="mt-5 text-xs text-muted-foreground">{siteConfig.policy}</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          {trustStats.map((s) => (
+            <Stat key={s.label} value={s.value} label={s.label} sub={s.sub} />
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function OriginRail() {
+  return (
+    <Section className="pt-6">
+      <Container>
+        <SectionHeading
+          eyebrow="Multi origin"
+          title="Three origins, one landed price"
+          titleBn="তিনটি উৎস · একটাই ল্যান্ডেড প্রাইস"
+          intro="Most agents in Dhaka only handle China. We quote the same order across China factory pricing, Amazon retail and any global store, then tell you which one actually lands cheaper."
+        />
+        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+          {origins.map((o) => (
+            <Card key={o.key} className="lift flex flex-col p-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold">{o.label}</h3>
+                <Badge tone="green">{o.marketplaces}</Badge>
+              </div>
+              <p className="font-bn mt-1 text-sm text-muted-foreground">{o.labelBn}</p>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{o.blurb}</p>
+              <dl className="mt-6 grid grid-cols-2 gap-4 border-t border-border pt-4 text-xs">
+                <div>
+                  <dt className="text-muted-foreground">Lanes</dt>
+                  <dd className="mt-1 font-semibold">{o.lanes}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Transit</dt>
+                  <dd className="mt-1 font-semibold">{o.eta}</dd>
+                </div>
+              </dl>
+            </Card>
+          ))}
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+function FeaturedCatalogue({ products }: { products: ReturnType<typeof featuredProducts> }) {
+  return (
+    <Section className="pt-0">
+      <Container>
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <SectionHeading
+            eyebrow="Demo catalogue"
+            title="What a quote looks like before you send it"
+            intro="These are demo listings running on zero API cost. Every card deep links into a prefilled WhatsApp message so nothing gets retyped."
+          />
+          <ButtonLink to="/sourcing" variant="glass">
+            Open the sourcing desk
+          </ButtonLink>
+        </div>
+        <div className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {products.map((p) => (
+            <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
+          ))}
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+function ServiceGrid() {
+  return (
+    <Section className="pt-0">
+      <Container>
+        <SectionHeading
+          eyebrow="Services"
+          title="Pick the lane that fits the order"
+          titleBn="আপনার অর্ডারের জন্য সঠিক লেন"
+        />
+        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {services.map((s) => (
+            <Link
+              key={s.key}
+              to="/services"
+              hash={s.key}
+              className="glass matte lift flex flex-col rounded-[15px] p-6"
+            >
+              <h3 className="text-lg font-bold">{s.title}</h3>
+              <p className="font-bn mt-1 text-sm text-muted-foreground">{s.titleBn}</p>
+              <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                {s.short}
+              </p>
+              <span className="mt-6 text-xs font-semibold uppercase tracking-wider text-accent">
+                {s.eta}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+const steps = [
+  {
+    n: "01",
+    title: "Send the link, keyword or photo",
+    body: "Anything you have. A 1688 offer page, an Amazon ASIN, a screenshot from a competitor, or just a description.",
+  },
+  {
+    n: "02",
+    title: "We verify and price it",
+    body: "We read the original listing, confirm MOQ and tier pricing with the supplier, and pick the lane that lands cheapest for your quantity.",
+  },
+  {
+    n: "03",
+    title: "You approve, we buy",
+    body: "Payment to the supplier, receiving at our China or US address, count check and photos before anything moves.",
+  },
+  {
+    n: "04",
+    title: "Consolidate and ship",
+    body: "Cartons from several suppliers become one shipment. Air, sea, courier or hand carry, with tracking updates on WhatsApp.",
+  },
+  {
+    n: "05",
+    title: "Delivered in Bangladesh",
+    body: "Clearance handled, then delivery to your door in Dhaka or Chattogram, or pickup at our Chawkbazar office.",
+  },
+];
+
+function Process() {
+  return (
+    <Section className="pt-0">
+      <Container>
+        <SectionHeading eyebrow="How it works" title="Five steps, no black box" titleBn="পাঁচ ধাপ · সম্পূর্ণ স্বচ্ছ" />
+        <ol className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+          {steps.map((s) => (
+            <li key={s.n} className="glass matte rounded-[15px] p-5">
+              <span className="tnum text-xs font-bold tracking-widest text-signal">{s.n}</span>
+              <h3 className="mt-3 text-base font-bold leading-snug">{s.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+            </li>
+          ))}
+        </ol>
+      </Container>
+    </Section>
+  );
+}
+
+function ClosingCta() {
+  return (
+    <Section className="pt-0">
+      <Container>
+        <Card className="relative overflow-hidden p-8 sm:p-14">
+          <div className="grid-lines pointer-events-none absolute inset-0 opacity-50" aria-hidden />
+          <div className="relative max-w-2xl">
+            <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">
+              Send us one product today and see the difference in the quote.
+            </h2>
+            <p className="font-bn mt-3 text-base text-muted-foreground">
+              আজই একটি পণ্য পাঠান, কোট দেখে সিদ্ধান্ত নিন।
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <ButtonAnchor
+                href={generalInquiry()}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="green"
+                size="lg"
+              >
+                <WhatsAppIcon /> WhatsApp the desk
+              </ButtonAnchor>
+              <ButtonLink to="/quote" variant="glass" size="lg">
+                Fill the quote form
+              </ButtonLink>
+            </div>
+          </div>
+        </Card>
+      </Container>
+    </Section>
   );
 }

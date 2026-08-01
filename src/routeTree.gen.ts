@@ -24,6 +24,7 @@ import { Route as ApiProductsByImageRouteImport } from './routes/api/products/by
 import { Route as ApiProductsByUrlRouteImport } from './routes/api/products/by-url'
 import { Route as ApiProductsDetailRouteImport } from './routes/api/products/detail'
 import { Route as ApiProductsSearchRouteImport } from './routes/api/products/search'
+import { Route as ProductMarketplaceIdRouteImport } from './routes/product.$marketplace.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -100,6 +101,11 @@ const ApiProductsSearchRoute = ApiProductsSearchRouteImport.update({
   path: '/api/products/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductMarketplaceIdRoute = ProductMarketplaceIdRouteImport.update({
+  id: '/product/$marketplace/$id',
+  path: '/product/$marketplace/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
+  '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
+  '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
+  '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
+    | '/product/$marketplace/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
+    | '/product/$marketplace/$id'
   id:
     | '__root__'
     | '/'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
+    | '/product/$marketplace/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -223,6 +235,7 @@ export interface RootRouteChildren {
   ApiProductsByUrlRoute: typeof ApiProductsByUrlRoute
   ApiProductsDetailRoute: typeof ApiProductsDetailRoute
   ApiProductsSearchRoute: typeof ApiProductsSearchRoute
+  ProductMarketplaceIdRoute: typeof ProductMarketplaceIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -332,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiProductsSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/product/$marketplace/$id': {
+      id: '/product/$marketplace/$id'
+      path: '/product/$marketplace/$id'
+      fullPath: '/product/$marketplace/$id'
+      preLoaderRoute: typeof ProductMarketplaceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -351,6 +371,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductsByUrlRoute: ApiProductsByUrlRoute,
   ApiProductsDetailRoute: ApiProductsDetailRoute,
   ApiProductsSearchRoute: ApiProductsSearchRoute,
+  ProductMarketplaceIdRoute: ProductMarketplaceIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
