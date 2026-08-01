@@ -6,13 +6,65 @@
 import type { ProductDetail } from "./types";
 
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "openai/gpt-5.6-sol";
+/** Cheapest model that handles short e-commerce strings well. */
+const MODEL = "openai/gpt-5.4-nano";
 
 const memo = new Map<string, string>();
+const queryMemo = new Map<string, string>();
 const CJK = /[\u3400-\u9fff\uf900-\ufaff\u3000-\u303f\uff00-\uffef]/;
 
 export function hasChinese(v: string | undefined): v is string {
   return typeof v === "string" && CJK.test(v);
+}
+
+/**
+ * Turns an English or Banglish keyword into the Chinese search phrase a 1688
+ * seller would actually use. Without this, "red light" comes back as plain
+ * lamps because the marketplace matches loose romanised text.
+ */
+export async function translateQuery(query: string): Promise<string> {
+  const q: string = query.trim();
+  if (!q || CJK.test(q)) return q;
+  const cached = queryMemo.get(q.toLowerCase());
+  if (cached) return cached;
+
+  const key = process.env["LOVABLE_API_KEY"];
+  if (!key) return q;
+
+  try {
+    const res = await fetch(GATEWAY, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          {
+            role: "system",
+            content:
+              'Translate the shopper keyword into the Simplified Chinese search phrase used on 1688 or Taobao. Keep every qualifier such as colour, size and material. Reply only with JSON {"q":"..."} and nothing else.',
+          },
+          { role: "user", content: q },
+        ],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 60,
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) {
+      console.error(`query translate failed [${res.status}]`);
+      return q;
+    }
+    const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+    const out = (JSON.parse(json.choices?.[0]?.message?.content ?? "{}") as { q?: unknown }).q;
+    if (typeof out === "string" && out.trim()) {
+      const value = out.trim().slice(0, 60);
+      queryMemo.set(q.toLowerCase(), value);
+      return value;
+    }
+  } catch (err) {
+    console.error("query translate error", err);
+  }
+  return q;
 }
 
 /** Translates one chunk and writes the results into the memo. */
@@ -64,9 +116,9 @@ export async function translateBatch(inputs: string[]): Promise<string[]> {
   const pending = [...new Set(inputs.filter((s) => hasChinese(s) && !memo.has(s)))];
   if (!key || pending.length === 0) return inputs.map((s) => memo.get(s) ?? s);
 
-  // Small chunks in parallel: one long list often trips the model into a
-  // short or truncated array, which loses the whole page of translations.
-  const CHUNK = 8;
+  // Chunked in parallel: one long list trips the model into a short array,
+  // but bigger chunks mean fewer billed requests per page of results.
+  const CHUNK = 16;
   const chunks: string[][] = [];
   for (let i = 0; i < pending.length; i += CHUNK) chunks.push(pending.slice(i, i + CHUNK));
   await Promise.all(chunks.map((c) => translateChunk(key, c)));

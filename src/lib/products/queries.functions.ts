@@ -9,7 +9,7 @@ export const searchProducts = createServerFn({ method: "GET" })
     z
       .object({
         q: z.string().trim().max(120).default(""),
-        marketplace: marketplaceSchema.default("global"),
+        marketplace: marketplaceSchema.default("1688"),
         page: z.number().int().min(1).max(50).default(1),
       })
       .parse(d),

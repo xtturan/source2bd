@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site";
+import { bdtLabel } from "@/lib/products/pricing";
 
 const MAX = 1200;
 
@@ -55,12 +56,7 @@ export function productQuote(input: {
   marketplace?: string | undefined;
 }) {
   const cur = input.currency ?? "CNY";
-  const price =
-    input.priceMin != null
-      ? input.priceMax != null && input.priceMax !== input.priceMin
-        ? `${cur} ${input.priceMin} to ${input.priceMax}`
-        : `${cur} ${input.priceMin}`
-      : "Not listed";
+  const price = bdtLabel(input.priceMin, input.priceMax, cur, "Not listed");
 
   return waLink(
     [

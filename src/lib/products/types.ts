@@ -55,8 +55,11 @@ export interface ProductProvider {
 
 export const PAGE_SIZE = 24;
 
-/** Origins fanned out in parallel when the shopper picks "All origins". */
-export const FANOUT_ORIGINS: Marketplace[] = ["1688", "alibaba", "aliexpress", "amazon"];
+/**
+ * Origins fanned out in parallel when the shopper picks "All origins".
+ * Amazon is off: it burns credit fast and rarely fits the cargo use case.
+ */
+export const FANOUT_ORIGINS: Marketplace[] = ["1688", "alibaba", "aliexpress"];
 
 export function isMarketplace(v: string): v is Marketplace {
   return (
