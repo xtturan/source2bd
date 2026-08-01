@@ -251,65 +251,117 @@ function toSummary(d: ProductDetail): ProductSummary {
   return rest;
 }
 
-/* ---------- generic mapper for alibaba / aliexpress / amazon actors ---------- */
+/* ---------- per marketplace mappers ---------- */
 
-function pick(raw: Raw, keys: string[]) {
-  for (const k of keys) {
-    const v = str(raw[k]);
-    if (v) return v;
-  }
-  return undefined;
+/** Pulls the numbers out of strings such as "$0.72-1.56" or "US $6.57". */
+function priceRange(raw: string | undefined) {
+  if (!raw) return {};
+  const nums = raw
+    .replace(/,/g, "")
+    .match(/\d+(?:\.\d+)?/g)
+    ?.map(Number)
+    .filter((n) => Number.isFinite(n) && n > 0);
+  if (!nums?.length) return {};
+  const lo = Math.min(...nums);
+  const hi = Math.max(...nums);
+  return { priceMin: lo, priceMax: hi > lo ? hi : undefined };
 }
-function pickNum(raw: Raw, keys: string[]) {
-  for (const k of keys) {
-    const v = num(raw[k]);
-    if (v) return v;
-  }
-  return undefined;
-}
 
-function mapGeneric(raw: Raw, marketplace: Marketplace): ProductDetail | null {
-  const title = pick(raw, ["title", "name", "productTitle", "product_title", "original_title"]);
-  const productUrl = pick(raw, ["url", "productUrl", "product_url", "detailUrl", "link"]);
-  const id =
-    pick(raw, ["id", "productId", "product_id", "asin", "offerId", "itemId"]) ??
-    (productUrl ? /(\d{6,}|[A-Z0-9]{10})/.exec(productUrl)?.[1] : undefined);
-  if (!title || !productUrl || !id) return null;
+/** zen-studio~alibaba-scraper: rows arrive wrapped in a `product` object. */
+function mapAlibaba(row: Raw): ProductDetail | null {
+  const raw = obj(row["product"]);
+  const id = str(raw["productId"]);
+  const title = str(raw["title"]);
+  const productUrl = str(raw["url"]);
+  if (!id || !title || !productUrl) return null;
 
-  const images = strList(raw["images"]);
-  const imageUrl =
-    pick(raw, ["image", "imageUrl", "image_url", "thumbnail", "mainImage"]) ?? images[0];
-  const lo = pickNum(raw, ["priceMin", "price_min", "price", "minPrice", "currentPrice"]);
-  const hi = pickNum(raw, ["priceMax", "price_max", "maxPrice", "originalPrice"]);
+  const images = [...new Set(strList(raw["images"]))];
+  const scores = obj(raw["scores"]);
+  const moqText = str(raw["moq"]);
 
   return {
     id,
-    marketplace,
+    marketplace: "alibaba",
     title,
-    priceMin: lo && hi ? Math.min(lo, hi) : (lo ?? hi),
-    priceMax: lo && hi ? Math.max(lo, hi) : undefined,
-    currency: marketplace === "1688" ? "CNY" : "USD",
-    moq: pickNum(raw, ["moq", "minOrderQuantity", "min_order_quantity"]),
-    imageUrl,
-    shopName: pick(raw, ["shopName", "shop_name", "seller", "sellerName", "supplier", "brand"]),
-    city: pick(raw, ["country", "location", "city"]),
+    ...priceRange(str(raw["price"])),
+    currency: "USD",
+    moq: moqText ? num(moqText.replace(/[^\d.]/g, " ").trim().split(/\s+/)[0]) : undefined,
+    imageUrl: images[0],
+    city: str(raw["supplierCountry"]),
     productUrl,
-    ordersHint: pick(raw, ["soldDisplay", "orders", "sold", "reviewsCount"]),
-    images: images.length ? images : imageUrl ? [imageUrl] : [],
-    description: pick(raw, ["description", "descriptionText"]),
+    ordersHint: str(scores["reviewCount"]) ? `${str(scores["reviewCount"])} reviews` : undefined,
+    images,
+    attributes: moqText ? [{ label: "Min. order", value: moqText }] : undefined,
   };
 }
 
-function inputFor(marketplace: Marketplace, query: string, page: number, limit: number): unknown {
+/** devcake~aliexpress-products-scraper */
+function mapAliExpress(raw: Raw): ProductDetail | null {
+  const id = str(raw["productId"]);
+  const title = str(raw["title"]);
+  const productUrl = str(raw["productUrl"]);
+  if (!id || !title || !productUrl) return null;
+  const image = str(raw["imageUrl"]);
+  const lo = num(raw["priceCurrentMin"]);
+  const hi = num(raw["priceCurrentMax"]);
+
+  return {
+    id,
+    marketplace: "aliexpress",
+    title,
+    priceMin: lo ?? hi,
+    priceMax: hi && lo && hi > lo ? hi : undefined,
+    currency: "USD",
+    imageUrl: image,
+    productUrl,
+    ordersHint: str(raw["soldDescription"]),
+    images: image ? [image] : [],
+  };
+}
+
+/** powerai~amazon-product-search-scraper */
+function mapAmazon(raw: Raw): ProductDetail | null {
+  const id = str(raw["asin"]);
+  const title = str(raw["product_title"])?.replace(/&quot;/g, '"');
+  const productUrl = str(raw["product_url"]);
+  if (!id || !title || !productUrl) return null;
+  const image = str(raw["product_photo"]);
+
+  return {
+    id,
+    marketplace: "amazon",
+    title,
+    ...priceRange(str(raw["product_price"])),
+    currency: "USD",
+    moq: 1,
+    imageUrl: image,
+    productUrl,
+    ordersHint: str(raw["sales_volume"]),
+    images: image ? [image] : [],
+  };
+}
+
+function mapperFor(marketplace: Marketplace): (raw: Raw) => ProductDetail | null {
   switch (marketplace) {
-    case "1688":
-      return { keywords: [query], maxResults: limit };
     case "alibaba":
-      return { keywords: [query], maxResults: limit, page };
+      return mapAlibaba;
     case "aliexpress":
-      return { keyword: query, search: query, maxItems: limit, page };
+      return mapAliExpress;
     case "amazon":
-      return { keywords: [query], keyword: query, maxItems: limit, maxResults: limit, page };
+      return mapAmazon;
+    default:
+      return map1688;
+  }
+}
+
+function inputFor(marketplace: Marketplace, query: string, limit: number): unknown {
+  switch (marketplace) {
+    case "alibaba":
+      return { keywords: [query], maxResults: limit, resultType: "products" };
+    case "aliexpress":
+      return { searchQueries: [query], maxProducts: limit };
+    case "amazon":
+      return { query, maxResults: limit };
     default:
       return { keywords: [query], maxResults: limit };
   }
@@ -323,8 +375,8 @@ async function searchOne(
 ): Promise<ProductSummary[]> {
   const actor = actorFor(marketplace);
   if (!actor) return (await mockProvider.search(query, { marketplace, page })).items.slice(0, limit);
-  const raw = await runActor<Raw>(actor, inputFor(marketplace, query, page, limit), limit);
-  const map = marketplace === "1688" ? map1688 : (r: Raw) => mapGeneric(r, marketplace);
+  const raw = await runActor<Raw>(actor, inputFor(marketplace, query, limit), limit);
+  const map = mapperFor(marketplace);
   return raw
     .map(map)
     .filter((x): x is ProductDetail => !!x)
