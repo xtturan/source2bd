@@ -35,11 +35,10 @@ export const Route = createFileRoute("/sourcing")({
 });
 
 const markets: { key: Marketplace; label: string }[] = [
-  { key: "global", label: "All origins" },
   { key: "1688", label: "1688" },
+  { key: "global", label: "All origins" },
   { key: "alibaba", label: "Alibaba" },
   { key: "aliexpress", label: "AliExpress" },
-  { key: "amazon", label: "Amazon" },
 ];
 
 type Mode = "search" | "link" | "photo";
@@ -149,7 +148,7 @@ function LiveProgress({ label }: { label: string }) {
 
 function SearchPanelInner() {
   const [q, setQ] = useState("");
-  const [marketplace, setMarketplace] = useState<Marketplace>("global");
+  const [marketplace, setMarketplace] = useState<Marketplace>("1688");
   const [items, setItems] = useState<ProductSummary[] | null>(null);
   const search = useServerFn(searchProducts);
   const [listening, setListening] = useState(false);
