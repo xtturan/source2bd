@@ -1,114 +1,97 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle, Search } from "lucide-react";
-import { Container, Section, Badge, Card } from "@/components/s2b/primitives";
-import { ExternalButton, Input } from "@/components/s2b/button";
+import { useState } from "react";
+import { Container, Section, SectionHeading, Card } from "@/components/s2b/primitives";
+import { ButtonAnchor, WhatsAppIcon } from "@/components/s2b/button";
 import { trackingInquiry } from "@/lib/whatsapp";
+import { siteConfig } from "@/config/site";
 
 export const Route = createFileRoute("/track")({
   head: () => ({
     meta: [
-      { title: "Track your China to Bangladesh shipment — TWT International" },
+      { title: "Track your shipment | Source2BD" },
       {
         name: "description",
         content:
-          "Enter your TWT booking or tracking reference and we'll check the status on WhatsApp — warehouse receipt, departure, arrival and clearance.",
+          "Send your Source2BD shipment code and our desk replies with the current leg, location and expected delivery window in Bangladesh.",
       },
-      { property: "og:title", content: "Track a shipment — TWT International" },
-      {
-        property: "og:description",
-        content: "Send your reference and get a live status update from our team.",
-      },
-      { property: "og:url", content: "/track" },
+      { property: "og:title", content: "Track a Source2BD shipment" },
+      { property: "og:description", content: "Send your shipment code and get a live status from the desk." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/track" }],
   }),
   component: TrackPage,
 });
 
-const stages = [
-  { t: "Booked", d: "We've confirmed the mode, quantity and destination with you." },
-  { t: "Received in China", d: "Cartons arrived at our warehouse and counts were checked." },
-  { t: "Consolidated & departed", d: "Repacked, loaded and on the agreed air or sea lane." },
-  { t: "Arrived in Bangladesh", d: "Landed at DAC or Chattogram, awaiting clearance." },
-  { t: "Cleared & delivering", d: "Customs done, moving to your address or office pickup." },
+const legs = [
+  { label: "Supplier pickup", body: "Goods collected and received at our origin warehouse." },
+  { label: "Consolidation", body: "Counted, repacked and merged with your other cartons." },
+  { label: "In transit", body: "Booked on the air, sea or courier lane with a reference number." },
+  { label: "Customs", body: "Documentation submitted, duty assessed and settled." },
+  { label: "Last mile", body: "Out for delivery in Dhaka or Chattogram, or ready for pickup." },
 ];
 
 function TrackPage() {
-  const [ref, setRef] = useState("");
-  const clean = ref.trim().slice(0, 40);
+  const [code, setCode] = useState("");
 
   return (
-    <>
-      <div className="grid-lines bg-navy py-14 text-white">
-        <Container>
-          <Badge tone="outline">Tracking</Badge>
-          <h1 className="mt-4 max-w-2xl text-4xl font-bold leading-[1.05] sm:text-5xl">
-            Where is my cargo right now?
-          </h1>
-          <p className="font-bn mt-3 text-white/70">শিপমেন্ট ট্র্যাক করুন</p>
-        </Container>
-      </div>
+    <Section>
+      <Container className="grid gap-12 lg:grid-cols-[1fr_0.9fr]">
+        <div>
+          <SectionHeading
+            eyebrow="Tracking"
+            title="Shipment updates come from a person, not a dead portal"
+            titleBn="শিপমেন্ট আপডেট জানুন"
+            intro="We do not pretend to run a live carrier API. Send the code and the person handling your cargo answers with where it actually is."
+          />
 
-      <Section>
-        <Container className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <div>
-            <p className="text-[15px] leading-relaxed text-steel">
-              We don't run an automated portal — a real person checks your consignment against the
-              warehouse and carrier records. Send your reference and we'll reply with the current
-              stage and what happens next.
-            </p>
-            <form
-              className="mt-6 flex flex-col gap-3 sm:flex-row"
-              onSubmit={(e) => {
-                e.preventDefault();
-                window.open(trackingInquiry(clean), "_blank", "noopener,noreferrer");
-              }}
+          <form className="mt-10 flex flex-col gap-3 sm:flex-row" onSubmit={(e) => e.preventDefault()}>
+            <label htmlFor="code" className="sr-only">
+              Shipment code
+            </label>
+            <input
+              id="code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="S2B-2026-00123"
+              className="tnum h-12 flex-1 rounded-[11px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
+            />
+            <ButtonAnchor
+              href={trackingInquiry(code || "not sure of my code")}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="green"
+              size="lg"
             >
-              <Input
-                value={ref}
-                maxLength={40}
-                onChange={(e) => setRef(e.target.value)}
-                placeholder="Booking / tracking reference"
-                aria-label="Tracking reference"
-              />
-              <button
-                type="submit"
-                className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-signal px-6 font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-signal-600"
-              >
-                <Search className="size-4" /> Check status
-              </button>
-            </form>
-            <p className="mt-3 text-xs text-steel">
-              No reference yet? Send the supplier tracking number instead — we can usually match it.
-            </p>
-            <div className="mt-6">
-              <ExternalButton href={trackingInquiry("")} variant="outline">
-                <MessageCircle className="size-4" /> Ask without a reference
-              </ExternalButton>
-            </div>
-          </div>
+              <WhatsAppIcon /> Check status
+            </ButtonAnchor>
+          </form>
 
-          <Card className="p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-steel">
-              Shipment stages
-            </h2>
-            <ol className="mt-5 space-y-5">
-              {stages.map((s, i) => (
-                <li key={s.t} className="flex gap-4">
-                  <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-navy text-xs font-bold text-white">
-                    {i + 1}
-                  </span>
-                  <div>
-                    <p className="font-semibold text-navy">{s.t}</p>
-                    <p className="mt-1 text-sm text-steel">{s.d}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </Card>
-        </Container>
-      </Section>
-    </>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Do not have a code? Send the supplier name or the date you paid, that is usually enough.
+          </p>
+        </div>
+
+        <Card className="h-fit p-6">
+          <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">
+            The five legs we report on
+          </h2>
+          <ol className="mt-5 space-y-5">
+            {legs.map((l, i) => (
+              <li key={l.label} className="flex gap-4">
+                <span className="tnum mt-0.5 text-xs font-bold text-signal">{String(i + 1).padStart(2, "0")}</span>
+                <div>
+                  <div className="text-sm font-semibold">{l.label}</div>
+                  <p className="mt-1 text-sm text-muted-foreground">{l.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-6 border-t border-border pt-5 text-xs text-muted-foreground">
+            Desk hours {siteConfig.hours}.
+          </p>
+        </Card>
+      </Container>
+    </Section>
   );
 }
