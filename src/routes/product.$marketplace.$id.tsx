@@ -113,13 +113,11 @@ function ProductPage() {
             ) : null}
 
             <p className="tnum mt-5 text-3xl font-extrabold tracking-tight">
-              {item.priceMin != null ? `${sym}${item.priceMin}` : "Price on request"}
-              {item.priceMax != null && item.priceMax !== item.priceMin
-                ? ` to ${sym}${item.priceMax}`
-                : ""}
+              {bdtLabel(item.priceMin, item.priceMax, item.currency, "Price on request")}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Supplier price only. Freight, duty and local delivery are quoted separately.
+              Taka price of the supplier rate, sourcing service included. Freight, duty and local
+              delivery are quoted separately.
             </p>
 
             {item.priceTiers?.length ? (
