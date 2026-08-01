@@ -51,15 +51,14 @@ function SourcingPage() {
       <Section className="pb-10">
         <Container>
           <SectionHeading
-            eyebrow="Sourcing desk"
             title={
-              <>
-                Search it, paste it, or show us a photo.
+              <span className="font-bn">
+                পণ্য খুঁজুন, লিংক দিন,
                 <br />
-                We quote it landed in Bangladesh.
-              </>
+                অথবা ছবি পাঠান
+              </span>
             }
-            titleBn="পণ্য খুঁজুন, লিংক দিন, অথবা ছবি পাঠান"
+            titleBn=""
             intro="Type the product name in English or Banglish, or just press the microphone and say it."
           />
 
