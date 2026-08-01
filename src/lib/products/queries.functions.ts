@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { ProductDetail, SearchResult } from "./types";
 
-const marketplaceSchema = z.enum(["1688", "alibaba", "amazon", "global"]);
+const marketplaceSchema = z.enum(["1688", "alibaba", "aliexpress", "amazon", "global"]);
 
 export const searchProducts = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) =>

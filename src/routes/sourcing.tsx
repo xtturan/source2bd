@@ -38,6 +38,7 @@ const markets: { key: Marketplace; label: string }[] = [
   { key: "global", label: "All origins" },
   { key: "1688", label: "1688" },
   { key: "alibaba", label: "Alibaba" },
+  { key: "aliexpress", label: "AliExpress" },
   { key: "amazon", label: "Amazon" },
 ];
 

@@ -1,8 +1,9 @@
-export type Marketplace = "1688" | "alibaba" | "amazon" | "global";
+export type Marketplace = "1688" | "alibaba" | "aliexpress" | "amazon" | "global";
 
 export const marketplaceLabels: Record<Marketplace, string> = {
   "1688": "1688",
   alibaba: "Alibaba",
+  aliexpress: "AliExpress",
   amazon: "Amazon",
   global: "Global",
 };
@@ -52,10 +53,19 @@ export interface ProductProvider {
   ): Promise<{ items: ProductSummary[] }>;
 }
 
-export const PAGE_SIZE = 12;
+export const PAGE_SIZE = 24;
+
+/** Origins fanned out in parallel when the shopper picks "All origins". */
+export const FANOUT_ORIGINS: Marketplace[] = ["1688", "alibaba", "aliexpress", "amazon"];
 
 export function isMarketplace(v: string): v is Marketplace {
-  return v === "1688" || v === "alibaba" || v === "amazon" || v === "global";
+  return (
+    v === "1688" ||
+    v === "alibaba" ||
+    v === "aliexpress" ||
+    v === "amazon" ||
+    v === "global"
+  );
 }
 
 export function currencySymbol(c: "CNY" | "USD") {
