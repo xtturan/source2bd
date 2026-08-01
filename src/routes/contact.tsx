@@ -1,98 +1,89 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle, Phone, MapPin, Clock, ShieldCheck } from "lucide-react";
-import { Container, Section, Badge, Card } from "@/components/s2b/primitives";
-import { ExternalButton, LinkButton } from "@/components/s2b/button";
+import { Container, Section, SectionHeading, Card } from "@/components/s2b/primitives";
+import { ButtonAnchor, ButtonLink, WhatsAppIcon } from "@/components/s2b/button";
+import { generalInquiry, telLink } from "@/lib/whatsapp";
 import { siteConfig } from "@/config/site";
-import { generalInquiry } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact TWT International — Chawkbazar, Dhaka" },
+      { title: "Contact the Source2BD desk in Dhaka" },
       {
         name: "description",
-        content:
-          "Reach the TWT International cargo desk on WhatsApp 01752-457930 or visit our Chawkbazar office in Dhaka, open Saturday to Thursday.",
+        content: `Reach Source2BD on WhatsApp at ${siteConfig.phoneDisplay}, call the same number, or visit the Chawkbazar office in Dhaka.`,
       },
-      { property: "og:title", content: "Contact TWT International" },
-      {
-        property: "og:description",
-        content: "WhatsApp 01752-457930 or visit our Chawkbazar office in Dhaka.",
-      },
-      { property: "og:url", content: "/contact" },
+      { property: "og:title", content: "Contact Source2BD" },
+      { property: "og:description", content: "WhatsApp, phone and our Chawkbazar office in Dhaka." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/contact" }],
   }),
   component: ContactPage,
 });
 
 function ContactPage() {
   return (
-    <>
-      <div className="grid-lines bg-navy py-14 text-white">
-        <Container>
-          <Badge tone="outline">Contact</Badge>
-          <h1 className="mt-4 max-w-2xl text-4xl font-bold leading-[1.05] sm:text-5xl">
-            Talk to the cargo desk.
-          </h1>
-          <p className="font-bn mt-3 text-white/70">যোগাযোগ করুন</p>
-        </Container>
-      </div>
+    <Section>
+      <Container className="grid gap-12 lg:grid-cols-[1fr_0.9fr]">
+        <div>
+          <SectionHeading
+            eyebrow="Contact"
+            title="One number, one desk, no call centre"
+            titleBn="সরাসরি যোগাযোগ করুন"
+            intro="WhatsApp is the fastest route. The same number handles quotes, order updates and complaints, so you never repeat your story to a second person."
+          />
 
-      <Section>
-        <Container className="grid gap-6 md:grid-cols-2">
-          <Card className="p-7">
-            <MessageCircle className="size-6 text-green" />
-            <h2 className="mt-4 text-xl font-bold text-navy">WhatsApp — fastest</h2>
-            <p className="mt-2 text-sm leading-relaxed text-steel">
-              Send a product link, photo or carton list. Include quantity and delivery city and
-              we'll usually reply the same working day.
-            </p>
-            <div className="mt-5">
-              <ExternalButton href={generalInquiry()}>
-                <MessageCircle className="size-4" /> {siteConfig.phoneDisplay}
-              </ExternalButton>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <ButtonAnchor href={generalInquiry()} target="_blank" rel="noopener noreferrer" variant="green" size="lg">
+              <WhatsAppIcon /> WhatsApp {siteConfig.phoneDisplay}
+            </ButtonAnchor>
+            <ButtonAnchor href={telLink} variant="glass" size="lg">
+              Call {siteConfig.phoneDisplay}
+            </ButtonAnchor>
+          </div>
+
+          <dl className="mt-12 grid gap-6 sm:grid-cols-2">
+            <div className="border-t border-border pt-4">
+              <dt className="text-xs uppercase tracking-wider text-muted-foreground">Office</dt>
+              <dd className="mt-1.5 text-sm font-medium">{siteConfig.officeLine2}</dd>
             </div>
-          </Card>
-
-          <Card className="p-7">
-            <Phone className="size-6 text-green" />
-            <h2 className="mt-4 text-xl font-bold text-navy">Call us</h2>
-            <p className="mt-2 text-sm leading-relaxed text-steel">
-              Prefer to talk it through? Ring the same number during office hours.
-            </p>
-            <a
-              href={`tel:${siteConfig.phoneTel}`}
-              className="mt-5 inline-flex h-11 items-center rounded-xl border border-navy/15 px-5 font-semibold text-navy hover:bg-white/80"
-            >
-              {siteConfig.phoneDisplay}
-            </a>
-          </Card>
-
-          <Card className="p-7">
-            <MapPin className="size-6 text-green" />
-            <h2 className="mt-4 text-xl font-bold text-navy">Office</h2>
-            <p className="mt-2 text-sm leading-relaxed text-steel">{siteConfig.officeLine2}</p>
-            <p className="mt-3 flex items-center gap-2 text-sm text-steel">
-              <Clock className="size-4 text-green" /> {siteConfig.hours}
-            </p>
-          </Card>
-
-          <Card className="p-7">
-            <ShieldCheck className="size-6 text-green" />
-            <h2 className="mt-4 text-xl font-bold text-navy">Legal goods only</h2>
-            <p className="mt-2 text-sm leading-relaxed text-steel">
-              We handle permitted, legal cargo. We do not carry restricted, prohibited or
-              counterfeit goods, and we do not under-declare shipments to reduce duty.
-            </p>
-            <div className="mt-5">
-              <LinkButton to="/faq" variant="outline">
-                Read the FAQ
-              </LinkButton>
+            <div className="border-t border-border pt-4">
+              <dt className="text-xs uppercase tracking-wider text-muted-foreground">Desk hours</dt>
+              <dd className="mt-1.5 text-sm font-medium">{siteConfig.hours}</dd>
             </div>
-          </Card>
-        </Container>
-      </Section>
-    </>
+            <div className="border-t border-border pt-4">
+              <dt className="text-xs uppercase tracking-wider text-muted-foreground">Origins covered</dt>
+              <dd className="mt-1.5 text-sm font-medium">{siteConfig.originCities.join(", ")}</dd>
+            </div>
+            <div className="border-t border-border pt-4">
+              <dt className="text-xs uppercase tracking-wider text-muted-foreground">Delivery hubs</dt>
+              <dd className="mt-1.5 text-sm font-medium">{siteConfig.destinationCities.join(", ")}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <Card className="h-fit p-6">
+          <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">
+            Make the first message count
+          </h2>
+          <ul className="mt-5 space-y-4 text-sm text-muted-foreground">
+            {[
+              "Product link, photo or clear description",
+              "Quantity you plan to order",
+              "Delivery city in Bangladesh",
+              "Any deadline you are working to",
+            ].map((t) => (
+              <li key={t} className="flex gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
+                {t}
+              </li>
+            ))}
+          </ul>
+          <ButtonLink to="/quote" variant="glass" className="mt-6 w-full">
+            Use the quote form instead
+          </ButtonLink>
+        </Card>
+      </Container>
+    </Section>
   );
 }
