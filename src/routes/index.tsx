@@ -170,7 +170,7 @@ function ServiceGrid() {
               key={s.key}
               to="/services"
               hash={s.key}
-              className="glass matte lift flex flex-col rounded-[15px] p-6"
+              className="glass matte lift flex flex-col rounded-[18px] p-6"
             >
               <h3 className="text-lg font-bold">{s.title}</h3>
               <p className="font-bn mt-1 text-sm text-muted-foreground">{s.titleBn}</p>
@@ -223,7 +223,7 @@ function Process() {
         <SectionHeading eyebrow="How it works" title="Five steps, no black box" titleBn="পাঁচ ধাপ · সম্পূর্ণ স্বচ্ছ" />
         <ol className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           {steps.map((s) => (
-            <li key={s.n} className="glass matte rounded-[15px] p-5">
+            <li key={s.n} className="glass matte rounded-[18px] p-5">
               <span className="tnum text-xs font-bold tracking-widest text-signal">{s.n}</span>
               <h3 className="mt-3 text-base font-bold leading-snug">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>

@@ -15,7 +15,7 @@ function priceLabel(p: ProductSummary) {
 
 export function ProductCard({ product }: { product: ProductSummary }) {
   return (
-    <article className="glass matte lift group flex flex-col overflow-hidden rounded-[15px]">
+    <article className="glass matte lift group flex flex-col overflow-hidden rounded-[18px]">
       <Link
         to="/product/$marketplace/$id"
         params={{ marketplace: product.marketplace, id: product.id }}
@@ -65,7 +65,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           })}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto inline-flex h-10 items-center justify-center gap-2 rounded-[11px] bg-accent text-sm font-semibold text-accent-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.28)] transition-transform duration-150 hover:-translate-y-0.5"
+          className="mt-auto inline-flex h-10 items-center justify-center gap-2 rounded-[12px] bg-accent text-sm font-semibold text-accent-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.28)] transition-transform duration-150 hover:-translate-y-0.5"
         >
           <WhatsAppIcon />
           Quote on WhatsApp

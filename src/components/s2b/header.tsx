@@ -26,7 +26,7 @@ export function Header() {
       )}
     >
       <Container className="flex h-16 items-center justify-between gap-4">
-        <Link to="/" className="rounded-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" aria-label={`${siteConfig.name} home`}>
+        <Link to="/" className="rounded-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" aria-label={`${siteConfig.name} home`}>
           <Logo />
         </Link>
 
@@ -35,7 +35,7 @@ export function Header() {
             <Link
               key={l.to}
               to={l.to}
-              className="rounded-[11px] px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/6 hover:text-foreground [&.active]:text-foreground"
+              className="rounded-[12px] px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/6 hover:text-foreground [&.active]:text-foreground"
             >
               {l.label}
             </Link>
@@ -60,7 +60,7 @@ export function Header() {
 
         <button
           type="button"
-          className="glass flex h-10 w-10 items-center justify-center rounded-[11px] lg:hidden"
+          className="glass flex h-10 w-10 items-center justify-center rounded-[12px] lg:hidden"
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((v) => !v)}
@@ -79,7 +79,7 @@ export function Header() {
                 key={l.to}
                 to={l.to}
                 onClick={() => setOpen(false)}
-                className="rounded-[11px] px-3 py-3 text-sm font-semibold text-muted-foreground hover:bg-foreground/6 hover:text-foreground"
+                className="rounded-[12px] px-3 py-3 text-sm font-semibold text-muted-foreground hover:bg-foreground/6 hover:text-foreground"
               >
                 {l.label}
               </Link>
