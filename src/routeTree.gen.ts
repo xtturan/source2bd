@@ -10,33 +10,219 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as QuoteRouteImport } from './routes/quote'
+import { Route as ServicesRouteImport } from './routes/services'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SourcingRouteImport } from './routes/sourcing'
+import { Route as TrackRouteImport } from './routes/track'
+import { Route as ApiProductsByUrlRouteImport } from './routes/api/products/by-url'
+import { Route as ApiProductsDetailRouteImport } from './routes/api/products/detail'
+import { Route as ApiProductsSearchRouteImport } from './routes/api/products/search'
+import { Route as ProductSourceIdRouteImport } from './routes/product.$source.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuoteRoute = QuoteRouteImport.update({
+  id: '/quote',
+  path: '/quote',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SourcingRoute = SourcingRouteImport.update({
+  id: '/sourcing',
+  path: '/sourcing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductsByUrlRoute = ApiProductsByUrlRouteImport.update({
+  id: '/api/products/by-url',
+  path: '/api/products/by-url',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductsDetailRoute = ApiProductsDetailRouteImport.update({
+  id: '/api/products/detail',
+  path: '/api/products/detail',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductsSearchRoute = ApiProductsSearchRouteImport.update({
+  id: '/api/products/search',
+  path: '/api/products/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductSourceIdRoute = ProductSourceIdRouteImport.update({
+  id: '/product/$source/$id',
+  path: '/product/$source/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/privacy': typeof PrivacyRoute
+  '/quote': typeof QuoteRoute
+  '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sourcing': typeof SourcingRoute
+  '/track': typeof TrackRoute
+  '/api/products/by-url': typeof ApiProductsByUrlRoute
+  '/api/products/detail': typeof ApiProductsDetailRoute
+  '/api/products/search': typeof ApiProductsSearchRoute
+  '/product/$source/$id': typeof ProductSourceIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/privacy': typeof PrivacyRoute
+  '/quote': typeof QuoteRoute
+  '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sourcing': typeof SourcingRoute
+  '/track': typeof TrackRoute
+  '/api/products/by-url': typeof ApiProductsByUrlRoute
+  '/api/products/detail': typeof ApiProductsDetailRoute
+  '/api/products/search': typeof ApiProductsSearchRoute
+  '/product/$source/$id': typeof ProductSourceIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/privacy': typeof PrivacyRoute
+  '/quote': typeof QuoteRoute
+  '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sourcing': typeof SourcingRoute
+  '/track': typeof TrackRoute
+  '/api/products/by-url': typeof ApiProductsByUrlRoute
+  '/api/products/detail': typeof ApiProductsDetailRoute
+  '/api/products/search': typeof ApiProductsSearchRoute
+  '/product/$source/$id': typeof ProductSourceIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/faq'
+    | '/how-it-works'
+    | '/privacy'
+    | '/quote'
+    | '/services'
+    | '/sitemap.xml'
+    | '/sourcing'
+    | '/track'
+    | '/api/products/by-url'
+    | '/api/products/detail'
+    | '/api/products/search'
+    | '/product/$source/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/faq'
+    | '/how-it-works'
+    | '/privacy'
+    | '/quote'
+    | '/services'
+    | '/sitemap.xml'
+    | '/sourcing'
+    | '/track'
+    | '/api/products/by-url'
+    | '/api/products/detail'
+    | '/api/products/search'
+    | '/product/$source/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/faq'
+    | '/how-it-works'
+    | '/privacy'
+    | '/quote'
+    | '/services'
+    | '/sitemap.xml'
+    | '/sourcing'
+    | '/track'
+    | '/api/products/by-url'
+    | '/api/products/detail'
+    | '/api/products/search'
+    | '/product/$source/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
+  HowItWorksRoute: typeof HowItWorksRoute
+  PrivacyRoute: typeof PrivacyRoute
+  QuoteRoute: typeof QuoteRoute
+  ServicesRoute: typeof ServicesRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SourcingRoute: typeof SourcingRoute
+  TrackRoute: typeof TrackRoute
+  ApiProductsByUrlRoute: typeof ApiProductsByUrlRoute
+  ApiProductsDetailRoute: typeof ApiProductsDetailRoute
+  ApiProductsSearchRoute: typeof ApiProductsSearchRoute
+  ProductSourceIdRoute: typeof ProductSourceIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +234,124 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quote': {
+      id: '/quote'
+      path: '/quote'
+      fullPath: '/quote'
+      preLoaderRoute: typeof QuoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sourcing': {
+      id: '/sourcing'
+      path: '/sourcing'
+      fullPath: '/sourcing'
+      preLoaderRoute: typeof SourcingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/products/by-url': {
+      id: '/api/products/by-url'
+      path: '/api/products/by-url'
+      fullPath: '/api/products/by-url'
+      preLoaderRoute: typeof ApiProductsByUrlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/products/detail': {
+      id: '/api/products/detail'
+      path: '/api/products/detail'
+      fullPath: '/api/products/detail'
+      preLoaderRoute: typeof ApiProductsDetailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/products/search': {
+      id: '/api/products/search'
+      path: '/api/products/search'
+      fullPath: '/api/products/search'
+      preLoaderRoute: typeof ApiProductsSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/$source/$id': {
+      id: '/product/$source/$id'
+      path: '/product/$source/$id'
+      fullPath: '/product/$source/$id'
+      preLoaderRoute: typeof ProductSourceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
+  HowItWorksRoute: HowItWorksRoute,
+  PrivacyRoute: PrivacyRoute,
+  QuoteRoute: QuoteRoute,
+  ServicesRoute: ServicesRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SourcingRoute: SourcingRoute,
+  TrackRoute: TrackRoute,
+  ApiProductsByUrlRoute: ApiProductsByUrlRoute,
+  ApiProductsDetailRoute: ApiProductsDetailRoute,
+  ApiProductsSearchRoute: ApiProductsSearchRoute,
+  ProductSourceIdRoute: ProductSourceIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
