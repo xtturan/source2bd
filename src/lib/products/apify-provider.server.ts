@@ -5,6 +5,7 @@ import type {
   ProductSummary,
   SearchResult,
 } from "./types";
+import { PAGE_SIZE } from "./types";
 import { mockProvider, parseProductUrl } from "./mock-provider";
 
 /**
@@ -44,7 +45,7 @@ function actorFor(marketplace: Marketplace | undefined) {
   }
 }
 
-async function runActor<T>(actorId: string, input: unknown, limit = 24): Promise<T[]> {
+async function runActor<T>(actorId: string, input: unknown, limit = 12): Promise<T[]> {
   const token = env("APIFY_TOKEN");
   if (!token) {
     throw new ProviderUnavailableError(
@@ -63,6 +64,7 @@ async function runActor<T>(actorId: string, input: unknown, limit = 24): Promise
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(input),
+      signal: AbortSignal.timeout(120_000),
     },
   );
 
@@ -214,7 +216,7 @@ export function createApifyProvider(): ProductProvider {
       if (!actor) return mockProvider.search(query, opts);
 
       if (marketplace === "1688" || marketplace === "global") {
-        const raw = await runActor<Raw>(actor, { keywords: [query], maxResults: 24 }, 24);
+        const raw = await runActor<Raw>(actor, { keywords: [query], maxResults: PAGE_SIZE }, PAGE_SIZE);
         return {
           items: raw
             .map(map1688)
@@ -224,7 +226,7 @@ export function createApifyProvider(): ProductProvider {
         };
       }
 
-      const raw = await runActor<Raw>(actor, { keyword: query, query, page, maxItems: 24 }, 24);
+      const raw = await runActor<Raw>(actor, { keyword: query, query, page, maxItems: PAGE_SIZE }, PAGE_SIZE);
       return {
         items: raw
           .map(map1688)
@@ -266,7 +268,7 @@ export function createApifyProvider(): ProductProvider {
       const raw = await runActor<Raw>(
         actor,
         { provider, imageUrls: [imageUrl], maxProducts: 30 },
-        24,
+        PAGE_SIZE,
       );
       return {
         items: raw
