@@ -110,13 +110,36 @@ function LiveProgress({ label }: { label: string }) {
     const t = setInterval(() => setSec((s) => s + 1), 1000);
     return () => clearInterval(t);
   }, []);
+  // Eases toward 95% over ~35s so the bar always feels alive without lying about completion.
+  const pct = Math.min(95, Math.round(95 * (1 - Math.exp(-sec / 12))));
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-[12px] border border-border bg-background/60 px-4 py-3 text-sm">
-      <span className="h-2 w-2 animate-pulse rounded-full bg-accent" aria-hidden />
-      <span className="font-medium">{label}</span>
-      <span className="text-muted-foreground">
-        live scrape, usually 15 to 30 seconds. {sec}s elapsed
-      </span>
+    <div
+      className="rounded-[12px] border border-border bg-background/60 px-4 py-3 text-sm"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span className="h-2 w-2 animate-pulse rounded-full bg-accent" aria-hidden />
+        <span className="font-medium">{label}</span>
+        <span className="tnum ml-auto text-muted-foreground">
+          {sec}s elapsed, usually 15 to 30 seconds
+        </span>
+      </div>
+      <div
+        className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+      >
+        <div
+          className="h-full rounded-full bg-accent transition-[width] duration-700 ease-out"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Reading the marketplace, then translating the listings into English.
+      </p>
     </div>
   );
 }

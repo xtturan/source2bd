@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { ProductSummary } from "@/lib/products/types";
 import { currencySymbol, marketplaceLabels } from "@/lib/products/types";
 import { productQuote } from "@/lib/whatsapp";
+import { productImage } from "@/lib/images";
 import { Badge } from "./primitives";
 import { WhatsAppIcon } from "./button";
 
@@ -23,7 +24,8 @@ export function ProductCard({ product }: { product: ProductSummary }) {
       >
         {product.imageUrl ? (
           <img
-            src={product.imageUrl}
+            src={productImage(product.imageUrl)}
+            referrerPolicy="no-referrer"
             alt={product.title}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-300 ease-[cubic-bezier(.2,.8,.2,1)] group-hover:scale-[1.04]"

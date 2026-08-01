@@ -24,6 +24,7 @@ import { Route as ApiProductsByImageRouteImport } from './routes/api/products/by
 import { Route as ApiProductsByUrlRouteImport } from './routes/api/products/by-url'
 import { Route as ApiProductsDetailRouteImport } from './routes/api/products/detail'
 import { Route as ApiProductsSearchRouteImport } from './routes/api/products/search'
+import { Route as ApiPublicImgRouteImport } from './routes/api/public/img'
 import { Route as ProductMarketplaceIdRouteImport } from './routes/product.$marketplace.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -101,6 +102,11 @@ const ApiProductsSearchRoute = ApiProductsSearchRouteImport.update({
   path: '/api/products/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicImgRoute = ApiPublicImgRouteImport.update({
+  id: '/api/public/img',
+  path: '/api/public/img',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductMarketplaceIdRoute = ProductMarketplaceIdRouteImport.update({
   id: '/product/$marketplace/$id',
   path: '/product/$marketplace/$id',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
+  '/api/public/img': typeof ApiPublicImgRoute
   '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
 export interface FileRoutesByTo {
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
+  '/api/public/img': typeof ApiPublicImgRoute
   '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
 export interface FileRoutesById {
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
+  '/api/public/img': typeof ApiPublicImgRoute
   '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
 export interface FileRouteTypes {
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
+    | '/api/public/img'
     | '/product/$marketplace/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
+    | '/api/public/img'
     | '/product/$marketplace/$id'
   id:
     | '__root__'
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
+    | '/api/public/img'
     | '/product/$marketplace/$id'
   fileRoutesById: FileRoutesById
 }
@@ -235,6 +247,7 @@ export interface RootRouteChildren {
   ApiProductsByUrlRoute: typeof ApiProductsByUrlRoute
   ApiProductsDetailRoute: typeof ApiProductsDetailRoute
   ApiProductsSearchRoute: typeof ApiProductsSearchRoute
+  ApiPublicImgRoute: typeof ApiPublicImgRoute
   ProductMarketplaceIdRoute: typeof ProductMarketplaceIdRoute
 }
 
@@ -345,6 +358,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiProductsSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/img': {
+      id: '/api/public/img'
+      path: '/api/public/img'
+      fullPath: '/api/public/img'
+      preLoaderRoute: typeof ApiPublicImgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/$marketplace/$id': {
       id: '/product/$marketplace/$id'
       path: '/product/$marketplace/$id'
@@ -371,6 +391,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductsByUrlRoute: ApiProductsByUrlRoute,
   ApiProductsDetailRoute: ApiProductsDetailRoute,
   ApiProductsSearchRoute: ApiProductsSearchRoute,
+  ApiPublicImgRoute: ApiPublicImgRoute,
   ProductMarketplaceIdRoute: ProductMarketplaceIdRoute,
 }
 export const routeTree = rootRouteImport
