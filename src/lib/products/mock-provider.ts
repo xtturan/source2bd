@@ -26,7 +26,11 @@ export function parseProductUrl(
     return null;
   }
 
-  const marketplace: Marketplace = /alibaba\.com/i.test(url) ? "alibaba" : "1688";
+  const marketplace: Marketplace = /aliexpress\.[a-z.]+/i.test(url)
+    ? "aliexpress"
+    : /alibaba\.com/i.test(url)
+      ? "alibaba"
+      : "1688";
 
   const patterns = [
     /offer\/(\d{6,})/i,

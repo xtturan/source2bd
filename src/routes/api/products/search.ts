@@ -5,7 +5,7 @@ import { cached, rateLimited, tooMany } from "@/lib/api/guard.server";
 
 const schema = z.object({
   q: z.string().trim().max(120).default(""),
-  marketplace: z.enum(["1688", "alibaba", "amazon", "global"]).default("global"),
+  marketplace: z.enum(["1688", "alibaba", "aliexpress", "amazon", "global"]).default("global"),
   page: z.coerce.number().int().min(1).max(50).default(1),
 });
 

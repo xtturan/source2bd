@@ -5,7 +5,7 @@ import type {
   ProductSummary,
   SearchResult,
 } from "./types";
-import { PAGE_SIZE } from "./types";
+import { FANOUT_ORIGINS, PAGE_SIZE } from "./types";
 import { mockProvider, parseProductUrl } from "./mock-provider";
 import { translateProducts } from "./translate.server";
 
@@ -39,6 +39,8 @@ function actorFor(marketplace: Marketplace | undefined) {
       return env("APIFY_AMAZON_ACTOR");
     case "alibaba":
       return env("APIFY_ALIBABA_ACTOR");
+    case "aliexpress":
+      return env("APIFY_ALIEXPRESS_ACTOR");
     case "1688":
       return env("APIFY_1688_ACTOR");
     default:
@@ -215,7 +217,13 @@ function mapImageItem(raw: Raw): ProductDetail | null {
 
   const provider = str(raw["provider"]);
   const marketplace: Marketplace =
-    provider === "1688" ? "1688" : provider === "alibaba" ? "alibaba" : "global";
+    provider === "1688"
+      ? "1688"
+      : provider === "alibaba"
+        ? "alibaba"
+        : provider === "aliexpress"
+          ? "aliexpress"
+          : "global";
   const images = strList(raw["images"]);
   const lo = num(raw["price_min"]);
   const hi = num(raw["price_max"]);
@@ -243,6 +251,140 @@ function toSummary(d: ProductDetail): ProductSummary {
   return rest;
 }
 
+/* ---------- per marketplace mappers ---------- */
+
+/** Pulls the numbers out of strings such as "$0.72-1.56" or "US $6.57". */
+function priceRange(raw: string | undefined) {
+  if (!raw) return {};
+  const nums = raw
+    .replace(/,/g, "")
+    .match(/\d+(?:\.\d+)?/g)
+    ?.map(Number)
+    .filter((n) => Number.isFinite(n) && n > 0);
+  if (!nums?.length) return {};
+  const lo = Math.min(...nums);
+  const hi = Math.max(...nums);
+  return { priceMin: lo, priceMax: hi > lo ? hi : undefined };
+}
+
+/** zen-studio~alibaba-scraper: rows arrive wrapped in a `product` object. */
+function mapAlibaba(row: Raw): ProductDetail | null {
+  const raw = obj(row["product"]);
+  const id = str(raw["productId"]);
+  const title = str(raw["title"]);
+  const productUrl = str(raw["url"]);
+  if (!id || !title || !productUrl) return null;
+
+  const images = [...new Set(strList(raw["images"]))];
+  const scores = obj(raw["scores"]);
+  const moqText = str(raw["moq"]);
+
+  return {
+    id,
+    marketplace: "alibaba",
+    title,
+    ...priceRange(str(raw["price"])),
+    currency: "USD",
+    moq: moqText ? num(moqText.replace(/[^\d.]/g, " ").trim().split(/\s+/)[0]) : undefined,
+    imageUrl: images[0],
+    city: str(raw["supplierCountry"]),
+    productUrl,
+    ordersHint: str(scores["reviewCount"]) ? `${str(scores["reviewCount"])} reviews` : undefined,
+    images,
+    attributes: moqText ? [{ label: "Min. order", value: moqText }] : undefined,
+  };
+}
+
+/** devcake~aliexpress-products-scraper */
+function mapAliExpress(raw: Raw): ProductDetail | null {
+  const id = str(raw["productId"]);
+  const title = str(raw["title"]);
+  const productUrl = str(raw["productUrl"]);
+  if (!id || !title || !productUrl) return null;
+  const image = str(raw["imageUrl"]);
+  const lo = num(raw["priceCurrentMin"]);
+  const hi = num(raw["priceCurrentMax"]);
+
+  return {
+    id,
+    marketplace: "aliexpress",
+    title,
+    priceMin: lo ?? hi,
+    priceMax: hi && lo && hi > lo ? hi : undefined,
+    currency: "USD",
+    imageUrl: image,
+    productUrl,
+    ordersHint: str(raw["soldDescription"]),
+    images: image ? [image] : [],
+  };
+}
+
+/** powerai~amazon-product-search-scraper */
+function mapAmazon(raw: Raw): ProductDetail | null {
+  const id = str(raw["asin"]);
+  const title = str(raw["product_title"])?.replace(/&quot;/g, '"');
+  const productUrl = str(raw["product_url"]);
+  if (!id || !title || !productUrl) return null;
+  const image = str(raw["product_photo"]);
+
+  return {
+    id,
+    marketplace: "amazon",
+    title,
+    ...priceRange(str(raw["product_price"])),
+    currency: "USD",
+    moq: 1,
+    imageUrl: image,
+    productUrl,
+    ordersHint: str(raw["sales_volume"]),
+    images: image ? [image] : [],
+  };
+}
+
+function mapperFor(marketplace: Marketplace): (raw: Raw) => ProductDetail | null {
+  switch (marketplace) {
+    case "alibaba":
+      return mapAlibaba;
+    case "aliexpress":
+      return mapAliExpress;
+    case "amazon":
+      return mapAmazon;
+    default:
+      return map1688;
+  }
+}
+
+function inputFor(marketplace: Marketplace, query: string, limit: number): unknown {
+  switch (marketplace) {
+    case "alibaba":
+      return { keywords: [query], maxResults: limit, resultType: "products" };
+    case "aliexpress":
+      // The actor rejects anything under 50; we stop reading at `limit` anyway.
+      return { searchQueries: [query], maxProducts: Math.max(limit, 50) };
+    case "amazon":
+      // The actor rejects anything under 20; we stop reading at `limit` anyway.
+      return { query, maxResults: Math.max(limit, 20) };
+    default:
+      return { keywords: [query], maxResults: limit };
+  }
+}
+
+async function searchOne(
+  marketplace: Marketplace,
+  query: string,
+  page: number,
+  limit: number,
+): Promise<ProductSummary[]> {
+  const actor = actorFor(marketplace);
+  if (!actor) return (await mockProvider.search(query, { marketplace, page })).items.slice(0, limit);
+  const raw = await runActor<Raw>(actor, inputFor(marketplace, query, limit), limit);
+  const map = mapperFor(marketplace);
+  return raw
+    .map(map)
+    .filter((x): x is ProductDetail => !!x)
+    .map(toSummary);
+}
+
 function offerIdFromUrl(url: string) {
   return (
     /\/offer\/(\d+)\.html/.exec(url)?.[1] ??
@@ -256,27 +398,44 @@ export function createApifyProvider(): ProductProvider {
     name: "apify",
 
     async search(query, opts): Promise<SearchResult> {
-      const marketplace = opts?.marketplace ?? "1688";
+      const marketplace = opts?.marketplace ?? "global";
       const page = opts?.page ?? 1;
-      const actor = actorFor(marketplace);
 
-      // No live actor for this marketplace yet: serve the demo catalogue.
-      if (!actor) return mockProvider.search(query, opts);
+      // "All origins": fan out to every marketplace in parallel and interleave
+      // the results so the grid shows a spread of 24 listings, not one source.
+      if (marketplace === "global") {
+        const per = Math.ceil(PAGE_SIZE / FANOUT_ORIGINS.length);
+        const settled = await Promise.allSettled(
+          FANOUT_ORIGINS.map((m) => searchOne(m, query, page, per)),
+        );
+        const buckets = settled.map((r) => (r.status === "fulfilled" ? r.value : []));
+        settled.forEach((r, i) => {
+          if (r.status === "rejected")
+            console.error(`origin ${FANOUT_ORIGINS[i]} search failed`, r.reason);
+        });
 
-      if (marketplace === "1688" || marketplace === "global") {
-        const raw = await runActor<Raw>(actor, { keywords: [query], maxResults: PAGE_SIZE }, PAGE_SIZE);
-        const mapped = raw.map(map1688).filter((x): x is ProductDetail => !!x).map(toSummary);
-        return { items: await translateProducts(mapped), page };
+        const items: ProductSummary[] = [];
+        for (let i = 0; items.length < PAGE_SIZE; i++) {
+          const row = buckets.map((b) => b[i]).filter((x): x is ProductSummary => !!x);
+          if (!row.length) break;
+          items.push(...row);
+        }
+        if (!items.length) {
+          throw new ProviderUnavailableError(
+            "Live marketplace search did not come back. Send the keyword on WhatsApp and we will source it by hand.",
+          );
+        }
+        return { items: await translateProducts(items.slice(0, PAGE_SIZE)), page };
       }
 
-      const raw = await runActor<Raw>(actor, { keyword: query, query, page, maxItems: PAGE_SIZE }, PAGE_SIZE);
-      const mapped = raw.map(map1688).filter((x): x is ProductDetail => !!x).map(toSummary);
-      return { items: await translateProducts(mapped), page };
+      const single = await searchOne(marketplace, query, page, PAGE_SIZE);
+      return { items: await translateProducts(single), page };
     },
 
     async getById(id, marketplace = "1688"): Promise<ProductDetail | null> {
       const actor = actorFor(marketplace);
-      if (!actor) return mockProvider.getById(id, marketplace);
+      // Only the 1688 actor exposes a by-id lookup; the others are search only.
+      if (!actor || marketplace !== "1688") return mockProvider.getById(id, marketplace);
       const raw = await runActor<Raw>(actor, { offerIds: [id] }, 1);
       const first = raw[0];
       const detail = first ? map1688(first) : null;
@@ -287,7 +446,7 @@ export function createApifyProvider(): ProductProvider {
       const parsed = parseProductUrl(url);
       const marketplace = parsed?.marketplace ?? "1688";
       const actor = actorFor(marketplace);
-      if (!actor) return mockProvider.getByUrl(url);
+      if (!actor || marketplace !== "1688") return mockProvider.getByUrl(url);
       const id = parsed?.id ?? offerIdFromUrl(url);
       if (!id) return null;
       const raw = await runActor<Raw>(actor, { offerIds: [id] }, 1);
@@ -303,11 +462,18 @@ export function createApifyProvider(): ProductProvider {
           ? mockProvider.searchByImage(imageUrl, opts)
           : { items: [] };
       }
-      const marketplace = opts?.marketplace ?? "1688";
-      const provider = marketplace === "alibaba" ? "alibaba" : marketplace === "1688" ? "1688" : "aliexpress";
+      const marketplace = opts?.marketplace ?? "global";
+      const provider =
+        marketplace === "alibaba"
+          ? "alibaba"
+          : marketplace === "aliexpress"
+            ? "aliexpress"
+            : marketplace === "1688"
+              ? "1688"
+              : "global";
       const raw = await runActor<Raw>(
         actor,
-        { provider, imageUrls: [imageUrl], maxProducts: 30 },
+        { provider, destination: provider, imageUrls: [imageUrl], imageUrl, maxProducts: PAGE_SIZE },
         PAGE_SIZE,
       );
       const mapped = raw.map(mapImageItem).filter((x): x is ProductDetail => !!x).map(toSummary);
