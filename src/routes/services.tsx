@@ -1,113 +1,108 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle, Check, ClipboardList } from "lucide-react";
-import { Container, Section, SectionHeading, Badge } from "@/components/s2b/primitives";
-import { ExternalButton } from "@/components/s2b/button";
-import { services } from "@/config/site";
-import { serviceQuote, generalInquiry } from "@/lib/whatsapp";
+import { Container, Section, SectionHeading, Card, Badge } from "@/components/s2b/primitives";
+import { ButtonAnchor, ButtonLink, WhatsAppIcon } from "@/components/s2b/button";
+import { services, siteConfig } from "@/config/site";
+import { serviceQuote } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
-      { title: "Cargo services China to Bangladesh — TWT International" },
+      { title: "Freight and sourcing services into Bangladesh | Source2BD" },
       {
         name: "description",
         content:
-          "Hand carry, air freight, sea freight, courier, China warehouse consolidation and 1688 buying agent services for Bangladesh importers.",
+          "Air freight, sea freight, hand carry, courier, warehouse consolidation and sourcing agent work into Dhaka and Chattogram, priced per order.",
       },
-      { property: "og:title", content: "Cargo services — TWT International" },
+      { property: "og:title", content: "Source2BD services" },
       {
         property: "og:description",
-        content: "Six China → Bangladesh lanes: hand carry, air, sea, courier, warehouse, sourcing.",
+        content: "Six lanes into Bangladesh: air, sea, hand carry, courier, consolidation and sourcing.",
       },
-      { property: "og:url", content: "/services" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/services" }],
   }),
   component: ServicesPage,
 });
 
 function ServicesPage() {
   return (
-    <>
-      <div className="grid-lines bg-navy py-14 text-white">
-        <Container>
-          <Badge tone="outline">Services</Badge>
-          <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] sm:text-5xl">
-            Pick the lane that fits your cargo, not the other way round.
-          </h1>
-          <p className="font-bn mt-3 text-white/70">আমাদের সার্ভিসসমূহ</p>
-        </Container>
-      </div>
+    <Section>
+      <Container>
+        <SectionHeading
+          eyebrow="Services"
+          title="Every lane we run, with the honest transit window"
+          titleBn="আমাদের সব সার্ভিস ও সময়সীমা"
+          intro="No lane is best for everything. Read what each one is for, what we need from you, and what it realistically takes."
+        />
 
-      <Section>
-        <Container className="space-y-16">
-          {services.map((service, i) => (
-            <div
-              key={service.key}
-              id={service.key}
-              className="scroll-mt-24 grid gap-10 border-t border-navy/8 pt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
-            >
-              <div>
-                <span className="font-display text-sm font-bold text-green">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h2 className="mt-2 text-2xl font-bold text-navy sm:text-3xl">{service.title}</h2>
-                <p className="font-bn mt-1 text-steel">{service.titleBn}</p>
-                <p className="mt-4 text-[15px] leading-relaxed text-steel">{service.short}</p>
-                <p className="mt-5 inline-flex rounded-full bg-green/10 px-3 py-1.5 text-xs font-semibold text-green-600">
-                  {service.eta}
-                </p>
-                <div className="mt-6">
-                  <ExternalButton href={serviceQuote({ mode: service.title })}>
-                    <MessageCircle className="size-4" /> Quote this service
-                  </ExternalButton>
+        <div className="mt-14 space-y-6">
+          {services.map((s) => (
+            <Card key={s.key} id={s.key} className="scroll-mt-24 p-6 sm:p-8">
+              <div className="grid gap-8 lg:grid-cols-[1fr_1fr_1fr]">
+                <div>
+                  <h2 className="text-2xl font-extrabold">{s.title}</h2>
+                  <p className="font-bn mt-1 text-sm text-muted-foreground">{s.titleBn}</p>
+                  <p className="mt-4 max-w-[54ch] text-sm leading-relaxed text-muted-foreground">
+                    {s.short}
+                  </p>
+                  <Badge tone="green" className="mt-5">
+                    {s.eta}
+                  </Badge>
                 </div>
-              </div>
 
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="glass matte rounded-2xl p-5">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-steel">
-                    When to use it
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                    Use it when
                   </h3>
-                  <ul className="mt-4 space-y-3">
-                    {service.whenToUse.map((line) => (
-                      <li key={line} className="flex gap-2.5 text-sm text-navy">
-                        <Check className="mt-0.5 size-4 shrink-0 text-green" />
-                        {line}
+                  <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
+                    {s.whenToUse.map((i) => (
+                      <li key={i} className="flex gap-3">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
+                        {i}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="matte rounded-2xl border border-navy/8 bg-mist/60 p-5 backdrop-blur-md">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-steel">
-                    What to prepare
+
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                    Have this ready
                   </h3>
-                  <ul className="mt-4 space-y-3">
-                    {service.prepare.map((line) => (
-                      <li key={line} className="flex gap-2.5 text-sm text-navy">
-                        <ClipboardList className="mt-0.5 size-4 shrink-0 text-navy/40" />
-                        {line}
+                  <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
+                    {s.prepare.map((i) => (
+                      <li key={i} className="flex gap-3">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-signal" aria-hidden />
+                        {i}
                       </li>
                     ))}
                   </ul>
+                  <ButtonAnchor
+                    href={serviceQuote({ mode: s.title })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="green"
+                    className="mt-6 w-full"
+                  >
+                    <WhatsAppIcon /> Quote {s.title.toLowerCase()}
+                  </ButtonAnchor>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
-        </Container>
-      </Section>
+        </div>
 
-      <Section tone="muted" className="py-16">
-        <Container className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-          <SectionHeading
-            title="Still not sure which mode is cheaper?"
-            intro="Send weight and carton dimensions. We'll compare air against sea for your actual shipment before you commit."
-          />
-          <ExternalButton href={generalInquiry()} size="lg">
-            <MessageCircle className="size-5" /> Ask on WhatsApp
-          </ExternalButton>
-        </Container>
-      </Section>
-    </>
+        <Card className="mt-10 p-6 text-sm text-muted-foreground">
+          {siteConfig.policy} Transit windows are estimates based on normal conditions and are not a
+          guarantee. Duty and clearance charges are set by Bangladesh Customs, not by us.
+        </Card>
+
+        <div className="mt-10">
+          <ButtonLink to="/quote" size="lg">
+            Get a written quote
+          </ButtonLink>
+        </div>
+      </Container>
+    </Section>
   );
 }

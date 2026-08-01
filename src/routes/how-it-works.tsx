@@ -1,128 +1,110 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle } from "lucide-react";
-import { Container, Section, SectionHeading, Badge, Card } from "@/components/s2b/primitives";
-import { ExternalButton, LinkButton } from "@/components/s2b/button";
+import { Container, Section, SectionHeading, Card } from "@/components/s2b/primitives";
+import { ButtonAnchor, ButtonLink, WhatsAppIcon } from "@/components/s2b/button";
 import { generalInquiry } from "@/lib/whatsapp";
+import { siteConfig } from "@/config/site";
 
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How our China to Bangladesh shipping works — TWT International" },
+      { title: "How Source2BD sourcing and shipping works" },
       {
         name: "description",
         content:
-          "From WhatsApp enquiry to Dhaka delivery: sourcing, China warehouse consolidation, freight mode selection, customs documents and last-mile delivery explained.",
+          "From a pasted link to a delivered carton in Dhaka: verification, supplier payment, consolidation, freight, clearance and last mile, step by step.",
       },
-      { property: "og:title", content: "How it works — TWT International" },
+      { property: "og:title", content: "How Source2BD works" },
       {
         property: "og:description",
-        content: "The full China → Bangladesh process, step by step, with no surprise line items.",
+        content: "The full path from a product link to a carton delivered in Bangladesh.",
       },
-      { property: "og:url", content: "/how-it-works" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/how-it-works" }],
   }),
-  component: HowItWorksPage,
+  component: HowItWorks,
 });
 
-const steps = [
+const stages = [
   {
-    t: "You send the enquiry",
-    bn: "আপনি মেসেজ দেন",
-    d: "A 1688 link, a product photo, or a carton list on WhatsApp. Tell us quantity and your delivery city — those two things decide most of the answer.",
-    detail: ["Product link or clear photo", "Target quantity", "Dhaka / Chattogram / other city"],
+    n: "01",
+    title: "You send the request",
+    body: "A link, a keyword, a photo or a spec sheet. Anything that identifies the product. Tell us the quantity you are aiming for and the city it needs to reach.",
+    bn: "লিংক, কীওয়ার্ড বা ছবি পাঠান",
   },
   {
-    t: "We confirm with the supplier",
-    bn: "সাপ্লায়ারের সাথে যাচাই",
-    d: "For sourcing jobs we read the Chinese listing, verify the MOQ and quantity tiers, and check the supplier actually has stock before you pay anything.",
-    detail: ["MOQ and tier pricing", "Stock and lead time", "Alternative suppliers if better"],
+    n: "02",
+    title: "We verify the listing",
+    body: "Our desk opens the original page, reads the Chinese or English detail, confirms MOQ and tier price with the supplier, and flags anything that looks like a reseller markup.",
+    bn: "লিস্টিং যাচাই করা হয়",
   },
   {
-    t: "Freight mode and quote",
-    bn: "মোড ও কোট",
-    d: "Air is priced on the higher of actual or volumetric weight; sea is priced on CBM. We tell you which one is cheaper for your specific cartons instead of defaulting to one.",
-    detail: ["Actual vs volumetric weight", "Rough transit window", "Applicable documents"],
+    n: "03",
+    title: "You get a landed estimate",
+    body: "Product cost, our service fee, freight by lane, and an indication of duty exposure. If sea beats air for your volume, we say so even when air pays us more.",
+    bn: "ল্যান্ডেড কোট পাবেন",
   },
   {
-    t: "China warehouse & consolidation",
-    bn: "কনসোলিডেশন",
-    d: "Your parcels arrive at our China warehouse. We check counts against your list, repack weak cartons and combine multiple suppliers into one shipment.",
-    detail: ["Count verification", "Repack and reinforce", "One freight bill, not five"],
+    n: "04",
+    title: "Purchase and inbound",
+    body: "You approve, we pay the supplier and receive at our China or US address. Cartons are counted and photographed before anything ships.",
+    bn: "ক্রয় ও রিসিভ",
   },
   {
-    t: "Shipping and clearance",
-    bn: "শিপিং ও ক্লিয়ারেন্স",
-    d: "Cargo moves on the agreed lane. Documentation is prepared for Bangladesh customs — commercial consignments need consignee details and correct product descriptions.",
-    detail: ["Correct product description", "Consignee NID / BIN if commercial", "Duty is separate from freight"],
+    n: "05",
+    title: "Consolidation and freight",
+    body: "Multiple suppliers become one shipment so you pay one freight bill. We book the lane and share tracking as it moves.",
+    bn: "কনসলিডেশন ও শিপিং",
   },
   {
-    t: "Delivery in Bangladesh",
-    bn: "বাংলাদেশে ডেলিভারি",
-    d: "Once cleared, goods move to your address or you collect from our Chawkbazar office. You get an update at each handover, not silence.",
-    detail: ["Door delivery or office pickup", "Handover updates", "Support after arrival"],
+    n: "06",
+    title: "Clearance and delivery",
+    body: "Customs documentation, duty payment as agreed, then delivery to your address or pickup from our Chawkbazar office.",
+    bn: "কাস্টমস ও ডেলিভারি",
   },
 ];
 
-function HowItWorksPage() {
+function HowItWorks() {
   return (
-    <>
-      <div className="grid-lines bg-navy py-14 text-white">
-        <Container>
-          <Badge tone="outline">Process</Badge>
-          <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] sm:text-5xl">
-            From a WhatsApp message to a delivered carton.
-          </h1>
-          <p className="font-bn mt-3 text-white/70">কীভাবে কাজ করে</p>
-        </Container>
-      </div>
+    <Section>
+      <Container>
+        <SectionHeading
+          eyebrow="Process"
+          title="What actually happens after you press send"
+          titleBn="লিংক পাঠানোর পর কী হয়"
+          intro="Sourcing goes wrong in the gaps between people. We keep the whole chain on one desk so nothing is handed off and lost."
+        />
 
-      <Section>
-        <Container>
-          <ol className="space-y-6">
-            {steps.map((s, i) => (
-              <li key={s.t}>
-                <Card className="grid gap-6 p-6 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,260px)]">
-                  <span className="font-display text-3xl font-bold text-green/30">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div>
-                    <h2 className="text-xl font-bold text-navy">{s.t}</h2>
-                    <p className="font-bn text-sm text-steel">{s.bn}</p>
-                    <p className="mt-3 text-sm leading-relaxed text-steel">{s.d}</p>
-                  </div>
-                  <ul className="space-y-2 rounded-xl border border-navy/8 bg-white/55 p-4 backdrop-blur-md text-sm text-navy">
-                    {s.detail.map((d) => (
-                      <li key={d} className="flex gap-2">
-                        <span className="mt-2 size-1.5 shrink-0 rounded-full bg-green" />
-                        {d}
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              </li>
-            ))}
-          </ol>
-        </Container>
-      </Section>
+        <ol className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {stages.map((s) => (
+            <li key={s.n}>
+              <Card className="h-full p-6">
+                <span className="tnum text-xs font-bold tracking-widest text-signal">{s.n}</span>
+                <h2 className="mt-3 text-lg font-bold leading-snug">{s.title}</h2>
+                <p className="font-bn mt-1 text-sm text-muted-foreground">{s.bn}</p>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+              </Card>
+            </li>
+          ))}
+        </ol>
 
-      <Section tone="muted" className="py-16">
-        <Container>
-          <SectionHeading
-            eyebrow="Honesty first"
-            title="What we will not promise"
-            intro="Transit windows are estimates, not guarantees — flights, vessels and customs move on their own schedule. Duty and taxes are set by Bangladesh customs, not by us. And we only handle legal, permitted goods: no restricted, counterfeit or prohibited items, whatever the offer."
-          />
+        <Card className="mt-12 p-8">
+          <h2 className="text-2xl font-extrabold">What we will not do</h2>
+          <p className="mt-3 max-w-[64ch] text-sm leading-relaxed text-muted-foreground">
+            {siteConfig.policy} We will not undervalue an invoice, mislabel cargo, or move
+            counterfeit branded goods. If an order needs that to work, it is not an order we can
+            take, and we will tell you on day one rather than at the port.
+          </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <ExternalButton href={generalInquiry()} size="lg">
-              <MessageCircle className="size-5" /> Start on WhatsApp
-            </ExternalButton>
-            <LinkButton to="/quote" variant="outline" size="lg">
-              Build a quote request
-            </LinkButton>
+            <ButtonAnchor href={generalInquiry()} target="_blank" rel="noopener noreferrer" variant="green" size="lg">
+              <WhatsAppIcon /> Ask a question
+            </ButtonAnchor>
+            <ButtonLink to="/sourcing" variant="glass" size="lg">
+              Try the sourcing desk
+            </ButtonLink>
           </div>
-        </Container>
-      </Section>
-    </>
+        </Card>
+      </Container>
+    </Section>
   );
 }
