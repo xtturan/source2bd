@@ -6,7 +6,8 @@ import { ProductCard } from "@/components/s2b/product-card";
 import { productById } from "@/lib/products/queries.functions";
 import { relatedProducts } from "@/lib/products/mock-provider";
 import type { Marketplace, ProductDetail } from "@/lib/products/types";
-import { currencySymbol, isMarketplace, marketplaceLabels } from "@/lib/products/types";
+import { isMarketplace, marketplaceLabels } from "@/lib/products/types";
+import { bdtLabel, formatBdt, toBdt } from "@/lib/products/pricing";
 import { productQuote } from "@/lib/whatsapp";
 import { siteConfig } from "@/config/site";
 import { productImage } from "@/lib/images";
@@ -47,7 +48,6 @@ function ProductPage() {
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState<string>(String(item.moq ?? 10));
   const [city, setCity] = useState("Dhaka");
-  const sym = currencySymbol(item.currency);
   const related = relatedProducts(item.id, 4);
 
   const quoteHref = productQuote({
@@ -134,8 +134,7 @@ function ProductPage() {
                     <tr key={t.minQty} className="border-t border-border">
                       <td className="py-2.5">{t.minQty}+</td>
                       <td className="py-2.5 font-semibold">
-                        {sym}
-                        {t.price}
+                        {formatBdt(toBdt(t.price, item.currency))}
                       </td>
                     </tr>
                   ))}
