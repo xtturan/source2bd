@@ -17,8 +17,8 @@ export function generalInquiry(topic?: string) {
   return waLink(
     [
       `Assalamu alaikum, ${siteConfig.name}.`,
-      topic ? `I want to ask about: ${clean(topic)}` : "I want to ask about China → Bangladesh cargo.",
-      "আমি চীন থেকে বাংলাদেশে পণ্য আনতে চাই।",
+      topic ? `I want to ask about: ${clean(topic)}` : "I want to ask about sourcing and cargo into Bangladesh.",
+      "আমি বিদেশ থেকে বাংলাদেশে পণ্য আনতে চাই।",
     ].join("\n"),
   );
 }
@@ -51,17 +51,21 @@ export function productQuote(input: {
   moq?: number | undefined;
   qty?: number | string | undefined;
   city?: string | undefined;
+  currency?: "CNY" | "USD" | undefined;
+  marketplace?: string | undefined;
 }) {
+  const cur = input.currency ?? "CNY";
   const price =
     input.priceMin != null
       ? input.priceMax != null && input.priceMax !== input.priceMin
-        ? `CNY ${input.priceMin} – ${input.priceMax}`
-        : `CNY ${input.priceMin}`
+        ? `${cur} ${input.priceMin} to ${input.priceMax}`
+        : `${cur} ${input.priceMin}`
       : "Not listed";
 
   return waLink(
     [
       `Assalamu alaikum, ${siteConfig.name}.`,
+      `Marketplace: ${input.marketplace ?? "not specified"}`,
       `Product: ${clean(input.title, 180)}`,
       `Link: ${clean(input.productUrl, 300)}`,
       `Listed price: ${price}`,

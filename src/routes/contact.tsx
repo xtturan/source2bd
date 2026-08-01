@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MessageCircle, Phone, MapPin, Clock, ShieldCheck } from "lucide-react";
-import { Container, Section, Badge, Card } from "@/components/twt/primitives";
-import { ExternalButton, LinkButton } from "@/components/twt/button";
+import { Container, Section, Badge, Card } from "@/components/s2b/primitives";
+import { ExternalButton, LinkButton } from "@/components/s2b/button";
 import { siteConfig } from "@/config/site";
 import { generalInquiry } from "@/lib/whatsapp";
 

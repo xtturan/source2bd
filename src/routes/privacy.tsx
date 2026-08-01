@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Container, Section, Badge } from "@/components/twt/primitives";
+import { Container, Section, Badge } from "@/components/s2b/primitives";
 import { siteConfig } from "@/config/site";
 
 export const Route = createFileRoute("/privacy")({

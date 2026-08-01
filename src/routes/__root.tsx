@@ -11,17 +11,17 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { Header } from "@/components/twt/header";
-import { Footer } from "@/components/twt/footer";
-import { MobileDock, WhatsAppFloat } from "@/components/twt/mobile-dock";
+import { Header } from "@/components/s2b/header";
+import { Footer } from "@/components/s2b/footer";
+import { MobileDock } from "@/components/s2b/mobile-dock";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-[70vh] items-center justify-center bg-background px-4 py-24">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-navy">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-navy">This page isn't on our route map</h2>
-        <p className="mt-2 text-sm text-steel">
+        <h1 className="text-7xl font-bold text-foreground">404</h1>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">This page isn't on our route map</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
           The page you're looking for doesn't exist or has been moved. Our WhatsApp desk is still
           open.
         </p>
@@ -81,14 +81,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TWT International — China to Bangladesh cargo & sourcing" },
+      { title: "Source2BD, global sourcing and Bangladesh cargo" },
       {
         name: "description",
         content:
-          "China → Bangladesh air, sea, courier and hand carry cargo plus 1688 and Alibaba buying agent support. WhatsApp quotes from our Chawkbazar desk.",
+          "Source from 1688, Alibaba, Amazon and any global store, then land it in Dhaka or Chattogram. Air, sea, courier and hand carry, quoted on WhatsApp.",
       },
-      { name: "author", content: "TWT International" },
-      { property: "og:site_name", content: "TWT International" },
+      { name: "author", content: "Source2BD" },
+      { property: "og:site_name", content: "Source2BD" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -101,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=Noto+Sans+Bengali:wght@400;500;600&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -111,9 +111,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
-          name: "TWT International",
+          name: "Source2BD",
           description:
-            "China to Bangladesh freight forwarding, consolidation and 1688/Alibaba buying agent services.",
+            "Global sourcing agent and Bangladesh cargo: 1688, Alibaba, Amazon and worldwide stores, delivered to Dhaka and Chattogram.",
           telephone: "+8801752457930",
           address: {
             "@type": "PostalAddress",
@@ -121,7 +121,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             addressLocality: "Dhaka",
             addressCountry: "BD",
           },
-          areaServed: ["Bangladesh", "China"],
+          areaServed: ["Bangladesh", "China", "United States"],
           openingHours: "Sa-Th 10:00-20:00",
         }),
       },
@@ -135,7 +135,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
       </head>
@@ -160,7 +160,6 @@ function RootComponent() {
         </main>
         <Footer />
         <MobileDock />
-        <WhatsAppFloat />
       </div>
     </QueryClientProvider>
   );

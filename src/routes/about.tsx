@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
-import { Container, Section, SectionHeading, Badge, Card } from "@/components/twt/primitives";
-import { ExternalButton } from "@/components/twt/button";
+import { Container, Section, SectionHeading, Badge, Card } from "@/components/s2b/primitives";
+import { ExternalButton } from "@/components/s2b/button";
 import { siteConfig } from "@/config/site";
 import { generalInquiry } from "@/lib/whatsapp";
 

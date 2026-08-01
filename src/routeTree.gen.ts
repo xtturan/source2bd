@@ -20,6 +20,7 @@ import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SourcingRouteImport } from './routes/sourcing'
 import { Route as TrackRouteImport } from './routes/track'
+import { Route as ApiProductsByImageRouteImport } from './routes/api/products/by-image'
 import { Route as ApiProductsByUrlRouteImport } from './routes/api/products/by-url'
 import { Route as ApiProductsDetailRouteImport } from './routes/api/products/detail'
 import { Route as ApiProductsSearchRouteImport } from './routes/api/products/search'
@@ -80,6 +81,11 @@ const TrackRoute = TrackRouteImport.update({
   path: '/track',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiProductsByImageRoute = ApiProductsByImageRouteImport.update({
+  id: '/api/products/by-image',
+  path: '/api/products/by-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiProductsByUrlRoute = ApiProductsByUrlRouteImport.update({
   id: '/api/products/by-url',
   path: '/api/products/by-url',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sourcing': typeof SourcingRoute
   '/track': typeof TrackRoute
+  '/api/products/by-image': typeof ApiProductsByImageRoute
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sourcing': typeof SourcingRoute
   '/track': typeof TrackRoute
+  '/api/products/by-image': typeof ApiProductsByImageRoute
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sourcing': typeof SourcingRoute
   '/track': typeof TrackRoute
+  '/api/products/by-image': typeof ApiProductsByImageRoute
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sourcing'
     | '/track'
+    | '/api/products/by-image'
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sourcing'
     | '/track'
+    | '/api/products/by-image'
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sourcing'
     | '/track'
+    | '/api/products/by-image'
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
@@ -219,6 +231,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SourcingRoute: typeof SourcingRoute
   TrackRoute: typeof TrackRoute
+  ApiProductsByImageRoute: typeof ApiProductsByImageRoute
   ApiProductsByUrlRoute: typeof ApiProductsByUrlRoute
   ApiProductsDetailRoute: typeof ApiProductsDetailRoute
   ApiProductsSearchRoute: typeof ApiProductsSearchRoute
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/products/by-image': {
+      id: '/api/products/by-image'
+      path: '/api/products/by-image'
+      fullPath: '/api/products/by-image'
+      preLoaderRoute: typeof ApiProductsByImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/products/by-url': {
       id: '/api/products/by-url'
       path: '/api/products/by-url'
@@ -347,6 +367,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SourcingRoute: SourcingRoute,
   TrackRoute: TrackRoute,
+  ApiProductsByImageRoute: ApiProductsByImageRoute,
   ApiProductsByUrlRoute: ApiProductsByUrlRoute,
   ApiProductsDetailRoute: ApiProductsDetailRoute,
   ApiProductsSearchRoute: ApiProductsSearchRoute,
@@ -355,13 +376,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

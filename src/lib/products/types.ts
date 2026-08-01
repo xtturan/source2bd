@@ -1,13 +1,20 @@
-export type ProductSource = "1688" | "alibaba";
+export type Marketplace = "1688" | "alibaba" | "amazon" | "global";
+
+export const marketplaceLabels: Record<Marketplace, string> = {
+  "1688": "1688",
+  alibaba: "Alibaba",
+  amazon: "Amazon",
+  global: "Global",
+};
 
 export type ProductSummary = {
   id: string;
-  source: ProductSource;
+  marketplace: Marketplace;
   title: string;
   titleBn?: string | undefined;
   priceMin?: number | undefined;
   priceMax?: number | undefined;
-  currency: "CNY";
+  currency: "CNY" | "USD";
   moq?: number | undefined;
   imageUrl?: string | undefined;
   shopName?: string | undefined;
@@ -33,9 +40,24 @@ export interface SearchResult {
 
 export interface ProductProvider {
   name: string;
-  search(query: string, page?: number): Promise<SearchResult>;
-  getById(id: string, source?: ProductSource): Promise<ProductDetail | null>;
+  search(
+    query: string,
+    opts?: { marketplace?: Marketplace; page?: number },
+  ): Promise<SearchResult>;
+  getById(id: string, marketplace?: Marketplace): Promise<ProductDetail | null>;
   getByUrl(url: string): Promise<ProductDetail | null>;
+  searchByImage?(
+    imageUrl: string,
+    opts?: { marketplace?: Marketplace },
+  ): Promise<{ items: ProductSummary[] }>;
 }
 
 export const PAGE_SIZE = 12;
+
+export function isMarketplace(v: string): v is Marketplace {
+  return v === "1688" || v === "alibaba" || v === "amazon" || v === "global";
+}
+
+export function currencySymbol(c: "CNY" | "USD") {
+  return c === "USD" ? "$" : "CNY ";
+}

@@ -12,9 +12,9 @@ import {
   Clock,
   MapPin,
 } from "lucide-react";
-import { Container, Section, SectionHeading, Badge, Card } from "@/components/twt/primitives";
-import { ExternalButton, LinkButton } from "@/components/twt/button";
-import { ProductCard } from "@/components/twt/product-card";
+import { Container, Section, SectionHeading, Badge, Card } from "@/components/s2b/primitives";
+import { ExternalButton, LinkButton } from "@/components/s2b/button";
+import { ProductCard } from "@/components/s2b/product-card";
 import { siteConfig, services, type ServiceKey } from "@/config/site";
 import { generalInquiry } from "@/lib/whatsapp";
 import { featuredProducts } from "@/lib/products/mock-provider";

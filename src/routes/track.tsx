@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { MessageCircle, Search } from "lucide-react";
-import { Container, Section, Badge, Card } from "@/components/twt/primitives";
-import { ExternalButton, Input } from "@/components/twt/button";
+import { Container, Section, Badge, Card } from "@/components/s2b/primitives";
+import { ExternalButton, Input } from "@/components/s2b/button";
 import { trackingInquiry } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/track")({

@@ -3,9 +3,9 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { MessageCircle, Store, MapPin, Package } from "lucide-react";
-import { Container, Section, Badge, SectionHeading } from "@/components/twt/primitives";
-import { ExternalButton, Input } from "@/components/twt/button";
-import { ProductCard, priceLabel } from "@/components/twt/product-card";
+import { Container, Section, Badge, SectionHeading } from "@/components/s2b/primitives";
+import { ExternalButton, Input } from "@/components/s2b/button";
+import { ProductCard, priceLabel } from "@/components/s2b/product-card";
 import { productQuote } from "@/lib/whatsapp";
 import type { ProductDetail, ProductSummary } from "@/lib/products/types";
 
