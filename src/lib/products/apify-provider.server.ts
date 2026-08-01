@@ -362,7 +362,8 @@ function inputFor(marketplace: Marketplace, query: string, limit: number): unkno
       // The actor rejects anything under 50; we stop reading at `limit` anyway.
       return { searchQueries: [query], maxProducts: Math.max(limit, 50) };
     case "amazon":
-      return { query, maxResults: limit };
+      // The actor rejects anything under 20; we stop reading at `limit` anyway.
+      return { query, maxResults: Math.max(limit, 20) };
     default:
       return { keywords: [query], maxResults: limit };
   }
