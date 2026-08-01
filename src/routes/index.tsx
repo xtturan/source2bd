@@ -26,10 +26,10 @@ export const Route = createFileRoute("/")({
         content:
           "Source2BD sources from 1688, Alibaba, Amazon and any global store, then moves it to Dhaka and Chattogram by air, sea, courier or hand carry. WhatsApp quotes same day.",
       },
-      { property: "og:title", content: "Source2BD, global sourcing and Bangladesh cargo" },
+      { property: "og:title", content: "Source2BD, source from anywhere and land it in Bangladesh" },
       {
         property: "og:description",
-        content: "One desk for sourcing and freight into Bangladesh. Quotes on WhatsApp, same working day.",
+        content: "Source2BD sources from 1688, Alibaba, Amazon and any global store, then moves it to Dhaka and Chattogram by air, sea, courier or hand carry. WhatsApp quotes same day.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
