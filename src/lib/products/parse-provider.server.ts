@@ -109,6 +109,11 @@ function num(v: unknown) {
   }
   return undefined;
 }
+function qty(v: unknown) {
+  const n = num(v);
+  return n && n >= 1 ? Math.round(n) : undefined;
+}
+
 function obj(v: unknown): Raw {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Raw) : {};
 }
@@ -177,7 +182,7 @@ function mapAlibaba(raw: Raw): ProductDetail | null {
     title,
     ...priceRange(str(raw["price"])),
     currency: "USD",
-    moq: moqText ? num(moqText) : undefined,
+    moq: qty(moqText),
     imageUrl: image,
     shopName: str(raw["company_name"]),
     city: str(raw["country_code"]),
@@ -319,7 +324,7 @@ async function detailAlibaba(id: string): Promise<ProductDetail | null> {
     title,
     ...priceRange(str(data["price_display"])),
     currency: "USD",
-    moq: moqText ? num(moqText) : tiers[0]?.minQty,
+    moq: qty(moqText) ?? tiers[0]?.minQty,
     imageUrl: images[0],
     shopName: str(data["supplier_name"]),
     productUrl:
