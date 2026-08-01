@@ -151,6 +151,18 @@ function SearchPanelInner() {
   const [marketplace, setMarketplace] = useState<Marketplace>("global");
   const [items, setItems] = useState<ProductSummary[] | null>(null);
   const search = useServerFn(searchProducts);
+  const [listening, setListening] = useState(false);
+  const [voiceReady, setVoiceReady] = useState(false);
+
+  useEffect(() => {
+    setVoiceReady(
+      typeof window !== "undefined" &&
+        Boolean(
+          (window as unknown as { SpeechRecognition?: unknown }).SpeechRecognition ??
+            (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition,
+        ),
+    );
+  }, []);
 
   const mutation = useMutation({
     mutationFn: (vars: { q: string; marketplace: Marketplace }) =>
@@ -158,8 +170,31 @@ function SearchPanelInner() {
     onSuccess: (res) => setItems(res.items),
   });
 
+  // Speaking is easier than spelling. Falls back silently when unsupported.
+  function startVoice() {
+    const Ctor =
+      (window as unknown as { SpeechRecognition?: new () => any }).SpeechRecognition ??
+      (window as unknown as { webkitSpeechRecognition?: new () => any }).webkitSpeechRecognition;
+    if (!Ctor) return;
+    const rec = new Ctor();
+    rec.lang = "bn-BD";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e: any) => {
+      const text = String(e.results?.[0]?.[0]?.transcript ?? "").trim();
+      if (!text) return;
+      setQ(text);
+      mutation.mutate({ q: text, marketplace });
+    };
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    setListening(true);
+    rec.start();
+  }
+
   return (
     <div>
+      <p className="font-bn mb-3 text-lg font-bold">পণ্যের নাম লিখুন বা বলুন</p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -170,17 +205,50 @@ function SearchPanelInner() {
         <label className="sr-only" htmlFor="q">
           Product keyword
         </label>
-        <input
-          id="q"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Try led strip, phone case, kitchen rack"
-          className="h-12 flex-1 rounded-[12px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
-        />
-        <Button type="submit" size="lg" disabled={mutation.isPending}>
+        <div className="relative flex-1">
+          <input
+            id="q"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="led light, phone case, kitchen rack"
+            className="h-14 w-full rounded-[14px] border border-input bg-background/60 pl-4 pr-14 text-base outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          />
+          {voiceReady ? (
+            <button
+              type="button"
+              onClick={startVoice}
+              aria-label="Speak the product name"
+              className={cn(
+                "absolute right-2 top-2 grid h-10 w-10 place-items-center rounded-full transition-colors",
+                listening ? "animate-pulse bg-accent text-accent-foreground" : "bg-foreground/8 text-foreground",
+              )}
+            >
+              <IconMic className="h-5 w-5" />
+            </button>
+          ) : null}
+        </div>
+        <Button type="submit" size="lg" disabled={mutation.isPending} className="h-14 text-base">
+          <IconSearch className="h-5 w-5" />
           {mutation.isPending ? "Searching" : "Search"}
         </Button>
       </form>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="font-bn text-sm text-muted-foreground">যেমন:</span>
+        {["led light", "phone case", "kitchen rack", "school bag"].map((ex) => (
+          <button
+            key={ex}
+            type="button"
+            onClick={() => {
+              setQ(ex);
+              mutation.mutate({ q: ex, marketplace });
+            }}
+            className="min-h-[40px] rounded-full bg-foreground/6 px-4 text-sm font-semibold hover:bg-foreground/10"
+          >
+            {ex}
+          </button>
+        ))}
+      </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {markets.map((m) => (
