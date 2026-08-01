@@ -245,6 +245,86 @@ function toSummary(d: ProductDetail): ProductSummary {
   return rest;
 }
 
+/* ---------- generic mapper for alibaba / aliexpress / amazon actors ---------- */
+
+function pick(raw: Raw, keys: string[]) {
+  for (const k of keys) {
+    const v = str(raw[k]);
+    if (v) return v;
+  }
+  return undefined;
+}
+function pickNum(raw: Raw, keys: string[]) {
+  for (const k of keys) {
+    const v = num(raw[k]);
+    if (v) return v;
+  }
+  return undefined;
+}
+
+function mapGeneric(raw: Raw, marketplace: Marketplace): ProductDetail | null {
+  const title = pick(raw, ["title", "name", "productTitle", "product_title", "original_title"]);
+  const productUrl = pick(raw, ["url", "productUrl", "product_url", "detailUrl", "link"]);
+  const id =
+    pick(raw, ["id", "productId", "product_id", "asin", "offerId", "itemId"]) ??
+    (productUrl ? /(\d{6,}|[A-Z0-9]{10})/.exec(productUrl)?.[1] : undefined);
+  if (!title || !productUrl || !id) return null;
+
+  const images = strList(raw["images"]);
+  const imageUrl =
+    pick(raw, ["image", "imageUrl", "image_url", "thumbnail", "mainImage"]) ?? images[0];
+  const lo = pickNum(raw, ["priceMin", "price_min", "price", "minPrice", "currentPrice"]);
+  const hi = pickNum(raw, ["priceMax", "price_max", "maxPrice", "originalPrice"]);
+
+  return {
+    id,
+    marketplace,
+    title,
+    priceMin: lo && hi ? Math.min(lo, hi) : (lo ?? hi),
+    priceMax: lo && hi ? Math.max(lo, hi) : undefined,
+    currency: marketplace === "1688" ? "CNY" : "USD",
+    moq: pickNum(raw, ["moq", "minOrderQuantity", "min_order_quantity"]),
+    imageUrl,
+    shopName: pick(raw, ["shopName", "shop_name", "seller", "sellerName", "supplier", "brand"]),
+    city: pick(raw, ["country", "location", "city"]),
+    productUrl,
+    ordersHint: pick(raw, ["soldDisplay", "orders", "sold", "reviewsCount"]),
+    images: images.length ? images : imageUrl ? [imageUrl] : [],
+    description: pick(raw, ["description", "descriptionText"]),
+  };
+}
+
+function inputFor(marketplace: Marketplace, query: string, page: number, limit: number): unknown {
+  switch (marketplace) {
+    case "1688":
+      return { keywords: [query], maxResults: limit };
+    case "alibaba":
+      return { keywords: [query], maxResults: limit, page };
+    case "aliexpress":
+      return { keyword: query, search: query, maxItems: limit, page };
+    case "amazon":
+      return { keywords: [query], keyword: query, maxItems: limit, maxResults: limit, page };
+    default:
+      return { keywords: [query], maxResults: limit };
+  }
+}
+
+async function searchOne(
+  marketplace: Marketplace,
+  query: string,
+  page: number,
+  limit: number,
+): Promise<ProductSummary[]> {
+  const actor = actorFor(marketplace);
+  if (!actor) return (await mockProvider.search(query, { marketplace, page })).items.slice(0, limit);
+  const raw = await runActor<Raw>(actor, inputFor(marketplace, query, page, limit), limit);
+  const map = marketplace === "1688" ? map1688 : (r: Raw) => mapGeneric(r, marketplace);
+  return raw
+    .map(map)
+    .filter((x): x is ProductDetail => !!x)
+    .map(toSummary);
+}
+
 function offerIdFromUrl(url: string) {
   return (
     /\/offer\/(\d+)\.html/.exec(url)?.[1] ??
@@ -258,22 +338,38 @@ export function createApifyProvider(): ProductProvider {
     name: "apify",
 
     async search(query, opts): Promise<SearchResult> {
-      const marketplace = opts?.marketplace ?? "1688";
+      const marketplace = opts?.marketplace ?? "global";
       const page = opts?.page ?? 1;
-      const actor = actorFor(marketplace);
 
-      // No live actor for this marketplace yet: serve the demo catalogue.
-      if (!actor) return mockProvider.search(query, opts);
+      // "All origins": fan out to every marketplace in parallel and interleave
+      // the results so the grid shows a spread of 24 listings, not one source.
+      if (marketplace === "global") {
+        const per = Math.ceil(PAGE_SIZE / FANOUT_ORIGINS.length);
+        const settled = await Promise.allSettled(
+          FANOUT_ORIGINS.map((m) => searchOne(m, query, page, per)),
+        );
+        const buckets = settled.map((r) => (r.status === "fulfilled" ? r.value : []));
+        settled.forEach((r, i) => {
+          if (r.status === "rejected")
+            console.error(`origin ${FANOUT_ORIGINS[i]} search failed`, r.reason);
+        });
 
-      if (marketplace === "1688" || marketplace === "global") {
-        const raw = await runActor<Raw>(actor, { keywords: [query], maxResults: PAGE_SIZE }, PAGE_SIZE);
-        const mapped = raw.map(map1688).filter((x): x is ProductDetail => !!x).map(toSummary);
-        return { items: await translateProducts(mapped), page };
+        const items: ProductSummary[] = [];
+        for (let i = 0; items.length < PAGE_SIZE; i++) {
+          const row = buckets.map((b) => b[i]).filter((x): x is ProductSummary => !!x);
+          if (!row.length) break;
+          items.push(...row);
+        }
+        if (!items.length) {
+          throw new ProviderUnavailableError(
+            "Live marketplace search did not come back. Send the keyword on WhatsApp and we will source it by hand.",
+          );
+        }
+        return { items: await translateProducts(items.slice(0, PAGE_SIZE)), page };
       }
 
-      const raw = await runActor<Raw>(actor, { keyword: query, query, page, maxItems: PAGE_SIZE }, PAGE_SIZE);
-      const mapped = raw.map(map1688).filter((x): x is ProductDetail => !!x).map(toSummary);
-      return { items: await translateProducts(mapped), page };
+      const single = await searchOne(marketplace, query, page, PAGE_SIZE);
+      return { items: await translateProducts(single), page };
     },
 
     async getById(id, marketplace = "1688"): Promise<ProductDetail | null> {
@@ -305,11 +401,18 @@ export function createApifyProvider(): ProductProvider {
           ? mockProvider.searchByImage(imageUrl, opts)
           : { items: [] };
       }
-      const marketplace = opts?.marketplace ?? "1688";
-      const provider = marketplace === "alibaba" ? "alibaba" : marketplace === "1688" ? "1688" : "aliexpress";
+      const marketplace = opts?.marketplace ?? "global";
+      const provider =
+        marketplace === "alibaba"
+          ? "alibaba"
+          : marketplace === "aliexpress"
+            ? "aliexpress"
+            : marketplace === "1688"
+              ? "1688"
+              : "global";
       const raw = await runActor<Raw>(
         actor,
-        { provider, imageUrls: [imageUrl], maxProducts: 30 },
+        { provider, destination: provider, imageUrls: [imageUrl], imageUrl, maxProducts: PAGE_SIZE },
         PAGE_SIZE,
       );
       const mapped = raw.map(mapImageItem).filter((x): x is ProductDetail => !!x).map(toSummary);
