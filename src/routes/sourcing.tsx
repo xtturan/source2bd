@@ -101,6 +101,27 @@ function SourcingPage() {
 }
 
 function SearchPanel() {
+  return <SearchPanelInner />;
+}
+
+function LiveProgress({ label }: { label: string }) {
+  const [sec, setSec] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setSec((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-[12px] border border-border bg-background/60 px-4 py-3 text-sm">
+      <span className="h-2 w-2 animate-pulse rounded-full bg-accent" aria-hidden />
+      <span className="font-medium">{label}</span>
+      <span className="text-muted-foreground">
+        live scrape, usually 30 to 60 seconds. {sec}s elapsed
+      </span>
+    </div>
+  );
+}
+
+function SearchPanelInner() {
   const [q, setQ] = useState("");
   const [marketplace, setMarketplace] = useState<Marketplace>("global");
   const [items, setItems] = useState<ProductSummary[] | null>(null);
