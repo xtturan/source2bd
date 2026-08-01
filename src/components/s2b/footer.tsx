@@ -6,7 +6,7 @@ import { generalInquiry, telLink } from "@/lib/whatsapp";
 
 export function Footer() {
   return (
-    <footer className="mt-24 border-t border-border bg-[#071526]/70">
+    <footer className="mt-24 border-t border-border bg-paper/60">
       <Container className="grid gap-12 py-16 md:grid-cols-[1.3fr_1fr_1fr_1.1fr]">
         <div>
           <Logo />
