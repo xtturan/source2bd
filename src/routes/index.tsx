@@ -100,7 +100,7 @@ function Hero() {
 
 function TrustStrip() {
   return (
-    <Section className="pt-2">
+    <Section className="py-10 sm:py-12">
       <Container>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {trustStats.map((s) => (
