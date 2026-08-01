@@ -1,95 +1,82 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle } from "lucide-react";
-import { Container, Section, SectionHeading, Badge, Card } from "@/components/s2b/primitives";
-import { ExternalButton } from "@/components/s2b/button";
-import { siteConfig } from "@/config/site";
+import { Container, Section, SectionHeading, Card, Stat } from "@/components/s2b/primitives";
+import { ButtonAnchor, ButtonLink, WhatsAppIcon } from "@/components/s2b/button";
 import { generalInquiry } from "@/lib/whatsapp";
+import { siteConfig, trustStats } from "@/config/site";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About TWT International — Dhaka cargo & sourcing desk" },
+      { title: "About Source2BD, a Dhaka sourcing and cargo desk" },
       {
         name: "description",
         content:
-          "TWT International is a Chawkbazar-based China to Bangladesh freight and buying agent team moving cargo from Guangzhou, Yiwu and Shenzhen to Dhaka and Chattogram.",
+          "Source2BD runs sourcing and freight from one desk in Chawkbazar, Dhaka, covering China, Amazon and global marketplaces for Bangladeshi buyers.",
       },
-      { property: "og:title", content: "About TWT International" },
-      {
-        property: "og:description",
-        content: "Who we are, how we work, and what we refuse to ship.",
-      },
-      { property: "og:url", content: "/about" },
+      { property: "og:title", content: "About Source2BD" },
+      { property: "og:description", content: "A Dhaka desk covering sourcing and freight end to end." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
   }),
   component: AboutPage,
 });
 
 function AboutPage() {
   return (
-    <>
-      <div className="grid-lines bg-navy py-14 text-white">
-        <Container>
-          <Badge tone="outline">About</Badge>
-          <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] sm:text-5xl">
-            A cargo desk that answers, not a call centre.
-          </h1>
-          <p className="font-bn mt-3 text-white/70">আমাদের সম্পর্কে</p>
-        </Container>
-      </div>
+    <Section>
+      <Container>
+        <SectionHeading
+          eyebrow="About"
+          title="Built for importers who are tired of guessing"
+          titleBn="আমাদের সম্পর্কে"
+          intro="Most Bangladeshi buyers work with one agent for sourcing, another for freight, and a third for clearance. Every handover is a place where the price grows and the timeline slips. Source2BD keeps all three on one desk."
+        />
 
-      <Section>
-        <Container className="grid gap-12 lg:grid-cols-2">
-          <div className="space-y-5 text-[15px] leading-relaxed text-steel">
-            <p>
-              {siteConfig.name} moves goods from the Chinese wholesale markets into Bangladesh:
-              Guangzhou, Yiwu and Shenzhen out; Dhaka and Chattogram in. We run air, sea, courier
-              and hand carry lanes, hold and consolidate cargo at our China warehouse, and act as a
-              buying agent for importers who can't read a 1688 listing.
-            </p>
-            <p>
-              Most of our customers are small and mid-size traders who've been burned by vague
-              quotes. So we do the boring things properly: tell you whether air or sea is actually
-              cheaper for your cartons, verify counts before shipping, and separate freight from
-              duty instead of hiding one inside the other.
-            </p>
-            <p>
-              Everything runs through one WhatsApp thread from our {siteConfig.office}. You talk to
-              the same people from quote to delivery.
-            </p>
-            <div className="pt-2">
-              <ExternalButton href={generalInquiry()} size="lg">
-                <MessageCircle className="size-5" /> Talk to us
-              </ExternalButton>
-            </div>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {trustStats.map((s) => (
+            <Stat key={s.label} value={s.value} label={s.label} sub={s.sub} />
+          ))}
+        </div>
+
+        <div className="mt-14 grid gap-4 lg:grid-cols-3">
+          {[
+            {
+              t: "Multi origin by default",
+              b: "China for factory pricing, Amazon for brand items and spares, global stores for everything else. We compare rather than push one lane.",
+            },
+            {
+              t: "Priced in the open",
+              b: "Product cost, service fee and freight are three separate numbers. You can check the supplier price yourself on the original listing.",
+            },
+            {
+              t: "Legal cargo only",
+              b: `${siteConfig.policy} We would rather lose an order than lose your shipment at the port.`,
+            },
+          ].map((c) => (
+            <Card key={c.t} className="p-6">
+              <h2 className="text-lg font-bold">{c.t}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{c.b}</p>
+            </Card>
+          ))}
+        </div>
+
+        <Card className="mt-12 p-8">
+          <h2 className="text-2xl font-extrabold">Where to find us</h2>
+          <p className="mt-3 max-w-[60ch] text-sm leading-relaxed text-muted-foreground">
+            {siteConfig.officeLine2}. Desk hours {siteConfig.hours}. Walk in with a sample or a
+            photo and we will price it while you are there.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <ButtonAnchor href={generalInquiry()} target="_blank" rel="noopener noreferrer" variant="green" size="lg">
+              <WhatsAppIcon /> Message the desk
+            </ButtonAnchor>
+            <ButtonLink to="/contact" variant="glass" size="lg">
+              Contact details
+            </ButtonLink>
           </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { t: "Origin cities", d: siteConfig.originCities.join(" · ") },
-              { t: "Destinations", d: siteConfig.destinationCities.join(" · ") },
-              { t: "Office", d: siteConfig.officeLine2 },
-              { t: "Hours", d: siteConfig.hours },
-            ].map((s) => (
-              <Card key={s.t} className="p-5">
-                <p className="text-xs font-semibold uppercase tracking-wider text-green">{s.t}</p>
-                <p className="mt-2 font-semibold text-navy">{s.d}</p>
-              </Card>
-            ))}
-          </div>
-        </Container>
-      </Section>
-
-      <Section tone="muted" className="py-16">
-        <Container>
-          <SectionHeading
-            eyebrow="Our line in the sand"
-            title="Legal goods only"
-            intro="We do not move restricted, prohibited or counterfeit items, and we do not under-declare shipments to reduce duty. If a consignment can't be shipped honestly, we'd rather lose the job."
-          />
-        </Container>
-      </Section>
-    </>
+        </Card>
+      </Container>
+    </Section>
   );
 }
