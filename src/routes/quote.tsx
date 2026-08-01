@@ -27,7 +27,7 @@ export const Route = createFileRoute("/quote")({
 });
 
 const inputClass =
-  "mt-1.5 h-11 w-full rounded-[11px] border border-input bg-background/60 px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent";
+  "mt-1.5 h-11 w-full rounded-[12px] border border-input bg-background/60 px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent";
 
 function QuotePage() {
   const [mode, setMode] = useState(services[0]!.title);
@@ -99,7 +99,7 @@ function QuotePage() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Product links, carton count, target date, anything else that helps"
-                className="mt-1.5 w-full rounded-[11px] border border-input bg-background/60 p-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                className="mt-1.5 w-full rounded-[12px] border border-input bg-background/60 p-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
               />
             </div>
 

@@ -65,9 +65,9 @@ export function Badge({
   tone?: "neutral" | "green" | "signal" | "outline";
 }) {
   const tones = {
-    neutral: "bg-foreground/6 text-muted-foreground ring-1 ring-inset ring-border",
-    green: "bg-accent/12 text-accent ring-1 ring-inset ring-accent/25",
-    signal: "bg-signal/14 text-[#ff6b81] ring-1 ring-inset ring-signal/30",
+    neutral: "bg-foreground/[0.05] text-muted-foreground ring-1 ring-inset ring-border",
+    green: "bg-accent/10 text-accent ring-1 ring-inset ring-accent/25",
+    signal: "bg-accent/10 text-accent ring-1 ring-inset ring-accent/25",
     outline: "ring-1 ring-inset ring-border text-foreground/80",
   } as const;
   return (
@@ -84,11 +84,11 @@ export function Badge({
 }
 
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("glass matte rounded-[15px]", className)} {...props} />;
+  return <div className={cn("panel matte rounded-[18px]", className)} {...props} />;
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-[11px] bg-foreground/8", className)} />;
+  return <div className={cn("animate-pulse rounded-[12px] bg-foreground/[0.07]", className)} />;
 }
 
 export function EmptyState({
@@ -101,7 +101,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="matte rounded-[15px] border border-dashed border-border px-6 py-14 text-center">
+    <div className="matte rounded-[18px] border border-dashed border-border px-6 py-14 text-center">
       <h3 className="text-lg font-bold">{title}</h3>
       <p className="mx-auto mt-2 max-w-[52ch] text-sm leading-relaxed text-muted-foreground">{body}</p>
       {action ? <div className="mt-6 flex justify-center">{action}</div> : null}
@@ -111,7 +111,7 @@ export function EmptyState({
 
 export function Stat({ value, label, sub }: { value: string; label: string; sub?: string }) {
   return (
-    <div className="glass matte rounded-[15px] px-5 py-6">
+    <div className="panel matte rounded-[18px] px-5 py-6">
       <div className="tnum text-3xl font-extrabold tracking-tight">{value}</div>
       <div className="mt-1 text-sm font-semibold">{label}</div>
       {sub ? <div className="mt-1 text-xs text-muted-foreground">{sub}</div> : null}

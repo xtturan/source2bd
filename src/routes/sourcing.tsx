@@ -62,7 +62,7 @@ function SourcingPage() {
             intro="Demo catalogue is live now at zero API cost. Live marketplace lookup switches on behind the same interface when you enable a provider key."
           />
 
-          <div className="glass matte mt-10 rounded-[15px] p-2">
+          <div className="glass matte mt-10 rounded-[18px] p-2">
             <div role="tablist" aria-label="Sourcing method" className="grid grid-cols-3 gap-1">
               {(
                 [
@@ -77,7 +77,7 @@ function SourcingPage() {
                   aria-selected={mode === key}
                   onClick={() => setMode(key)}
                   className={cn(
-                    "h-11 rounded-[11px] text-sm font-semibold transition-colors duration-150",
+                    "h-11 rounded-[12px] text-sm font-semibold transition-colors duration-150",
                     mode === key
                       ? "bg-foreground/10 text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.1)]"
                       : "text-muted-foreground hover:text-foreground",
@@ -129,7 +129,7 @@ function SearchPanel() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Try led strip, phone case, kitchen rack"
-          className="h-12 flex-1 rounded-[11px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="h-12 flex-1 rounded-[12px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
         />
         <Button type="submit" size="lg" disabled={mutation.isPending}>
           {mutation.isPending ? "Searching" : "Search"}
@@ -229,7 +229,7 @@ function LinkPanel() {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://detail.1688.com/offer/... or amazon.com/dp/..."
-          className="h-12 flex-1 rounded-[11px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          className="h-12 flex-1 rounded-[12px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
         />
         <Button type="submit" size="lg" disabled={mutation.isPending || url.trim().length < 8}>
           {mutation.isPending ? "Reading" : "Read link"}
@@ -269,7 +269,7 @@ function LinkResult({ item }: { item: ProductDetail }) {
         <img
           src={item.imageUrl}
           alt={item.title}
-          className="h-40 w-40 shrink-0 rounded-[11px] object-cover"
+          className="h-40 w-40 shrink-0 rounded-[12px] object-cover"
           loading="lazy"
         />
       ) : null}
@@ -302,7 +302,7 @@ function LinkResult({ item }: { item: ProductDetail }) {
             <Link
               to="/product/$marketplace/$id"
               params={{ marketplace: item.marketplace, id: item.id }}
-              className="glass inline-flex h-11 items-center justify-center rounded-[11px] px-5 text-sm font-semibold transition-transform duration-150 hover:-translate-y-0.5"
+              className="glass inline-flex h-11 items-center justify-center rounded-[12px] px-5 text-sm font-semibold transition-transform duration-150 hover:-translate-y-0.5"
             >
               Open full listing
             </Link>

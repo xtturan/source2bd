@@ -72,7 +72,7 @@ function ProductPage() {
 
         <div className="mt-6 grid gap-10 lg:grid-cols-[1.05fr_1fr]">
           <div>
-            <div className="glass matte overflow-hidden rounded-[15px]">
+            <div className="glass matte overflow-hidden rounded-[18px]">
               <img
                 src={item.images[active] ?? item.imageUrl}
                 alt={item.title}
@@ -87,7 +87,7 @@ function ProductPage() {
                     onClick={() => setActive(i)}
                     aria-label={`View image ${i + 1}`}
                     className={
-                      "h-20 w-20 overflow-hidden rounded-[11px] border transition-colors " +
+                      "h-20 w-20 overflow-hidden rounded-[12px] border transition-colors " +
                       (i === active ? "border-accent" : "border-border hover:border-foreground/30")
                     }
                   >
@@ -157,7 +157,7 @@ function ProductPage() {
                     inputMode="numeric"
                     value={qty}
                     onChange={(e) => setQty(e.target.value)}
-                    className="tnum mt-1.5 h-11 w-full rounded-[11px] border border-input bg-background/60 px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="tnum mt-1.5 h-11 w-full rounded-[12px] border border-input bg-background/60 px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   />
                 </div>
                 <div>
@@ -168,7 +168,7 @@ function ProductPage() {
                     id="city"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="mt-1.5 h-11 w-full rounded-[11px] border border-input bg-background/60 px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="mt-1.5 h-11 w-full rounded-[12px] border border-input bg-background/60 px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   />
                 </div>
               </div>

@@ -54,7 +54,7 @@ function TrackPage() {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="S2B-2026-00123"
-              className="tnum h-12 flex-1 rounded-[11px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
+              className="tnum h-12 flex-1 rounded-[12px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
             />
             <ButtonAnchor
               href={trackingInquiry(code || "not sure of my code")}

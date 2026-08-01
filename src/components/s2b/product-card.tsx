@@ -15,11 +15,11 @@ function priceLabel(p: ProductSummary) {
 
 export function ProductCard({ product }: { product: ProductSummary }) {
   return (
-    <article className="glass matte lift group flex flex-col overflow-hidden rounded-[15px]">
+    <article className="panel matte lift group flex flex-col overflow-hidden rounded-[18px]">
       <Link
         to="/product/$marketplace/$id"
         params={{ marketplace: product.marketplace, id: product.id }}
-        className="relative block aspect-square overflow-hidden bg-foreground/5"
+        className="relative block aspect-square overflow-hidden bg-stone-1"
       >
         {product.imageUrl ? (
           <img
@@ -30,7 +30,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           />
         ) : null}
         <span className="absolute left-3 top-3">
-          <Badge tone="outline" className="bg-background/70 backdrop-blur-md">
+          <Badge tone="outline" className="bg-paper/80 backdrop-blur-md">
             {marketplaceLabels[product.marketplace]}
           </Badge>
         </span>
@@ -65,7 +65,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           })}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto inline-flex h-10 items-center justify-center gap-2 rounded-[11px] bg-accent text-sm font-semibold text-accent-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.28)] transition-transform duration-150 hover:-translate-y-0.5"
+          className="mt-auto inline-flex h-10 items-center justify-center gap-2 rounded-full bg-accent text-sm font-semibold text-accent-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.24)] transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.98]"
         >
           <WhatsAppIcon />
           Quote on WhatsApp

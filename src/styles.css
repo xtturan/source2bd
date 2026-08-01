@@ -2,39 +2,35 @@
 @import "tw-animate-css";
 @source "../src";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme {
-  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-bn: "Noto Sans Bengali", "DM Sans", sans-serif;
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --font-bn: "Noto Sans Bengali", "Geist", sans-serif;
 
-  --color-navy: #0a2540;
-  --color-navy-deep: #071526;
-  --color-surface: #0b1220;
-  --color-surface-2: #0f1a2b;
-  --color-green: #1fa64a;
-  --color-green-600: #17843a;
-  --color-red: #c41e3a;
-  --color-red-600: #a4162e;
-  --color-steel: #5a6570;
-  --color-mist: #94a3b8;
-  --color-paper: #f6f7f9;
-  --color-charcoal: #141414;
+  /* Stone + ink + one accent. No second accent anywhere. */
+  --color-stone-0: #f4f1ec;
+  --color-stone-1: #eae5dd;
+  --color-stone-2: #ded7cc;
+  --color-ink: #17171a;
+  --color-ink-soft: #3d3c3a;
+  --color-clay: #d9541f;
+  --color-clay-600: #bc4415;
+  --color-paper: #fcfbf9;
 
-  /* Radius lock: cards 15, buttons 11, inputs 11 */
-  --radius-card: 15px;
-  --radius-control: 11px;
+  /* Radius rule: surfaces 18, controls 12, primary buttons pill */
+  --radius-card: 18px;
+  --radius-control: 12px;
 
-  /* Elevation: three levels only */
-  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.24);
-  --shadow-2: 0 2px 6px rgb(0 0 0 / 0.28), 0 18px 40px -28px rgb(0 0 0 / 0.6);
-  --shadow-3: 0 4px 10px rgb(0 0 0 / 0.3), 0 40px 80px -40px rgb(0 0 0 / 0.75);
+  /* Elevation: three levels only, tinted to the ground */
+  --shadow-1: 0 1px 2px rgb(60 46 30 / 0.06);
+  --shadow-2: 0 2px 6px rgb(60 46 30 / 0.07), 0 18px 36px -26px rgb(60 46 30 / 0.28);
+  --shadow-3: 0 6px 14px rgb(60 46 30 / 0.09), 0 44px 80px -44px rgb(60 46 30 / 0.42);
 }
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
@@ -57,33 +53,34 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-signal: var(--accent);
+  --color-signal-600: var(--color-clay-600);
 }
 
 :root {
-  --radius: 0.875rem;
+  --radius: 1.125rem;
 
-  /* Dark-first marketing surface */
-  --background: #0b1220;
-  --foreground: #f6f7f9;
-  --card: #0f1a2b;
-  --card-foreground: #f6f7f9;
-  --popover: #0f1a2b;
-  --popover-foreground: #f6f7f9;
-  --primary: #c41e3a;
-  --primary-foreground: #ffffff;
-  --secondary: #0a2540;
-  --secondary-foreground: #f6f7f9;
-  --muted: #12203a;
-  --muted-foreground: #94a3b8;
-  --accent: #1fa64a;
-  --accent-foreground: #04150a;
-  --destructive: #c41e3a;
+  --background: #f1eee8;
+  --foreground: #17171a;
+  --card: #fcfbf9;
+  --card-foreground: #17171a;
+  --popover: #fcfbf9;
+  --popover-foreground: #17171a;
+  --primary: #17171a;
+  --primary-foreground: #fcfbf9;
+  --secondary: #eae5dd;
+  --secondary-foreground: #17171a;
+  --muted: #eae5dd;
+  --muted-foreground: #6d6a63;
+  --accent: #d9541f;
+  --accent-foreground: #ffffff;
+  --destructive: #b3341a;
   --destructive-foreground: #ffffff;
-  --border: rgb(148 163 184 / 0.16);
-  --input: rgb(148 163 184 / 0.22);
-  --ring: #1fa64a;
+  --border: rgb(23 23 26 / 0.1);
+  --input: rgb(23 23 26 / 0.14);
+  --ring: #d9541f;
 
-  --glass-blur: 20px;
+  --glass-blur: 18px;
 }
 
 @layer base {
@@ -103,6 +100,7 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Plaster ground: soft light fall plus a faint warm bloom */
   body::before {
     content: "";
     position: fixed;
@@ -110,9 +108,9 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(58rem 38rem at 8% -12%, rgb(31 166 74 / 0.1), transparent 62%),
-      radial-gradient(50rem 34rem at 96% 0%, rgb(196 30 58 / 0.1), transparent 60%),
-      linear-gradient(180deg, #0a2540 0%, #0b1220 55%);
+      radial-gradient(60rem 40rem at 12% -10%, rgb(255 255 255 / 0.9), transparent 60%),
+      radial-gradient(46rem 32rem at 92% 4%, rgb(217 84 31 / 0.07), transparent 62%),
+      linear-gradient(180deg, #f6f3ee 0%, #ece8e1 60%, #e8e3da 100%);
   }
 
   h1,
@@ -124,8 +122,8 @@
   }
 
   ::selection {
-    background: var(--color-green);
-    color: #04150a;
+    background: var(--color-clay);
+    color: #fff;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -150,25 +148,32 @@
 
 @utility grid-lines {
   background-image:
-    linear-gradient(to right, rgb(148 163 184 / 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(148 163 184 / 0.07) 1px, transparent 1px);
-  background-size: 72px 72px;
+    linear-gradient(to right, rgb(23 23 26 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(23 23 26 / 0.05) 1px, transparent 1px);
+  background-size: 76px 76px;
 }
 
-/* Dark matte glass panel */
+/* Raised paper surface on the plaster ground */
 @utility glass {
-  background-color: rgb(246 247 249 / 0.045);
-  backdrop-filter: blur(var(--glass-blur)) saturate(135%);
-  border: 1px solid rgb(148 163 184 / 0.16);
-  box-shadow: var(--shadow-2), inset 0 1px 0 rgb(246 247 249 / 0.07);
+  background-color: rgb(252 251 249 / 0.72);
+  backdrop-filter: blur(var(--glass-blur)) saturate(115%);
+  border: 1px solid rgb(23 23 26 / 0.08);
+  box-shadow: var(--shadow-2), inset 0 1px 0 rgb(255 255 255 / 0.75);
 }
 
-/* Light content panel on dark ground */
+/* Solid paper card */
 @utility panel {
   background-color: var(--color-paper);
-  color: var(--color-navy-deep);
-  border: 1px solid rgb(10 37 64 / 0.08);
+  color: var(--color-ink);
+  border: 1px solid rgb(23 23 26 / 0.08);
   box-shadow: var(--shadow-2);
+}
+
+/* Ink block for inverted sections */
+@utility inkwell {
+  background-color: var(--color-ink);
+  color: #f4f1ec;
+  border: 1px solid rgb(255 255 255 / 0.08);
 }
 
 @utility matte {
@@ -181,25 +186,25 @@
     z-index: -1;
     border-radius: inherit;
     pointer-events: none;
-    opacity: 0.45;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
   }
 }
 
 @utility lift {
   transition:
-    transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 180ms ease,
+    box-shadow 180ms ease;
   &:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-3);
-    border-color: rgb(148 163 184 / 0.3);
+    border-color: rgb(23 23 26 / 0.16);
   }
 }
 
 @utility reveal {
-  animation: reveal-rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: reveal-rise 560ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @keyframes reveal-rise {
@@ -211,9 +216,4 @@
     opacity: 1;
     transform: none;
   }
-}
-
-@theme {
-  --color-signal: #c41e3a;
-  --color-signal-600: #a4162e;
 }
