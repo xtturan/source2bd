@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site";
+import { bdtLabel } from "@/lib/products/pricing";
 
 const MAX = 1200;
 
