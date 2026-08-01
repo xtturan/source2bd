@@ -58,9 +58,20 @@ export function Header() {
           </ButtonAnchor>
         </div>
 
+        <a
+          href={`tel:${siteConfig.phoneTel}`}
+          className="ml-auto flex h-11 items-center gap-2 rounded-full bg-accent px-4 text-accent-foreground lg:hidden"
+          aria-label={`Call ${siteConfig.phoneDisplay}`}
+        >
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M6.5 3.5h3l1.4 3.6-2 1.4a12 12 0 0 0 5.6 5.6l1.4-2 3.6 1.4v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2z" />
+          </svg>
+          <span className="font-bn text-sm font-bold">ফোন</span>
+        </a>
+
         <button
           type="button"
-          className="glass flex h-10 w-10 items-center justify-center rounded-[12px] lg:hidden"
+          className="glass flex h-11 w-11 items-center justify-center rounded-[12px] lg:hidden"
           aria-expanded={open}
           aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((v) => !v)}
@@ -79,7 +90,7 @@ export function Header() {
                 key={l.to}
                 to={l.to}
                 onClick={() => setOpen(false)}
-                className="rounded-[12px] px-3 py-3 text-sm font-semibold text-muted-foreground hover:bg-foreground/6 hover:text-foreground"
+                className="flex min-h-[52px] items-center rounded-[12px] px-3 text-base font-semibold text-muted-foreground hover:bg-foreground/6 hover:text-foreground"
               >
                 {l.label}
               </Link>
