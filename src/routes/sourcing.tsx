@@ -52,18 +52,18 @@ function SourcingPage() {
 
       <Section className="pt-10">
         <Container>
-          <div className="inline-flex rounded-xl border border-border bg-[#f4f6f8] p-1">
+          <div className="inline-flex rounded-xl border border-navy/10 bg-white/45 p-1 backdrop-blur-md">
             <button
               type="button"
               onClick={() => setTab("search")}
-              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${tab === "search" ? "bg-white text-navy shadow-[var(--shadow-lift)]" : "text-steel"}`}
+              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${tab === "search" ? "bg-white text-navy shadow-[var(--shadow-lift)] ring-1 ring-inset ring-navy/5" : "text-steel"}`}
             >
               <Search className="size-4" /> Search
             </button>
             <button
               type="button"
               onClick={() => setTab("link")}
-              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${tab === "link" ? "bg-white text-navy shadow-[var(--shadow-lift)]" : "text-steel"}`}
+              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${tab === "link" ? "bg-white text-navy shadow-[var(--shadow-lift)] ring-1 ring-inset ring-navy/5" : "text-steel"}`}
             >
               <Link2 className="size-4" /> Paste link
             </button>
@@ -140,7 +140,7 @@ function SearchPanel() {
       ) : isFetching ? (
         <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-border p-4">
+            <div key={i} className="rounded-2xl border border-navy/8 bg-white/40 p-4 backdrop-blur-md">
               <Skeleton className="aspect-square w-full" />
               <Skeleton className="mt-4 h-4 w-full" />
               <Skeleton className="mt-2 h-4 w-2/3" />
@@ -247,7 +247,7 @@ function LinkPanel() {
       ) : null}
 
       {mutation.isPending ? (
-        <div className="mt-8 grid gap-6 rounded-2xl border border-border p-5 sm:grid-cols-[220px_1fr]">
+        <div className="mt-8 grid gap-6 rounded-2xl border border-navy/8 bg-white/40 p-5 backdrop-blur-md sm:grid-cols-[220px_1fr]">
           <Skeleton className="aspect-square w-full" />
           <div>
             <Skeleton className="h-5 w-3/4" />
@@ -258,7 +258,7 @@ function LinkPanel() {
       ) : null}
 
       {item ? (
-        <div className="mt-8 grid gap-6 rounded-2xl border border-border bg-white p-5 shadow-[var(--shadow-lift)] sm:grid-cols-[220px_1fr]">
+        <div className="mt-8 grid gap-6 glass matte rounded-2xl p-5 shadow-[var(--shadow-lift)] sm:grid-cols-[220px_1fr]">
           <img
             src={item.imageUrl}
             alt={item.title}
@@ -296,7 +296,7 @@ function LinkPanel() {
                 <Link
                   to="/product/$source/$id"
                   params={{ source: item.source, id: item.id }}
-                  className="inline-flex h-11 items-center rounded-xl border border-navy/15 px-5 text-[15px] font-semibold text-navy hover:bg-[#f6f8fa]"
+                  className="inline-flex h-11 items-center rounded-xl border border-navy/15 px-5 text-[15px] font-semibold text-navy hover:bg-white/80"
                 >
                   Open full listing
                 </Link>

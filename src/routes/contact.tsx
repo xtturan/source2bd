@@ -63,7 +63,7 @@ function ContactPage() {
             </p>
             <a
               href={`tel:${siteConfig.phoneTel}`}
-              className="mt-5 inline-flex h-11 items-center rounded-xl border border-navy/15 px-5 font-semibold text-navy hover:bg-[#f6f8fa]"
+              className="mt-5 inline-flex h-11 items-center rounded-xl border border-navy/15 px-5 font-semibold text-navy hover:bg-white/80"
             >
               {siteConfig.phoneDisplay}
             </a>

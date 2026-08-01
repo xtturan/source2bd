@@ -91,7 +91,7 @@ function HowItWorksPage() {
                     <p className="font-bn text-sm text-steel">{s.bn}</p>
                     <p className="mt-3 text-sm leading-relaxed text-steel">{s.d}</p>
                   </div>
-                  <ul className="space-y-2 rounded-xl bg-[#f6f8fa] p-4 text-sm text-navy">
+                  <ul className="space-y-2 rounded-xl border border-navy/8 bg-white/55 p-4 backdrop-blur-md text-sm text-navy">
                     {s.detail.map((d) => (
                       <li key={d} className="flex gap-2">
                         <span className="mt-2 size-1.5 shrink-0 rounded-full bg-green" />

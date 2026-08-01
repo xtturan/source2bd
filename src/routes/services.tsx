@@ -45,7 +45,7 @@ function ServicesPage() {
             <div
               key={service.key}
               id={service.key}
-              className="scroll-mt-24 grid gap-10 border-t border-border pt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
+              className="scroll-mt-24 grid gap-10 border-t border-navy/8 pt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
             >
               <div>
                 <span className="font-display text-sm font-bold text-green">
@@ -65,7 +65,7 @@ function ServicesPage() {
               </div>
 
               <div className="grid gap-6 sm:grid-cols-2">
-                <div className="rounded-2xl border border-border bg-white p-5">
+                <div className="glass matte rounded-2xl p-5">
                   <h3 className="text-sm font-semibold uppercase tracking-wider text-steel">
                     When to use it
                   </h3>
@@ -78,7 +78,7 @@ function ServicesPage() {
                     ))}
                   </ul>
                 </div>
-                <div className="rounded-2xl border border-border bg-[#f8fafb] p-5">
+                <div className="matte rounded-2xl border border-navy/8 bg-mist/60 p-5 backdrop-blur-md">
                   <h3 className="text-sm font-semibold uppercase tracking-wider text-steel">
                     What to prepare
                   </h3>
