@@ -60,12 +60,15 @@ async function runActor<T>(actorId: string, input: unknown, limit = 12): Promise
 
   const auth = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
 
-  const started = await fetch(`${API}/acts/${encodeURIComponent(actorId)}/runs`, {
+  const started = await fetch(
+    `${API}/acts/${encodeURIComponent(actorId)}/runs?memory=4096&timeout=120`,
+    {
     method: "POST",
     headers: auth,
     body: JSON.stringify(input),
     signal: AbortSignal.timeout(20_000),
-  });
+    },
+  );
 
   if (!started.ok) {
     const body = await started.text();
@@ -84,31 +87,48 @@ async function runActor<T>(actorId: string, input: unknown, limit = 12): Promise
     throw new ProviderUnavailableError("Live marketplace search failed. Use WhatsApp for now.");
   }
 
-  // Poll instead of run-sync: the sync endpoint adds a large fixed wait.
+  // Read the dataset while the run is still going: the actor writes items
+  // incrementally, so we can return as soon as enough rows have landed
+  // instead of waiting for the run to finish.
+  const itemsUrl = `${API}/datasets/${run.defaultDatasetId}/items?limit=${limit}&clean=true`;
   const deadline = Date.now() + 100_000;
+  let items: T[] = [];
+  let finished = false;
+  let wait = 700;
+
   while (Date.now() < deadline) {
-    await new Promise((r) => setTimeout(r, 2500));
-    const statusRes = await fetch(`${API}/actor-runs/${run.id}`, {
-      headers: auth,
-      signal: AbortSignal.timeout(15_000),
-    });
+    await new Promise((r) => setTimeout(r, wait));
+    wait = Math.min(wait + 300, 2000);
+
+    const [itemsRes, statusRes] = await Promise.all([
+      fetch(itemsUrl, { headers: auth, signal: AbortSignal.timeout(15_000) }),
+      fetch(`${API}/actor-runs/${run.id}?fields=status`, {
+        headers: auth,
+        signal: AbortSignal.timeout(10_000),
+      }),
+    ]);
+
+    if (itemsRes.ok) {
+      const json = (await itemsRes.json()) as unknown;
+      if (Array.isArray(json)) items = json as T[];
+    }
+
     const status = statusRes.ok
       ? ((await statusRes.json()) as { data?: { status?: string } }).data?.status
       : undefined;
-    if (status === "SUCCEEDED" || status === "FAILED" || status === "ABORTED") break;
+    finished = status === "SUCCEEDED" || status === "FAILED" || status === "ABORTED";
+
+    if (items.length >= limit || finished) break;
   }
 
-  const itemsRes = await fetch(
-    `${API}/datasets/${run.defaultDatasetId}/items?limit=${limit}&clean=true`,
-    { headers: auth, signal: AbortSignal.timeout(30_000) },
-  );
-  if (!itemsRes.ok) {
-    console.error(`Apify dataset read failed [${itemsRes.status}]: ${await itemsRes.text()}`);
-    throw new ProviderUnavailableError("Live marketplace search failed. Use WhatsApp for now.");
+  // Enough rows already: stop the run so it does not burn credit in the background.
+  if (!finished && items.length) {
+    void fetch(`${API}/actor-runs/${run.id}/abort`, { method: "POST", headers: auth }).catch(
+      () => {},
+    );
   }
 
-  const json = (await itemsRes.json()) as unknown;
-  return Array.isArray(json) ? (json as T[]) : [];
+  return items;
 }
 
 type Raw = Record<string, unknown>;
