@@ -7,6 +7,7 @@ import type {
 } from "./types";
 import { PAGE_SIZE } from "./types";
 import { mockProvider, parseProductUrl } from "./mock-provider";
+import { translateProducts } from "./translate.server";
 
 /**
  * Apify provider.
@@ -264,23 +265,13 @@ export function createApifyProvider(): ProductProvider {
 
       if (marketplace === "1688" || marketplace === "global") {
         const raw = await runActor<Raw>(actor, { keywords: [query], maxResults: PAGE_SIZE }, PAGE_SIZE);
-        return {
-          items: raw
-            .map(map1688)
-            .filter((x): x is ProductDetail => !!x)
-            .map(toSummary),
-          page,
-        };
+        const mapped = raw.map(map1688).filter((x): x is ProductDetail => !!x).map(toSummary);
+        return { items: await translateProducts(mapped), page };
       }
 
       const raw = await runActor<Raw>(actor, { keyword: query, query, page, maxItems: PAGE_SIZE }, PAGE_SIZE);
-      return {
-        items: raw
-          .map(map1688)
-          .filter((x): x is ProductDetail => !!x)
-          .map(toSummary),
-        page,
-      };
+      const mapped = raw.map(map1688).filter((x): x is ProductDetail => !!x).map(toSummary);
+      return { items: await translateProducts(mapped), page };
     },
 
     async getById(id, marketplace = "1688"): Promise<ProductDetail | null> {
@@ -288,7 +279,8 @@ export function createApifyProvider(): ProductProvider {
       if (!actor) return mockProvider.getById(id, marketplace);
       const raw = await runActor<Raw>(actor, { offerIds: [id] }, 1);
       const first = raw[0];
-      return first ? map1688(first) : null;
+      const detail = first ? map1688(first) : null;
+      return detail ? ((await translateProducts([detail]))[0] ?? detail) : null;
     },
 
     async getByUrl(url): Promise<ProductDetail | null> {
@@ -300,7 +292,8 @@ export function createApifyProvider(): ProductProvider {
       if (!id) return null;
       const raw = await runActor<Raw>(actor, { offerIds: [id] }, 1);
       const first = raw[0];
-      return first ? map1688(first) : null;
+      const detail = first ? map1688(first) : null;
+      return detail ? ((await translateProducts([detail]))[0] ?? detail) : null;
     },
 
     async searchByImage(imageUrl, opts) {
@@ -317,12 +310,8 @@ export function createApifyProvider(): ProductProvider {
         { provider, imageUrls: [imageUrl], maxProducts: 30 },
         PAGE_SIZE,
       );
-      return {
-        items: raw
-          .map(mapImageItem)
-          .filter((x): x is ProductDetail => !!x)
-          .map(toSummary),
-      };
+      const mapped = raw.map(mapImageItem).filter((x): x is ProductDetail => !!x).map(toSummary);
+      return { items: await translateProducts(mapped) };
     },
   };
 }

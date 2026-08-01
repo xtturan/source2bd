@@ -9,6 +9,7 @@ import type { Marketplace, ProductDetail } from "@/lib/products/types";
 import { currencySymbol, isMarketplace, marketplaceLabels } from "@/lib/products/types";
 import { productQuote } from "@/lib/whatsapp";
 import { siteConfig } from "@/config/site";
+import { productImage } from "@/lib/images";
 
 export const Route = createFileRoute("/product/$marketplace/$id")({
   loader: async ({ params }): Promise<{ item: ProductDetail }> => {
@@ -74,7 +75,8 @@ function ProductPage() {
           <div>
             <div className="glass matte overflow-hidden rounded-[18px]">
               <img
-                src={item.images[active] ?? item.imageUrl}
+                src={productImage(item.images[active] ?? item.imageUrl)}
+                referrerPolicy="no-referrer"
                 alt={item.title}
                 className="aspect-square w-full object-cover"
               />
@@ -91,7 +93,7 @@ function ProductPage() {
                       (i === active ? "border-accent" : "border-border hover:border-foreground/30")
                     }
                   >
-                    <img src={src} alt="" className="h-full w-full object-cover" loading="lazy" />
+                    <img src={productImage(src)} alt="" referrerPolicy="no-referrer" className="h-full w-full object-cover" loading="lazy" />
                   </button>
                 ))}
               </div>
