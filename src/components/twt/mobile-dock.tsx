@@ -4,7 +4,7 @@ import { generalInquiry, telLink } from "@/lib/whatsapp";
 
 export function MobileDock() {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-white/95 backdrop-blur md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-navy/8 bg-white/70 backdrop-blur-xl backdrop-saturate-150 md:hidden">
       <div className="grid grid-cols-3">
         <a
           href={telLink}
@@ -41,7 +41,7 @@ export function WhatsAppFloat() {
       target="_blank"
       rel="noreferrer noopener"
       aria-label="Chat on WhatsApp"
-      className="fixed bottom-6 right-6 z-40 hidden size-14 items-center justify-center rounded-full bg-green text-white shadow-[var(--shadow-lift-lg)] transition-transform duration-150 hover:-translate-y-0.5 md:inline-flex"
+      className="fixed bottom-6 right-6 z-40 hidden size-14 items-center justify-center rounded-full bg-green text-white ring-1 ring-inset ring-white/20 shadow-[var(--shadow-lift-lg)] transition-transform duration-150 hover:-translate-y-0.5 md:inline-flex"
     >
       <MessageCircle className="size-6" />
     </a>

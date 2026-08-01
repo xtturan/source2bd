@@ -13,11 +13,11 @@ export function priceLabel(p: { priceMin?: number | undefined; priceMax?: number
 
 export function ProductCard({ product }: { product: ProductSummary }) {
   return (
-    <article className="lift group flex flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-[var(--shadow-lift)]">
+    <article className="lift matte group flex flex-col overflow-hidden rounded-2xl border border-navy/8 bg-white/60 shadow-[var(--shadow-lift)] backdrop-blur-xl">
       <Link
         to="/product/$source/$id"
         params={{ source: product.source, id: product.id }}
-        className="relative block aspect-square overflow-hidden bg-[#f1f4f7]"
+        className="relative block aspect-square overflow-hidden bg-navy/5"
       >
         <img
           src={product.imageUrl}
@@ -55,7 +55,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           <Link
             to="/product/$source/$id"
             params={{ source: product.source, id: product.id }}
-            className="flex-1 rounded-xl border border-navy/15 py-2.5 text-center text-sm font-semibold text-navy transition-colors hover:border-navy/40 hover:bg-[#f6f8fa]"
+            className="flex-1 rounded-xl border border-navy/12 bg-white/50 py-2.5 text-center text-sm font-semibold text-navy backdrop-blur-md transition-colors hover:border-navy/25 hover:bg-white/80"
           >
             View
           </Link>
