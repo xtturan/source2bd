@@ -260,7 +260,7 @@ function SearchPanelInner() {
               mutation.mutate({ q, marketplace: m.key });
             }}
             className={cn(
-              "rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors",
+              "min-h-[44px] rounded-full px-4 text-sm font-semibold transition-colors",
               marketplace === m.key
                 ? "bg-accent text-accent-foreground"
                 : "ring-1 ring-inset ring-border text-muted-foreground hover:text-foreground",
