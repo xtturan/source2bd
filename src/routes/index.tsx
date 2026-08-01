@@ -5,6 +5,8 @@ import { ProductCard } from "@/components/s2b/product-card";
 import { featuredProducts } from "@/lib/products/mock-provider";
 import { origins, services, siteConfig, trustStats } from "@/config/site";
 import { generalInquiry } from "@/lib/whatsapp";
+import heroCargo from "@/assets/hero-cargo.jpg";
+import deskQuote from "@/assets/desk-quote.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -33,6 +35,7 @@ function HomePage() {
   return (
     <>
       <Hero />
+      <TrustStrip />
       <OriginRail />
       <FeaturedCatalogue products={products} />
       <ServiceGrid />
@@ -46,27 +49,26 @@ function Hero() {
   return (
     <section className="relative overflow-hidden">
       <div className="grid-lines pointer-events-none absolute inset-0 opacity-60" aria-hidden />
-      <Container className="relative grid gap-14 pb-20 pt-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:pb-28 lg:pt-24">
+      <Container className="relative grid gap-12 pb-20 pt-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-24 lg:pt-20">
         <div className="reveal">
           <Eyebrow>China · Amazon · Global</Eyebrow>
-          <h1 className="mt-5 text-[2.6rem] font-extrabold leading-[0.98] sm:text-6xl lg:text-[4.1rem]">
+          <h1 className="mt-5 text-[2.5rem] font-extrabold leading-[1.02] sm:text-5xl lg:text-6xl">
             Source anything.
             <br />
             Land it in{" "}
             <span className="relative whitespace-nowrap text-accent">
               Bangladesh
-              <span className="absolute inset-x-0 -bottom-1 h-[3px] rounded-full bg-signal" aria-hidden />
+              <span className="absolute inset-x-0 -bottom-1 h-[3px] rounded-full bg-accent/40" aria-hidden />
             </span>
             .
           </h1>
           <p className="font-bn mt-4 text-lg text-muted-foreground">{siteConfig.taglineBn}</p>
-          <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
-            One desk handles the whole line: finding the supplier, checking the listing, buying it,
-            consolidating cartons and moving them into Dhaka or Chattogram. You get one price and
-            one person answering on WhatsApp.
+          <p className="mt-5 max-w-[52ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
+            One desk buys it, consolidates the cartons and lands them in Dhaka or Chattogram. One
+            price, one person on WhatsApp.
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <ButtonLink to="/sourcing" size="lg">
               Start sourcing
             </ButtonLink>
@@ -80,17 +82,34 @@ function Hero() {
               <WhatsAppIcon /> WhatsApp {siteConfig.phoneDisplay}
             </ButtonAnchor>
           </div>
-
-          <p className="mt-5 text-xs text-muted-foreground">{siteConfig.policy}</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <figure className="relative overflow-hidden rounded-[18px] border border-foreground/8 shadow-[var(--shadow-3)]">
+          <img
+            src={heroCargo}
+            alt="Cartons and crates staged for consolidation in a sunlit warehouse"
+            width={1280}
+            height={1600}
+            className="h-[340px] w-full object-cover sm:h-[420px] lg:h-[520px]"
+          />
+        </figure>
+      </Container>
+    </section>
+  );
+}
+
+function TrustStrip() {
+  return (
+    <Section className="pt-2">
+      <Container>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {trustStats.map((s) => (
             <Stat key={s.label} value={s.value} label={s.label} sub={s.sub} />
           ))}
         </div>
+        <p className="mt-5 text-xs text-muted-foreground">{siteConfig.policy}</p>
       </Container>
-    </section>
+    </Section>
   );
 }
 
@@ -99,7 +118,6 @@ function OriginRail() {
     <Section className="pt-6">
       <Container>
         <SectionHeading
-          eyebrow="Multi origin"
           title="Three origins, one landed price"
           titleBn="তিনটি উৎস · একটাই ল্যান্ডেড প্রাইস"
           intro="Most agents in Dhaka only handle China. We quote the same order across China factory pricing, Amazon retail and any global store, then tell you which one actually lands cheaper."
@@ -137,7 +155,6 @@ function FeaturedCatalogue({ products }: { products: ReturnType<typeof featuredP
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
-            eyebrow="Demo catalogue"
             title="What a quote looks like before you send it"
             intro="These are demo listings running on zero API cost. Every card deep links into a prefilled WhatsApp message so nothing gets retyped."
           />
@@ -159,18 +176,30 @@ function ServiceGrid() {
   return (
     <Section className="pt-0">
       <Container>
-        <SectionHeading
-          eyebrow="Services"
-          title="Pick the lane that fits the order"
-          titleBn="আপনার অর্ডারের জন্য সঠিক লেন"
-        />
-        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+          <figure className="overflow-hidden rounded-[18px] border border-foreground/8 shadow-[var(--shadow-2)]">
+            <img
+              src={deskQuote}
+              alt="A phone showing a supplier listing beside taped cartons ready to ship"
+              width={1408}
+              height={1008}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          </figure>
+          <SectionHeading
+            eyebrow="Services"
+            title="Pick the lane that fits the order"
+            titleBn="আপনার অর্ডারের জন্য সঠিক লেন"
+          />
+        </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {services.map((s) => (
             <Link
               key={s.key}
               to="/services"
               hash={s.key}
-              className="glass matte lift flex flex-col rounded-[18px] p-6"
+              className="panel matte lift flex flex-col rounded-[18px] p-6"
             >
               <h3 className="text-lg font-bold">{s.title}</h3>
               <p className="font-bn mt-1 text-sm text-muted-foreground">{s.titleBn}</p>
@@ -220,16 +249,21 @@ function Process() {
   return (
     <Section className="pt-0">
       <Container>
-        <SectionHeading eyebrow="How it works" title="Five steps, no black box" titleBn="পাঁচ ধাপ · সম্পূর্ণ স্বচ্ছ" />
-        <ol className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-          {steps.map((s) => (
-            <li key={s.n} className="glass matte rounded-[18px] p-5">
-              <span className="tnum text-xs font-bold tracking-widest text-signal">{s.n}</span>
-              <h3 className="mt-3 text-base font-bold leading-snug">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
-            </li>
-          ))}
-        </ol>
+        <div className="inkwell matte rounded-[18px] px-6 py-12 sm:px-12">
+          <h2 className="max-w-[18ch] font-display text-3xl font-extrabold leading-tight tracking-[-0.03em] sm:text-4xl">
+            Five steps, no black box
+          </h2>
+          <p className="font-bn mt-3 text-base opacity-70">পাঁচ ধাপ · সম্পূর্ণ স্বচ্ছ</p>
+          <ol className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-5">
+            {steps.map((s) => (
+              <li key={s.n} className="border-t border-white/15 pt-4">
+                <span className="tnum text-xs font-bold tracking-widest text-accent">{s.n}</span>
+                <h3 className="mt-3 text-base font-bold leading-snug">{s.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed opacity-70">{s.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
       </Container>
     </Section>
   );
