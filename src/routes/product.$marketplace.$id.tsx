@@ -42,7 +42,7 @@ export const Route = createFileRoute("/product/$marketplace/$id")({
 });
 
 function ProductPage() {
-  const { item } = Route.useLoaderData();
+  const { item } = Route.useLoaderData() as { item: ProductDetail };
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState<string>(String(item.moq ?? 10));
   const [city, setCity] = useState("Dhaka");

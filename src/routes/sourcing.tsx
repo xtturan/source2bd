@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Container, Section, SectionHeading, Badge, EmptyState, Skeleton, Card } from "@/components/s2b/primitives";
-import { Button, ButtonAnchor, ButtonLink, WhatsAppIcon } from "@/components/s2b/button";
+import { Button, ButtonAnchor, WhatsAppIcon } from "@/components/s2b/button";
 import { ProductCard } from "@/components/s2b/product-card";
 import { searchProducts, productByUrl } from "@/lib/products/queries.functions";
 import type { Marketplace, ProductDetail, ProductSummary } from "@/lib/products/types";
@@ -299,13 +299,13 @@ function LinkResult({ item }: { item: ProductDetail }) {
             <WhatsAppIcon /> Quote this on WhatsApp
           </ButtonAnchor>
           {item.manualQuoteOnly ? null : (
-            <ButtonLink
+            <Link
               to="/product/$marketplace/$id"
               params={{ marketplace: item.marketplace, id: item.id }}
-              variant="glass"
+              className="glass inline-flex h-11 items-center justify-center rounded-[11px] px-5 text-sm font-semibold transition-transform duration-150 hover:-translate-y-0.5"
             >
               Open full listing
-            </ButtonLink>
+            </Link>
           )}
         </div>
       </div>
