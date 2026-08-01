@@ -1,83 +1,99 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { Search, Link2, AlertTriangle, MessageCircle } from "lucide-react";
-import { Container, Section, SectionHeading, Badge, Skeleton, EmptyState } from "@/components/s2b/primitives";
-import { Button, ExternalButton, Input } from "@/components/s2b/button";
-import { ProductCard, priceLabel } from "@/components/s2b/product-card";
-import type { ProductDetail, SearchResult } from "@/lib/products/types";
-import { productQuote, generalInquiry } from "@/lib/whatsapp";
-import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { Container, Section, SectionHeading, Badge, EmptyState, Skeleton, Card } from "@/components/s2b/primitives";
+import { Button, ButtonAnchor, ButtonLink, WhatsAppIcon } from "@/components/s2b/button";
+import { ProductCard } from "@/components/s2b/product-card";
+import { searchProducts, productByUrl } from "@/lib/products/queries.functions";
+import type { Marketplace, ProductDetail, ProductSummary } from "@/lib/products/types";
+import { currencySymbol, marketplaceLabels } from "@/lib/products/types";
+import { generalInquiry, productQuote } from "@/lib/whatsapp";
+import { siteConfig } from "@/config/site";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/sourcing")({
   head: () => ({
     meta: [
-      { title: "1688 & Alibaba sourcing for Bangladesh — TWT International" },
+      { title: "Sourcing desk, search 1688, Alibaba and Amazon | Source2BD" },
       {
         name: "description",
         content:
-          "Search Chinese wholesale products or paste a 1688 / Alibaba link and get a Bangladesh-landed path quote on WhatsApp from TWT International.",
+          "Search the demo catalogue or paste a 1688, Alibaba or Amazon link. Source2BD reads the listing and returns a Bangladesh landed quote on WhatsApp.",
       },
-      { property: "og:title", content: "Sourcing tool — TWT International" },
+      { property: "og:title", content: "Source2BD sourcing desk" },
       {
         property: "og:description",
-        content: "Search or paste a 1688 link. Get a BD path quote on WhatsApp.",
+        content: "Search or paste any marketplace link and get a Dhaka landed quote on WhatsApp.",
       },
-      { property: "og:url", content: "/sourcing" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/sourcing" }],
   }),
   component: SourcingPage,
 });
 
+const markets: { key: Marketplace; label: string }[] = [
+  { key: "global", label: "All origins" },
+  { key: "1688", label: "1688" },
+  { key: "alibaba", label: "Alibaba" },
+  { key: "amazon", label: "Amazon" },
+];
+
+type Mode = "search" | "link" | "photo";
+
 function SourcingPage() {
-  const [tab, setTab] = useState<"search" | "link">("search");
+  const [mode, setMode] = useState<Mode>("search");
 
   return (
     <>
-      <div className="bg-navy py-14 text-white grid-lines">
+      <Section className="pb-10">
         <Container>
-          <Badge tone="outline">Sourcing desk · demo data</Badge>
-          <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] sm:text-5xl">
-            Paste a 1688 link. Get a BD path quote on WhatsApp.
-          </h1>
-          <p className="font-bn mt-3 text-white/70">লিংক পাঠান · হোয়াটসঅ্যাপে কোট নিন</p>
-          <p className="mt-4 max-w-2xl text-white/70">
-            Search our demo catalogue or drop any 1688 / Alibaba product URL. We read the Chinese
-            listing, confirm MOQ and tiers with the supplier, then send you a realistic
-            China-to-Bangladesh path.
-          </p>
-        </Container>
-      </div>
+          <SectionHeading
+            eyebrow="Sourcing desk"
+            title={
+              <>
+                Search it, paste it, or show us a photo.
+                <br />
+                We quote it landed in Bangladesh.
+              </>
+            }
+            titleBn="সার্চ করুন, লিংক দিন, অথবা ছবি পাঠান"
+            intro="Demo catalogue is live now at zero API cost. Live marketplace lookup switches on behind the same interface when you enable a provider key."
+          />
 
-      <Section className="pt-10">
-        <Container>
-          <div className="inline-flex rounded-xl border border-navy/10 bg-white/45 p-1 backdrop-blur-md">
-            <button
-              type="button"
-              onClick={() => setTab("search")}
-              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${tab === "search" ? "bg-white text-navy shadow-[var(--shadow-lift)] ring-1 ring-inset ring-navy/5" : "text-steel"}`}
-            >
-              <Search className="size-4" /> Search
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab("link")}
-              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${tab === "link" ? "bg-white text-navy shadow-[var(--shadow-lift)] ring-1 ring-inset ring-navy/5" : "text-steel"}`}
-            >
-              <Link2 className="size-4" /> Paste link
-            </button>
+          <div className="glass matte mt-10 rounded-[15px] p-2">
+            <div role="tablist" aria-label="Sourcing method" className="grid grid-cols-3 gap-1">
+              {(
+                [
+                  ["search", "Search catalogue"],
+                  ["link", "Paste a link"],
+                  ["photo", "Photo search"],
+                ] as const
+              ).map(([key, label]) => (
+                <button
+                  key={key}
+                  role="tab"
+                  aria-selected={mode === key}
+                  onClick={() => setMode(key)}
+                  className={cn(
+                    "h-11 rounded-[11px] text-sm font-semibold transition-colors duration-150",
+                    mode === key
+                      ? "bg-foreground/10 text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.1)]"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="p-4 pt-5 sm:p-6">
+              {mode === "search" ? <SearchPanel /> : null}
+              {mode === "link" ? <LinkPanel /> : null}
+              {mode === "photo" ? <PhotoPanel /> : null}
+            </div>
           </div>
-
-          <div className="mt-8">{tab === "search" ? <SearchPanel /> : <LinkPanel />}</div>
-
-          <p className="mt-10 flex items-start gap-2 rounded-xl border border-signal/20 bg-signal/5 p-4 text-sm text-navy">
-            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-signal" />
-            <span>
-              CNY marketplace price is not your final Bangladesh landed cost. Freight, duty,
-              handling and delivery are quoted separately after weight, volume and mode are known.
-            </span>
-          </p>
         </Container>
       </Section>
     </>
@@ -85,226 +101,261 @@ function SourcingPage() {
 }
 
 function SearchPanel() {
-  const [input, setInput] = useState("");
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
+  const [q, setQ] = useState("");
+  const [marketplace, setMarketplace] = useState<Marketplace>("global");
+  const [items, setItems] = useState<ProductSummary[] | null>(null);
+  const search = useServerFn(searchProducts);
 
-  const { data, isFetching, isError } = useQuery({
-    queryKey: ["products", "search", query, page],
-    queryFn: async (): Promise<SearchResult> => {
-      const res = await fetch(
-        `/api/products/search?q=${encodeURIComponent(query)}&page=${page}`,
-      );
-      if (!res.ok) throw new Error("Search failed");
-      return res.json();
-    },
+  const mutation = useMutation({
+    mutationFn: (vars: { q: string; marketplace: Marketplace }) =>
+      search({ data: { q: vars.q, marketplace: vars.marketplace, page: 1 } }),
+    onSuccess: (res) => setItems(res.items),
   });
-
-  const total = data?.totalApprox ?? 0;
-  const pages = Math.max(1, Math.ceil(total / 12));
 
   return (
     <div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          setPage(1);
-          setQuery(input.trim().slice(0, 120));
+          mutation.mutate({ q, marketplace });
         }}
         className="flex flex-col gap-3 sm:flex-row"
       >
-        <Input
-          value={input}
-          maxLength={120}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="e.g. usb cable, mailer bags, zipper, air fryer"
-          aria-label="Search products"
+        <label className="sr-only" htmlFor="q">
+          Product keyword
+        </label>
+        <input
+          id="q"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Try led strip, phone case, kitchen rack"
+          className="h-12 flex-1 rounded-[11px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
         />
-        <Button type="submit" size="lg" className="sm:w-40">
-          <Search className="size-4" /> Search
+        <Button type="submit" size="lg" disabled={mutation.isPending}>
+          {mutation.isPending ? "Searching" : "Search"}
         </Button>
       </form>
 
-      {isError ? (
-        <div className="mt-8">
-          <EmptyState
-            title="Search is unavailable right now"
-            body="Our catalogue service didn't respond. Message us on WhatsApp and we'll source it manually."
-            action={
-              <ExternalButton href={generalInquiry()}>
-                <MessageCircle className="size-4" /> WhatsApp us
-              </ExternalButton>
-            }
-          />
-        </div>
-      ) : isFetching ? (
-        <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-navy/8 bg-white/40 p-4 backdrop-blur-md">
-              <Skeleton className="aspect-square w-full" />
-              <Skeleton className="mt-4 h-4 w-full" />
-              <Skeleton className="mt-2 h-4 w-2/3" />
-            </div>
-          ))}
-        </div>
-      ) : data && data.items.length > 0 ? (
-        <>
-          <p className="mt-6 text-sm text-steel">
-            {total} listing{total === 1 ? "" : "s"}
-            {query ? ` for “${query}”` : " in the demo catalogue"}
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {data.items.map((p) => (
-              <ProductCard key={p.id} product={p} />
+      <div className="mt-4 flex flex-wrap gap-2">
+        {markets.map((m) => (
+          <button
+            key={m.key}
+            onClick={() => {
+              setMarketplace(m.key);
+              mutation.mutate({ q, marketplace: m.key });
+            }}
+            className={cn(
+              "rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors",
+              marketplace === m.key
+                ? "bg-accent text-accent-foreground"
+                : "ring-1 ring-inset ring-border text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-8">
+        {mutation.isPending ? (
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-[3/4]" />
             ))}
           </div>
-          {pages > 1 ? (
-            <div className="mt-8 flex items-center justify-center gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-              >
-                Previous
-              </Button>
-              <span className="text-sm text-steel">
-                Page {page} of {pages}
-              </span>
-              <Button
-                variant="outline"
-                onClick={() => setPage((p) => Math.min(pages, p + 1))}
-                disabled={page >= pages}
-              >
-                Next
-              </Button>
-            </div>
-          ) : null}
-        </>
-      ) : (
-        <div className="mt-8">
+        ) : mutation.isError ? (
           <EmptyState
-            title="Nothing matched that keyword"
-            body="Try a broader English keyword, or send us the Chinese listing link directly — we search 1688 by hand every day."
+            title="Search did not come back"
+            body="Live lookup is paused or busy. Our desk can still find this by hand today."
             action={
-              <ExternalButton href={generalInquiry()}>
-                <MessageCircle className="size-4" /> Ask on WhatsApp
-              </ExternalButton>
+              <ButtonAnchor href={generalInquiry(q)} target="_blank" rel="noopener noreferrer" variant="green">
+                <WhatsAppIcon /> Ask on WhatsApp
+              </ButtonAnchor>
             }
           />
-        </div>
-      )}
+        ) : items && items.length === 0 ? (
+          <EmptyState
+            title="Nothing matched that keyword"
+            body="The demo catalogue is small on purpose. Send the keyword to our desk and we will search the live marketplaces for you."
+            action={
+              <ButtonAnchor href={generalInquiry(q)} target="_blank" rel="noopener noreferrer" variant="green">
+                <WhatsAppIcon /> Send keyword
+              </ButtonAnchor>
+            }
+          />
+        ) : items ? (
+          <>
+            <p className="mb-4 text-sm text-muted-foreground">{items.length} demo listings</p>
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {items.map((p) => (
+                <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Start with a keyword, or switch to a marketplace chip to browse that origin.
+          </p>
+        )}
+      </div>
     </div>
   );
 }
 
 function LinkPanel() {
   const [url, setUrl] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [item, setItem] = useState<ProductDetail | null>(null);
+  const byUrl = useServerFn(productByUrl);
 
   const mutation = useMutation({
-    mutationFn: async (value: string): Promise<ProductDetail> => {
-      const res = await fetch(`/api/products/by-url?url=${encodeURIComponent(value)}`);
-      const json = (await res.json()) as { item?: ProductDetail; error?: string };
-      if (!res.ok || !json.item) throw new Error(json.error ?? "Could not read that link");
-      return json.item;
-    },
+    mutationFn: (u: string) => byUrl({ data: { url: u } }),
+    onSuccess: (res) => setItem(res),
   });
-
-  const item = mutation.data;
 
   return (
     <div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          const value = url.trim();
-          if (!/^https?:\/\/\S+$/.test(value)) {
-            setError("Paste the full product URL including https://");
-            return;
-          }
-          setError(null);
-          mutation.mutate(value.slice(0, 600));
+          mutation.mutate(url);
         }}
         className="flex flex-col gap-3 sm:flex-row"
       >
-        <Input
+        <label className="sr-only" htmlFor="url">
+          Product link
+        </label>
+        <input
+          id="url"
           value={url}
-          maxLength={600}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://detail.1688.com/offer/681204551903.html"
-          aria-label="Product URL"
-          inputMode="url"
+          placeholder="https://detail.1688.com/offer/... or amazon.com/dp/..."
+          className="h-12 flex-1 rounded-[11px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
         />
-        <Button type="submit" size="lg" className="sm:w-40" disabled={mutation.isPending}>
-          {mutation.isPending ? "Reading…" : "Fetch listing"}
+        <Button type="submit" size="lg" disabled={mutation.isPending || url.trim().length < 8}>
+          {mutation.isPending ? "Reading" : "Read link"}
         </Button>
       </form>
-      {error ? <p className="mt-2 text-sm font-medium text-signal">{error}</p> : null}
-      {mutation.isError ? (
-        <p className="mt-2 text-sm font-medium text-signal">
-          {(mutation.error as Error).message}
-        </p>
-      ) : null}
 
-      {mutation.isPending ? (
-        <div className="mt-8 grid gap-6 rounded-2xl border border-navy/8 bg-white/40 p-5 backdrop-blur-md sm:grid-cols-[220px_1fr]">
-          <Skeleton className="aspect-square w-full" />
-          <div>
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="mt-3 h-4 w-1/2" />
-            <Skeleton className="mt-6 h-11 w-48" />
-          </div>
-        </div>
-      ) : null}
+      <p className="mt-3 text-xs text-muted-foreground">
+        Works with 1688, Alibaba and Amazon product URLs. Any other store still reaches our desk.
+      </p>
 
-      {item ? (
-        <div className="mt-8 grid gap-6 glass matte rounded-2xl p-5 shadow-[var(--shadow-lift)] sm:grid-cols-[220px_1fr]">
-          <img
-            src={item.imageUrl}
-            alt={item.title}
-            loading="lazy"
-            className="aspect-square w-full rounded-xl object-cover"
+      <div className="mt-8">
+        {mutation.isPending ? <Skeleton className="h-56" /> : null}
+
+        {mutation.isError ? (
+          <EmptyState
+            title="Could not read that link"
+            body="Shortened and app shared links often hide the listing id. Send it on WhatsApp and we will open it directly."
+            action={
+              <ButtonAnchor href={generalInquiry(url)} target="_blank" rel="noopener noreferrer" variant="green">
+                <WhatsAppIcon /> Send the link
+              </ButtonAnchor>
+            }
           />
-          <div>
-            <Badge tone="green">{item.source}</Badge>
-            <h2 className="mt-3 text-xl font-bold text-navy">{item.title}</h2>
-            {item.manualQuoteOnly ? (
-              <p className="mt-2 text-sm text-steel">{item.description}</p>
-            ) : (
-              <>
-                <p className="mt-2 text-lg font-semibold text-navy">
-                  {priceLabel(item)} <span className="text-sm font-normal text-steel">CNY</span>
-                </p>
-                <p className="mt-1 text-sm text-steel">
-                  MOQ {item.moq ?? "—"} · {item.shopName ?? "Supplier to be confirmed"}
-                </p>
-              </>
-            )}
-            <div className="mt-5 flex flex-wrap gap-3">
-              <ExternalButton
-                href={productQuote({
-                  title: item.title,
-                  productUrl: item.productUrl,
-                  priceMin: item.priceMin,
-                  priceMax: item.priceMax,
-                  moq: item.moq,
-                })}
-              >
-                <MessageCircle className="size-4" /> Get BD quote on WhatsApp
-              </ExternalButton>
-              {!item.manualQuoteOnly ? (
-                <Link
-                  to="/product/$source/$id"
-                  params={{ source: item.source, id: item.id }}
-                  className="inline-flex h-11 items-center rounded-xl border border-navy/15 px-5 text-[15px] font-semibold text-navy hover:bg-white/80"
-                >
-                  Open full listing
-                </Link>
-              ) : null}
-            </div>
-          </div>
-        </div>
+        ) : null}
+
+        {item ? <LinkResult item={item} /> : null}
+      </div>
+    </div>
+  );
+}
+
+function LinkResult({ item }: { item: ProductDetail }) {
+  const sym = currencySymbol(item.currency);
+  return (
+    <Card className="flex flex-col gap-5 p-5 sm:flex-row">
+      {item.imageUrl ? (
+        <img
+          src={item.imageUrl}
+          alt={item.title}
+          className="h-40 w-40 shrink-0 rounded-[11px] object-cover"
+          loading="lazy"
+        />
       ) : null}
+      <div className="min-w-0 flex-1">
+        <Badge tone="green">{marketplaceLabels[item.marketplace]}</Badge>
+        <h3 className="mt-3 text-lg font-bold leading-snug">{item.title}</h3>
+        <p className="tnum mt-2 text-xl font-extrabold">
+          {item.priceMin != null ? `${sym}${item.priceMin}` : "Price on request"}
+          {item.priceMax != null && item.priceMax !== item.priceMin ? ` to ${sym}${item.priceMax}` : ""}
+        </p>
+        {item.moq ? <p className="mt-1 text-sm text-muted-foreground">MOQ {item.moq}</p> : null}
+        <div className="mt-5 flex flex-wrap gap-2">
+          <ButtonAnchor
+            href={productQuote({
+              title: item.title,
+              productUrl: item.productUrl,
+              priceMin: item.priceMin,
+              priceMax: item.priceMax,
+              moq: item.moq,
+              currency: item.currency,
+              marketplace: marketplaceLabels[item.marketplace],
+            })}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="green"
+          >
+            <WhatsAppIcon /> Quote this on WhatsApp
+          </ButtonAnchor>
+          {item.manualQuoteOnly ? null : (
+            <ButtonLink
+              to="/product/$marketplace/$id"
+              params={{ marketplace: item.marketplace, id: item.id }}
+              variant="glass"
+            >
+              Open full listing
+            </ButtonLink>
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function PhotoPanel() {
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div>
+        <h3 className="text-lg font-bold">Send a photo, get matching suppliers</h3>
+        <p className="mt-2 max-w-[56ch] text-sm leading-relaxed text-muted-foreground">
+          Take a clear photo of the item on a plain background. Our desk runs it against the China
+          marketplaces and comes back with the closest factory listings, MOQ and a landed estimate
+          for {siteConfig.destinationCities.join(" and ")}.
+        </p>
+        <p className="font-bn mt-3 text-sm text-muted-foreground">
+          পণ্যের ছবি পাঠান, আমরা সাপ্লায়ার খুঁজে দেব।
+        </p>
+        <div className="mt-6">
+          <ButtonAnchor
+            href={generalInquiry("I want to send a product photo for sourcing")}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="green"
+            size="lg"
+          >
+            <WhatsAppIcon /> Send the photo on WhatsApp
+          </ButtonAnchor>
+        </div>
+      </div>
+      <Card className="p-5">
+        <h4 className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">
+          Photo checklist
+        </h4>
+        <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+          {[
+            "One item per photo, plain background",
+            "Include the label or model number if there is one",
+            "Add a coin or hand for scale on small parts",
+            "Tell us the quantity you plan to order",
+          ].map((t) => (
+            <li key={t} className="flex gap-3">
+              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
+              {t}
+            </li>
+          ))}
+        </ul>
+      </Card>
     </div>
   );
 }
