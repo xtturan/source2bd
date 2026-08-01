@@ -432,7 +432,8 @@ export function createApifyProvider(): ProductProvider {
 
     async getById(id, marketplace = "1688"): Promise<ProductDetail | null> {
       const actor = actorFor(marketplace);
-      if (!actor) return mockProvider.getById(id, marketplace);
+      // Only the 1688 actor exposes a by-id lookup; the others are search only.
+      if (!actor || marketplace !== "1688") return mockProvider.getById(id, marketplace);
       const raw = await runActor<Raw>(actor, { offerIds: [id] }, 1);
       const first = raw[0];
       const detail = first ? map1688(first) : null;
@@ -443,7 +444,7 @@ export function createApifyProvider(): ProductProvider {
       const parsed = parseProductUrl(url);
       const marketplace = parsed?.marketplace ?? "1688";
       const actor = actorFor(marketplace);
-      if (!actor) return mockProvider.getByUrl(url);
+      if (!actor || marketplace !== "1688") return mockProvider.getByUrl(url);
       const id = parsed?.id ?? offerIdFromUrl(url);
       if (!id) return null;
       const raw = await runActor<Raw>(actor, { offerIds: [id] }, 1);
