@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Container, Section, SectionHeading, Badge, EmptyState, Skeleton, Card } from "@/components/s2b/primitives";
 import { Button, ButtonAnchor, WhatsAppIcon } from "@/components/s2b/button";
 import { ProductCard } from "@/components/s2b/product-card";
+import { IconMic, IconSearch } from "@/components/s2b/big-action";
 import { searchProducts, productByUrl } from "@/lib/products/queries.functions";
 import type { Marketplace, ProductDetail, ProductSummary } from "@/lib/products/types";
 import { currencySymbol, marketplaceLabels } from "@/lib/products/types";
@@ -50,40 +51,41 @@ function SourcingPage() {
       <Section className="pb-10">
         <Container>
           <SectionHeading
-            eyebrow="Sourcing desk"
             title={
-              <>
-                Search it, paste it, or show us a photo.
+              <span className="font-bn">
+                পণ্য খুঁজুন, লিংক দিন,
                 <br />
-                We quote it landed in Bangladesh.
-              </>
+                অথবা ছবি পাঠান
+              </span>
             }
-            titleBn="সার্চ করুন, লিংক দিন, অথবা ছবি পাঠান"
-            intro="Demo catalogue is live now at zero API cost. Live marketplace lookup switches on behind the same interface when you enable a provider key."
+            titleBn=""
+            intro="Type the product name in English or Banglish, or just press the microphone and say it."
           />
 
           <div className="glass matte mt-10 rounded-[18px] p-2">
             <div role="tablist" aria-label="Sourcing method" className="grid grid-cols-3 gap-1">
               {(
                 [
-                  ["search", "Search catalogue"],
-                  ["link", "Paste a link"],
-                  ["photo", "Photo search"],
+                  ["search", "পণ্য খুঁজুন", "Search"],
+                  ["link", "লিংক দিন", "Paste link"],
+                  ["photo", "ছবি পাঠান", "Send photo"],
                 ] as const
-              ).map(([key, label]) => (
+              ).map(([key, bn, en]) => (
                 <button
                   key={key}
                   role="tab"
                   aria-selected={mode === key}
+                  aria-label={en}
                   onClick={() => setMode(key)}
                   className={cn(
-                    "h-11 rounded-[12px] text-sm font-semibold transition-colors duration-150",
+                    "flex min-h-[60px] flex-col items-center justify-center gap-0.5 rounded-[12px] px-1 transition-colors duration-150",
                     mode === key
                       ? "bg-foreground/10 text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.1)]"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  {label}
+                  <span className="font-bn text-base font-bold leading-none">{bn}</span>
+                  <span className="text-[11px] font-semibold opacity-70">{en}</span>
                 </button>
               ))}
             </div>
@@ -149,6 +151,18 @@ function SearchPanelInner() {
   const [marketplace, setMarketplace] = useState<Marketplace>("global");
   const [items, setItems] = useState<ProductSummary[] | null>(null);
   const search = useServerFn(searchProducts);
+  const [listening, setListening] = useState(false);
+  const [voiceReady, setVoiceReady] = useState(false);
+
+  useEffect(() => {
+    setVoiceReady(
+      typeof window !== "undefined" &&
+        Boolean(
+          (window as unknown as { SpeechRecognition?: unknown }).SpeechRecognition ??
+            (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition,
+        ),
+    );
+  }, []);
 
   const mutation = useMutation({
     mutationFn: (vars: { q: string; marketplace: Marketplace }) =>
@@ -156,8 +170,31 @@ function SearchPanelInner() {
     onSuccess: (res) => setItems(res.items),
   });
 
+  // Speaking is easier than spelling. Falls back silently when unsupported.
+  function startVoice() {
+    const Ctor =
+      (window as unknown as { SpeechRecognition?: new () => any }).SpeechRecognition ??
+      (window as unknown as { webkitSpeechRecognition?: new () => any }).webkitSpeechRecognition;
+    if (!Ctor) return;
+    const rec = new Ctor();
+    rec.lang = "bn-BD";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e: any) => {
+      const text = String(e.results?.[0]?.[0]?.transcript ?? "").trim();
+      if (!text) return;
+      setQ(text);
+      mutation.mutate({ q: text, marketplace });
+    };
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    setListening(true);
+    rec.start();
+  }
+
   return (
     <div>
+      <p className="font-bn mb-3 text-lg font-bold">পণ্যের নাম লিখুন বা বলুন</p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -168,17 +205,50 @@ function SearchPanelInner() {
         <label className="sr-only" htmlFor="q">
           Product keyword
         </label>
-        <input
-          id="q"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Try led strip, phone case, kitchen rack"
-          className="h-12 flex-1 rounded-[12px] border border-input bg-background/60 px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
-        />
-        <Button type="submit" size="lg" disabled={mutation.isPending}>
+        <div className="relative flex-1">
+          <input
+            id="q"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="led light, phone case, kitchen rack"
+            className="h-14 w-full rounded-[14px] border border-input bg-background/60 pl-4 pr-14 text-base outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
+          />
+          {voiceReady ? (
+            <button
+              type="button"
+              onClick={startVoice}
+              aria-label="Speak the product name"
+              className={cn(
+                "absolute right-2 top-2 grid h-10 w-10 place-items-center rounded-full transition-colors",
+                listening ? "animate-pulse bg-accent text-accent-foreground" : "bg-foreground/8 text-foreground",
+              )}
+            >
+              <IconMic className="h-5 w-5" />
+            </button>
+          ) : null}
+        </div>
+        <Button type="submit" size="lg" disabled={mutation.isPending} className="h-14 text-base">
+          <IconSearch className="h-5 w-5" />
           {mutation.isPending ? "Searching" : "Search"}
         </Button>
       </form>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="font-bn text-sm text-muted-foreground">যেমন:</span>
+        {["led light", "phone case", "kitchen rack", "school bag"].map((ex) => (
+          <button
+            key={ex}
+            type="button"
+            onClick={() => {
+              setQ(ex);
+              mutation.mutate({ q: ex, marketplace });
+            }}
+            className="min-h-[40px] rounded-full bg-foreground/6 px-4 text-sm font-semibold hover:bg-foreground/10"
+          >
+            {ex}
+          </button>
+        ))}
+      </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {markets.map((m) => (
@@ -189,7 +259,7 @@ function SearchPanelInner() {
               mutation.mutate({ q, marketplace: m.key });
             }}
             className={cn(
-              "rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors",
+              "min-h-[44px] rounded-full px-4 text-sm font-semibold transition-colors",
               marketplace === m.key
                 ? "bg-accent text-accent-foreground"
                 : "ring-1 ring-inset ring-border text-muted-foreground hover:text-foreground",
