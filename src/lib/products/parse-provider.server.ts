@@ -279,11 +279,28 @@ async function detail1688(id: string): Promise<ProductDetail | null> {
   const data = obj(await call(scraperFor("1688"), "get_product_detail", { offer_id: id }));
   const model = obj(obj(data["skuModel"])["skuSelectorBizModel"]);
   const trade = obj(model["tradeModel"]);
-  const gallery = Array.isArray(model["mainImageList"])
+  let gallery = Array.isArray(model["mainImageList"])
     ? (model["mainImageList"] as Raw[])
         .map((im) => absUrl(str(im["fullPathImageURI"]) ?? str(im["imageURI"])))
         .filter((x): x is string => !!x)
     : [];
+
+  // The endpoint returns the SKU selector, not a product header: variant
+  // photos and option names are the only gallery and attribute source.
+  const attributes: { label: string; value: string }[] = [];
+  const props = Array.isArray(model["skuProps"]) ? (model["skuProps"] as Raw[]) : [];
+  for (const p of props) {
+    const label = str(p["prop"]);
+    const values = Array.isArray(p["value"]) ? (p["value"] as Raw[]) : [];
+    for (const v of values) {
+      const img = absUrl(str(v["imageUrl"]));
+      if (img) gallery.push(img);
+    }
+    const names = values.map((v) => str(v["name"])).filter((x): x is string => !!x);
+    if (label && names.length) attributes.push({ label, value: names.slice(0, 12).join(", ") });
+  }
+  gallery = [...new Set(gallery)];
+
   const infoMap = obj(model["skuInfoMap"]);
   const prices = Object.values(infoMap)
     .map((v) => num(obj(v)["price"]))
@@ -298,11 +315,12 @@ async function detail1688(id: string): Promise<ProductDetail | null> {
     priceMin: prices.length ? Math.min(...prices) : undefined,
     priceMax: prices.length ? Math.max(...prices) : undefined,
     currency: "CNY",
-    moq: num(trade["minOrderQuantity"]),
+    moq: qty(trade["minOrderQuantity"]),
     imageUrl: gallery[0],
     productUrl: `https://detail.1688.com/offer/${id}.html`,
     ordersHint: str(trade["saleCount"]) ? `${str(trade["saleCount"])} sold` : undefined,
     images: gallery,
+    attributes: attributes.length ? attributes : undefined,
   };
 }
 
