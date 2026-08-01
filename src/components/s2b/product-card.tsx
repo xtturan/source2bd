@@ -67,10 +67,14 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           })}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto inline-flex h-10 items-center justify-center gap-2 rounded-full bg-accent text-sm font-semibold text-accent-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.24)] transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.98]"
+          aria-label="Ask the price on WhatsApp"
+          className="mt-auto inline-flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-[14px] bg-accent px-3 py-2 text-accent-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.24)] transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.98]"
         >
-          <WhatsAppIcon />
-          Quote on WhatsApp
+          <span className="font-bn flex items-center gap-2 text-base font-bold leading-none">
+            <WhatsAppIcon className="h-5 w-5" />
+            দাম জানুন
+          </span>
+          <span className="text-[11px] font-semibold opacity-85">Ask price on WhatsApp</span>
         </a>
       </div>
     </article>
