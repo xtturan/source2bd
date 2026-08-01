@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Section, SectionHeading, Badge, EmptyState, Skeleton, Card } from "@/components/s2b/primitives";
 import { Button, ButtonAnchor, WhatsAppIcon } from "@/components/s2b/button";
 import { ProductCard } from "@/components/s2b/product-card";
@@ -101,6 +101,27 @@ function SourcingPage() {
 }
 
 function SearchPanel() {
+  return <SearchPanelInner />;
+}
+
+function LiveProgress({ label }: { label: string }) {
+  const [sec, setSec] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setSec((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-[12px] border border-border bg-background/60 px-4 py-3 text-sm">
+      <span className="h-2 w-2 animate-pulse rounded-full bg-accent" aria-hidden />
+      <span className="font-medium">{label}</span>
+      <span className="text-muted-foreground">
+        live scrape, usually 30 to 60 seconds. {sec}s elapsed
+      </span>
+    </div>
+  );
+}
+
+function SearchPanelInner() {
   const [q, setQ] = useState("");
   const [marketplace, setMarketplace] = useState<Marketplace>("global");
   const [items, setItems] = useState<ProductSummary[] | null>(null);
@@ -158,10 +179,13 @@ function SearchPanel() {
 
       <div className="mt-8">
         {mutation.isPending ? (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="aspect-[3/4]" />
-            ))}
+          <div>
+            <LiveProgress label="Pulling live listings from the marketplace" />
+            <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-[3/4]" />
+              ))}
+            </div>
           </div>
         ) : mutation.isError ? (
           <EmptyState
@@ -241,7 +265,12 @@ function LinkPanel() {
       </p>
 
       <div className="mt-8">
-        {mutation.isPending ? <Skeleton className="h-56" /> : null}
+        {mutation.isPending ? (
+          <div>
+            <LiveProgress label="Reading the listing from the marketplace" />
+            <Skeleton className="mt-4 h-56" />
+          </div>
+        ) : null}
 
         {mutation.isError ? (
           <EmptyState
