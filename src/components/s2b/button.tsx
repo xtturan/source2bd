@@ -6,16 +6,16 @@ export type ButtonVariant = "signal" | "green" | "glass" | "ghost";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-[12px] font-semibold transition-[transform,background-color,box-shadow,border-color] duration-150 ease-[cubic-bezier(.2,.8,.2,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-semibold transition-[transform,background-color,box-shadow,border-color] duration-150 ease-[cubic-bezier(.2,.8,.2,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50";
 
 const variants: Record<ButtonVariant, string> = {
   signal:
-    "bg-signal text-white shadow-[var(--shadow-2),inset_0_1px_0_rgb(255_255_255/0.2)] hover:bg-signal-600 hover:-translate-y-0.5",
+    "bg-foreground text-background shadow-[var(--shadow-2)] hover:bg-ink-soft hover:-translate-y-0.5",
   green:
-    "bg-accent text-accent-foreground shadow-[var(--shadow-2),inset_0_1px_0_rgb(255_255_255/0.28)] hover:bg-green-600 hover:-translate-y-0.5",
+    "bg-accent text-accent-foreground shadow-[var(--shadow-2),inset_0_1px_0_rgb(255_255_255/0.24)] hover:bg-clay-600 hover:-translate-y-0.5",
   glass:
-    "glass text-foreground hover:-translate-y-0.5 hover:border-foreground/25",
-  ghost: "text-muted-foreground hover:text-foreground hover:bg-foreground/6",
+    "bg-paper text-foreground border border-foreground/12 shadow-[var(--shadow-1)] hover:-translate-y-0.5 hover:border-foreground/25",
+  ghost: "text-muted-foreground hover:text-foreground hover:bg-foreground/[0.06]",
 };
 
 const sizes: Record<ButtonSize, string> = {
