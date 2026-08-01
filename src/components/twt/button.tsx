@@ -10,12 +10,14 @@ const base =
 
 const variants: Record<ButtonVariant, string> = {
   signal:
-    "bg-signal text-white shadow-[var(--shadow-lift)] hover:bg-signal-600 hover:-translate-y-0.5",
-  navy: "bg-navy text-white hover:bg-navy-700 hover:-translate-y-0.5",
-  green: "bg-green text-white hover:bg-green-600 hover:-translate-y-0.5",
-  outline: "border border-navy/15 bg-white text-navy hover:border-navy/40 hover:bg-[#f6f8fa]",
-  white: "bg-white text-navy hover:bg-white/90 hover:-translate-y-0.5",
-  ghost: "text-navy hover:bg-navy/5",
+    "bg-signal text-white shadow-[var(--shadow-lift)] ring-1 ring-inset ring-white/15 hover:bg-signal-600 hover:-translate-y-0.5",
+  navy: "bg-navy text-white ring-1 ring-inset ring-white/10 hover:bg-navy-700 hover:-translate-y-0.5",
+  green: "bg-green text-white ring-1 ring-inset ring-white/15 hover:bg-green-600 hover:-translate-y-0.5",
+  outline:
+    "border border-navy/12 bg-white/55 text-navy backdrop-blur-md hover:border-navy/25 hover:bg-white/80",
+  white:
+    "bg-white/85 text-navy backdrop-blur-md ring-1 ring-inset ring-white/40 hover:bg-white hover:-translate-y-0.5",
+  ghost: "text-navy hover:bg-navy/6",
 };
 
 const sizes: Record<ButtonSize, string> = {
