@@ -23,8 +23,8 @@ export function hasChinese(v: string | undefined): v is string {
  * lamps because the marketplace matches loose romanised text.
  */
 export async function translateQuery(query: string): Promise<string> {
-  const q = query.trim();
-  if (!q || hasChinese(q)) return q;
+  const q: string = query.trim();
+  if (!q || CJK.test(q)) return q;
   const cached = queryMemo.get(q.toLowerCase());
   if (cached) return cached;
 
