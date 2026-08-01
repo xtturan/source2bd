@@ -15,12 +15,8 @@ export function hasChinese(v: string | undefined): v is string {
   return typeof v === "string" && CJK.test(v);
 }
 
-/** Translates a batch of Chinese strings. Returns the input on any failure. */
-export async function translateBatch(inputs: string[]): Promise<string[]> {
-  const key = process.env["LOVABLE_API_KEY"];
-  const pending = [...new Set(inputs.filter((s) => hasChinese(s) && !memo.has(s)))];
-  if (!key || pending.length === 0) return inputs.map((s) => memo.get(s) ?? s);
-
+/** Translates one chunk and writes the results into the memo. */
+async function translateChunk(key: string, pending: string[]): Promise<void> {
   try {
     const res = await fetch(GATEWAY, {
       method: "POST",
@@ -38,27 +34,42 @@ export async function translateBatch(inputs: string[]): Promise<string[]> {
         ],
         response_format: { type: "json_object" },
       }),
-      signal: AbortSignal.timeout(25_000),
+      signal: AbortSignal.timeout(40_000),
     });
 
     if (!res.ok) {
       console.error(`translate failed [${res.status}]: ${await res.text()}`);
-      return inputs.map((s) => memo.get(s) ?? s);
+      return;
     }
 
     const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
     const content = json.choices?.[0]?.message?.content ?? "{}";
     const out = (JSON.parse(content) as { out?: unknown }).out;
-    if (Array.isArray(out) && out.length === pending.length) {
+    if (Array.isArray(out)) {
       pending.forEach((src, i) => {
         const v = out[i];
         if (typeof v === "string" && v.trim()) memo.set(src, v.trim());
       });
+      if (out.length !== pending.length)
+        console.error(`translate length mismatch: ${out.length} vs ${pending.length}`);
     }
   } catch (err) {
     console.error("translate error", err);
   }
+}
 
+/** Translates a batch of Chinese strings. Returns the input on any failure. */
+export async function translateBatch(inputs: string[]): Promise<string[]> {
+  const key = process.env["LOVABLE_API_KEY"];
+  const pending = [...new Set(inputs.filter((s) => hasChinese(s) && !memo.has(s)))];
+  if (!key || pending.length === 0) return inputs.map((s) => memo.get(s) ?? s);
+
+  // Small chunks in parallel: one long list often trips the model into a
+  // short or truncated array, which loses the whole page of translations.
+  const CHUNK = 8;
+  const chunks: string[][] = [];
+  for (let i = 0; i < pending.length; i += CHUNK) chunks.push(pending.slice(i, i + CHUNK));
+  await Promise.all(chunks.map((c) => translateChunk(key, c)));
   return inputs.map((s) => memo.get(s) ?? s);
 }
 
