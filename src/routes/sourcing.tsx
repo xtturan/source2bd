@@ -265,7 +265,12 @@ function LinkPanel() {
       </p>
 
       <div className="mt-8">
-        {mutation.isPending ? <Skeleton className="h-56" /> : null}
+        {mutation.isPending ? (
+          <div>
+            <LiveProgress label="Reading the listing from the marketplace" />
+            <Skeleton className="mt-4 h-56" />
+          </div>
+        ) : null}
 
         {mutation.isError ? (
           <EmptyState
