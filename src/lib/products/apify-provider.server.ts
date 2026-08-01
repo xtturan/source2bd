@@ -5,7 +5,7 @@ import type {
   ProductSummary,
   SearchResult,
 } from "./types";
-import { PAGE_SIZE } from "./types";
+import { FANOUT_ORIGINS, PAGE_SIZE } from "./types";
 import { mockProvider, parseProductUrl } from "./mock-provider";
 import { translateProducts } from "./translate.server";
 
@@ -39,6 +39,8 @@ function actorFor(marketplace: Marketplace | undefined) {
       return env("APIFY_AMAZON_ACTOR");
     case "alibaba":
       return env("APIFY_ALIBABA_ACTOR");
+    case "aliexpress":
+      return env("APIFY_ALIEXPRESS_ACTOR");
     case "1688":
       return env("APIFY_1688_ACTOR");
     default:
