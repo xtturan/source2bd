@@ -217,7 +217,13 @@ function mapImageItem(raw: Raw): ProductDetail | null {
 
   const provider = str(raw["provider"]);
   const marketplace: Marketplace =
-    provider === "1688" ? "1688" : provider === "alibaba" ? "alibaba" : "global";
+    provider === "1688"
+      ? "1688"
+      : provider === "alibaba"
+        ? "alibaba"
+        : provider === "aliexpress"
+          ? "aliexpress"
+          : "global";
   const images = strList(raw["images"]);
   const lo = num(raw["price_min"]);
   const hi = num(raw["price_max"]);
