@@ -7,7 +7,7 @@ import type {
 } from "./types";
 import { FANOUT_ORIGINS, PAGE_SIZE } from "./types";
 import { mockProvider, parseProductUrl } from "./mock-provider";
-import { translateProducts } from "./translate.server";
+import { translateProducts, translateQuery } from "./translate.server";
 
 /**
  * parse.bot provider.
@@ -264,7 +264,10 @@ async function searchOne(
   page: number,
   limit: number,
 ): Promise<ProductSummary[]> {
-  const data = await call(scraperFor(marketplace), "search_products", { query, page });
+  // 1688 is a Chinese-language index: search it with the Chinese phrase so
+  // qualifiers like "red" survive, and leave the others on English.
+  const q = marketplace === "1688" ? await translateQuery(query) : query;
+  const data = await call(scraperFor(marketplace), "search_products", { query: q, page });
   const map = mapperFor(marketplace);
   return rows(data, ...listKeys(marketplace))
     .map(map)
