@@ -34,6 +34,10 @@ export const Route = createFileRoute("/sourcing")({
   component: SourcingPage,
   validateSearch: (s: Record<string, unknown>) => ({
     q: typeof s["q"] === "string" ? s["q"].slice(0, 120) : undefined,
+    mode:
+      s["mode"] === "photo" || s["mode"] === "link" || s["mode"] === "search"
+        ? (s["mode"] as "photo" | "link" | "search")
+        : undefined,
   }),
 });
 
@@ -48,7 +52,8 @@ const markets: { key: Marketplace; label: string }[] = [
 type Mode = "search" | "link" | "photo";
 
 function SourcingPage() {
-  const [mode, setMode] = useState<Mode>("search");
+  const { mode: initialMode } = Route.useSearch();
+  const [mode, setMode] = useState<Mode>(initialMode ?? "search");
 
   return (
     <>
