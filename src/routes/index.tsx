@@ -38,10 +38,7 @@ export const Route = createFileRoute("/")({
     ],
   }),
   component: HomePage,
-});
-
-// Loader stays public: showcase rows come from the shared search cache.
-Route.update({
+  // Public loader: showcase rows come from the shared search cache.
   loader: async (): Promise<ShowcaseRow[]> => {
     try {
       return await showcaseSearches();
@@ -239,6 +236,70 @@ function OriginRail() {
 }
 
 function FeaturedCatalogue({ products }: { products: ReturnType<typeof featuredProducts> }) {
+  return (
+    <Section className="pt-0">
+      <Container>
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <SectionHeading
+            title="What a quote looks like before you send it"
+            intro="These are demo listings running on zero API cost. Every card deep links into a prefilled WhatsApp message so nothing gets retyped."
+          />
+          <ButtonLink to="/sourcing" variant="glass">
+            Open the sourcing desk
+          </ButtonLink>
+        </div>
+        <div className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {products.map((p) => (
+            <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
+          ))}
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+/** Real listings pulled from what shoppers already searched on this site. */
+function ShowcaseCatalogue({ rows }: { rows: ShowcaseRow[] }) {
+  return (
+    <Section className="pt-0">
+      <Container>
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <SectionHeading
+            title="What people are sourcing right now"
+            titleBn="এখন যা খোঁজা হচ্ছে"
+            intro="Live listings saved from real searches on this site, priced in taka with delivery to Bangladesh. Tap any card to get a WhatsApp quote."
+          />
+          <ButtonLink to="/sourcing" variant="glass">
+            Open the sourcing desk
+          </ButtonLink>
+        </div>
+        <div className="mt-12 grid gap-10">
+          {rows.map((row) => (
+            <div key={row.query}>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h3 className="text-lg font-bold capitalize">{row.query}</h3>
+                <Link
+                  to="/sourcing"
+                  search={{ q: row.query }}
+                  className="text-xs font-semibold uppercase tracking-wider text-accent"
+                >
+                  See all results
+                </Link>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                {row.items.map((p) => (
+                  <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+function LegacyFeaturedCatalogue({ products }: { products: ReturnType<typeof featuredProducts> }) {
   return (
     <Section className="pt-0">
       <Container>
