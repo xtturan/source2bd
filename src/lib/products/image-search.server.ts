@@ -67,7 +67,8 @@ export async function searchByPhoto(
   try {
     imageUrl = await hostPhoto(dataUrl);
   } catch (err) {
-    console.error("photo archive failed", err);
+    const { noteIncident } = await import("@/lib/api/error-log.server");
+    noteIncident("photo.archive", err);
   }
   return { items, imageUrl };
 }

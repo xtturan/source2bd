@@ -291,7 +291,8 @@ export async function uploadPhotoToElim(bytes: Uint8Array, mime: string): Promis
   const json = (await res.json().catch(() => ({}))) as Raw;
   const id = str(obj(json["data"])["image_id"]) ?? str(json["image_id"]);
   if (!res.ok || !id) {
-    console.error("elim photo upload failed", res.status, JSON.stringify(json).slice(0, 300));
+    const { noteIncident } = await import("@/lib/api/error-log.server");
+    noteIncident("elim.photo-upload", `HTTP ${res.status}`, JSON.stringify(json).slice(0, 300));
     throw new ProviderUnavailableError("We could not read that photo. Try a clearer one.");
   }
   return id;
@@ -349,9 +350,12 @@ export function createElimProvider(): ProductProvider {
           ...others.map(async (m) => (await fallback.search(query, { marketplace: m, page })).items),
         ]);
         const buckets = settled.map((r) => (r.status === "fulfilled" ? r.value : []));
-        settled.forEach((r) => {
-          if (r.status === "rejected") console.error("origin search failed", r.reason);
-        });
+        void (async () => {
+          const { noteIncident } = await import("@/lib/api/error-log.server");
+          settled.forEach((r) => {
+            if (r.status === "rejected") noteIncident("search.origin", r.reason, `query: ${query}`);
+          });
+        })();
 
         const items: ProductSummary[] = [];
         for (let i = 0; items.length < PAGE_SIZE; i++) {
@@ -378,7 +382,8 @@ export function createElimProvider(): ProductProvider {
       try {
         return (await detailElim(marketplace === "global" ? "1688" : marketplace, id)) ?? (await mockProvider.getById(id, marketplace));
       } catch (err) {
-        console.error("elim detail failed", err);
+        const { noteIncident } = await import("@/lib/api/error-log.server");
+        noteIncident("elim.detail", err, `${marketplace}:${id}`);
         return mockProvider.getById(id, marketplace);
       }
     },
@@ -393,7 +398,8 @@ export function createElimProvider(): ProductProvider {
       try {
         return (await detailElim(market, id)) ?? (await mockProvider.getByUrl(url));
       } catch (err) {
-        console.error("elim by-url failed", err);
+        const { noteIncident } = await import("@/lib/api/error-log.server");
+        noteIncident("elim.by-url", err, url);
         return mockProvider.getByUrl(url);
       }
     },
@@ -414,7 +420,8 @@ export function createElimProvider(): ProductProvider {
           .map(toSummary);
         if (items.length) return { items };
       } catch (err) {
-        console.error("elim image search failed", err);
+        const { noteIncident } = await import("@/lib/api/error-log.server");
+        noteIncident("elim.image-search", err);
       }
       return fallback.searchByImage ? fallback.searchByImage(imageUrl) : { items: [] };
     },
