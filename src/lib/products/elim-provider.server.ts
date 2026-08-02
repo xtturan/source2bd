@@ -208,24 +208,58 @@ function mapDetail(market: Marketplace, raw: Raw, id: string): ProductDetail | n
 
 /* ---------- calls ---------- */
 
+const STOP = new Set(["the", "a", "an", "for", "and", "with", "of", "to", "in", "on"]);
+
+function tokens(q: string) {
+  return q
+    .toLowerCase()
+    .split(/[^a-z0-9\u4e00-\u9fff]+/)
+    .filter((t) => t.length > 1 && !STOP.has(t));
+}
+
+/**
+ * Elim returns loosely matched rows, so a search for "red light" can bury the
+ * red ones under generic lamps. Re-rank on how well the English title covers
+ * the typed keywords before we cut the page down.
+ */
+function rankByQuery(items: ProductSummary[], query: string): ProductSummary[] {
+  const words = tokens(query);
+  if (!words.length) return items;
+  const phrase = words.join(" ");
+
+  return items
+    .map((item, index) => {
+      const title = item.title.toLowerCase();
+      let score = 0;
+      for (const w of words) if (title.includes(w)) score += 10;
+      if (words.every((w) => title.includes(w))) score += 15;
+      if (title.includes(phrase)) score += 20;
+      return { item, score, index };
+    })
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .map((x) => x.item);
+}
+
 async function searchElim(
   market: Marketplace,
   query: string,
   page: number,
   size: number,
 ): Promise<ProductSummary[]> {
+  // Over-fetch so the re-rank has room to pull the on-keyword rows up.
+  const fetchSize = query.trim() ? Math.min(size * 2, 50) : size;
   const data = await call("/v1/products/search", {
     q: query,
     platform: platformFor(market),
     page,
-    size,
+    size: fetchSize,
     lang: "en",
   });
-  return list(data["items"])
+  const mapped = list(data["items"])
     .map((row) => mapItem(market, row))
     .filter((x): x is ProductDetail => !!x)
-    .slice(0, size)
     .map(toSummary);
+  return rankByQuery(mapped, query).slice(0, size);
 }
 
 async function detailElim(market: Marketplace, id: string): Promise<ProductDetail | null> {
