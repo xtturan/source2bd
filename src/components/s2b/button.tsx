@@ -2,8 +2,8 @@ import { Link } from "@tanstack/react-router";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-export type ButtonVariant = "signal" | "green" | "glass" | "ghost";
-export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonVariant = "signal" | "green" | "clay" | "glass" | "ghost";
+export type ButtonSize = "sm" | "md" | "lg" | "xl";
 
 const base =
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-semibold transition-[transform,background-color,box-shadow,border-color] duration-150 ease-[cubic-bezier(.2,.8,.2,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50";
@@ -12,6 +12,8 @@ const variants: Record<ButtonVariant, string> = {
   signal:
     "bg-foreground text-background shadow-[var(--shadow-2)] hover:bg-ink-soft hover:-translate-y-0.5",
   green:
+    "bg-wa text-wa-foreground shadow-[var(--shadow-2),inset_0_1px_0_rgb(255_255_255/0.24)] hover:bg-wa-600 hover:-translate-y-0.5",
+  clay:
     "bg-accent text-accent-foreground shadow-[var(--shadow-2),inset_0_1px_0_rgb(255_255_255/0.24)] hover:bg-clay-600 hover:-translate-y-0.5",
   glass:
     "bg-paper text-foreground border border-foreground/12 shadow-[var(--shadow-1)] hover:-translate-y-0.5 hover:border-foreground/25",
@@ -21,7 +23,8 @@ const variants: Record<ButtonVariant, string> = {
 const sizes: Record<ButtonSize, string> = {
   sm: "h-9 px-3.5 text-sm",
   md: "h-11 px-5 text-sm",
-  lg: "h-13 px-7 text-base",
+  lg: "h-14 px-7 text-base",
+  xl: "h-16 px-8 text-lg",
 };
 
 type Common = { variant?: ButtonVariant; size?: ButtonSize; className?: string; children: ReactNode };
