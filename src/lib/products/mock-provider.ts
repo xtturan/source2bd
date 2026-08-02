@@ -26,14 +26,17 @@ export function parseProductUrl(
     return null;
   }
 
-  const marketplace: Marketplace = /aliexpress\.[a-z.]+/i.test(url)
-    ? "aliexpress"
-    : /alibaba\.com/i.test(url)
-      ? "alibaba"
-      : "1688";
+  const marketplace: Marketplace = /taobao\.com|tmall\.com/i.test(url)
+    ? "taobao"
+    : /aliexpress\.[a-z.]+/i.test(url)
+      ? "aliexpress"
+      : /alibaba\.com/i.test(url)
+        ? "alibaba"
+        : "1688";
 
   const patterns = [
     /offer\/(\d{6,})/i,
+    /[?&]id=(\d{6,})/i,
     /[?&]offerId=(\d{6,})/i,
     /_(\d{9,})\.html/i,
     /\/(\d{9,})\.html/i,
@@ -108,9 +111,11 @@ function manualQuoteDetail(url: string): ProductDetail {
     ? "amazon"
     : /alibaba\.com/i.test(url)
       ? "alibaba"
-      : /1688\./i.test(url)
-        ? "1688"
-        : "global";
+      : /taobao\.com|tmall\.com/i.test(url)
+        ? "taobao"
+        : /1688\./i.test(url)
+          ? "1688"
+          : "global";
   return {
     id: `manual-${h}`,
     marketplace,
