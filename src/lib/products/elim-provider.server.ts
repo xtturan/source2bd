@@ -106,6 +106,17 @@ function english(raw: Raw, ...keys: string[]) {
   return undefined;
 }
 
+/** Our marketplace keys mapped to Elim platform names. */
+function platformFor(m: Marketplace) {
+  return m === "taobao" ? "taobao" : "alibaba";
+}
+
+function offerUrl(m: Marketplace, id: string) {
+  return m === "taobao"
+    ? `https://item.taobao.com/item.htm?id=${id}`
+    : `https://detail.1688.com/offer/${id}.html`;
+}
+
 function toSummary(d: ProductDetail): ProductSummary {
   const { images: _i, priceTiers: _t, attributes: _a, description: _d, ...rest } = d;
   return rest;
@@ -119,7 +130,7 @@ function stripHtml(v: string | undefined) {
 
 /* ---------- mappers ---------- */
 
-function mapItem(raw: Raw): ProductDetail | null {
+function mapItem(market: Marketplace, raw: Raw): ProductDetail | null {
   const id = str(raw["id"]);
   const title = english(raw, "title");
   if (!id || !title) return null;
@@ -128,20 +139,20 @@ function mapItem(raw: Raw): ProductDetail | null {
 
   return {
     id,
-    marketplace: "1688",
+    marketplace: market,
     title,
     priceMin: num(raw["promotion_price"]) ?? num(raw["price"]),
     priceMax: num(raw["price"]),
     currency: "CNY",
     imageUrl: image,
     shopName: english(raw, "shop_name"),
-    productUrl: str(raw["link"]) ?? `https://detail.1688.com/offer/${id}.html`,
+    productUrl: str(raw["link"]) ?? offerUrl(market, id),
     ordersHint: sold ? `${sold.toLocaleString("en-US")} sold` : undefined,
     images: image ? [image] : [],
   };
 }
 
-function mapDetail(raw: Raw, id: string): ProductDetail | null {
+function mapDetail(market: Marketplace, raw: Raw, id: string): ProductDetail | null {
   const title = english(raw, "title");
   const images = strings(raw["img_urls"]);
   if (!title && !images.length) return null;
@@ -178,15 +189,15 @@ function mapDetail(raw: Raw, id: string): ProductDetail | null {
 
   return {
     id,
-    marketplace: "1688",
-    title: title ?? `1688 offer ${id}`,
+    marketplace: market,
+    title: title ?? `${market === "taobao" ? "Taobao" : "1688"} offer ${id}`,
     priceMin: prices.length ? Math.min(...prices) : base,
     priceMax: prices.length ? Math.max(...prices) : num(raw["price"]),
     currency: "CNY",
     moq: num(raw["moq"]),
     imageUrl: gallery[0],
     shopName: english(raw, "shop_name"),
-    productUrl: `https://detail.1688.com/offer/${id}.html`,
+    productUrl: offerUrl(market, id),
     ordersHint: sold ? `${sold.toLocaleString("en-US")} sold` : undefined,
     images: gallery,
     priceTiers: tiers.length > 1 ? tiers : undefined,
@@ -197,24 +208,29 @@ function mapDetail(raw: Raw, id: string): ProductDetail | null {
 
 /* ---------- calls ---------- */
 
-async function searchElim(query: string, page: number, size: number): Promise<ProductSummary[]> {
+async function searchElim(
+  market: Marketplace,
+  query: string,
+  page: number,
+  size: number,
+): Promise<ProductSummary[]> {
   const data = await call("/v1/products/search", {
     q: query,
-    platform: "alibaba",
+    platform: platformFor(market),
     page,
     size,
     lang: "en",
   });
   return list(data["items"])
-    .map(mapItem)
+    .map((row) => mapItem(market, row))
     .filter((x): x is ProductDetail => !!x)
     .slice(0, size)
     .map(toSummary);
 }
 
-async function detailElim(id: string): Promise<ProductDetail | null> {
-  const data = await call("/v1/products/find", { id, platform: "alibaba", lang: "en" });
-  return mapDetail(data, id);
+async function detailElim(market: Marketplace, id: string): Promise<ProductDetail | null> {
+  const data = await call("/v1/products/find", { id, platform: platformFor(market), lang: "en" });
+  return mapDetail(market, data, id);
 }
 
 function offerIdFromUrl(url: string) {
@@ -237,10 +253,15 @@ export function createElimProvider(): ProductProvider {
       const page = opts?.page ?? 1;
 
       if (marketplace === "global") {
-        const others = FANOUT_ORIGINS.filter((m) => m !== "1688" && m !== "global");
-        const per = Math.ceil(PAGE_SIZE / (others.length + 1));
+        const native = FANOUT_ORIGINS.filter(
+          (m): m is "1688" | "taobao" => m === "1688" || m === "taobao",
+        );
+        const others = FANOUT_ORIGINS.filter(
+          (m) => m !== "1688" && m !== "taobao" && m !== "global",
+        );
+        const per = Math.ceil(PAGE_SIZE / (native.length + others.length));
         const settled = await Promise.allSettled([
-          searchElim(query, page, PAGE_SIZE - others.length * per),
+          ...native.map((m) => searchElim(m, query, page, per)),
           ...others.map(async (m) => (await fallback.search(query, { marketplace: m, page })).items),
         ]);
         const buckets = settled.map((r) => (r.status === "fulfilled" ? r.value : []));
@@ -262,15 +283,16 @@ export function createElimProvider(): ProductProvider {
         return { items: items.slice(0, PAGE_SIZE), page };
       }
 
-      if (marketplace !== "1688") return fallback.search(query, { marketplace, page });
-      return { items: await searchElim(query, page, PAGE_SIZE), page };
+      if (marketplace !== "1688" && marketplace !== "taobao")
+        return fallback.search(query, { marketplace, page });
+      return { items: await searchElim(marketplace, query, page, PAGE_SIZE), page };
     },
 
     async getById(id, marketplace = "1688"): Promise<ProductDetail | null> {
-      if (marketplace !== "1688" && marketplace !== "global")
+      if (marketplace !== "1688" && marketplace !== "taobao" && marketplace !== "global")
         return fallback.getById(id, marketplace);
       try {
-        return (await detailElim(id)) ?? (await mockProvider.getById(id, marketplace));
+        return (await detailElim(marketplace === "global" ? "1688" : marketplace, id)) ?? (await mockProvider.getById(id, marketplace));
       } catch (err) {
         console.error("elim detail failed", err);
         return mockProvider.getById(id, marketplace);
@@ -279,12 +301,13 @@ export function createElimProvider(): ProductProvider {
 
     async getByUrl(url): Promise<ProductDetail | null> {
       const parsed = parseProductUrl(url);
-      if (parsed && parsed.marketplace !== "1688" && parsed.marketplace !== "global")
-        return fallback.getByUrl(url);
+      const market =
+        parsed?.marketplace && parsed.marketplace !== "global" ? parsed.marketplace : "1688";
+      if (market !== "1688" && market !== "taobao") return fallback.getByUrl(url);
       const id = parsed?.id ?? offerIdFromUrl(url);
       if (!id) return mockProvider.getByUrl(url);
       try {
-        return (await detailElim(id)) ?? (await mockProvider.getByUrl(url));
+        return (await detailElim(market, id)) ?? (await mockProvider.getByUrl(url));
       } catch (err) {
         console.error("elim by-url failed", err);
         return mockProvider.getByUrl(url);
@@ -301,7 +324,7 @@ export function createElimProvider(): ProductProvider {
           lang: "en",
         });
         const items = list(data["items"])
-          .map(mapItem)
+          .map((row) => mapItem("1688", row))
           .filter((x): x is ProductDetail => !!x)
           .slice(0, PAGE_SIZE)
           .map(toSummary);

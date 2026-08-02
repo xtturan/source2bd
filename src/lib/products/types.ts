@@ -1,7 +1,8 @@
-export type Marketplace = "1688" | "alibaba" | "aliexpress" | "amazon" | "global";
+export type Marketplace = "1688" | "taobao" | "alibaba" | "aliexpress" | "amazon" | "global";
 
 export const marketplaceLabels: Record<Marketplace, string> = {
   "1688": "1688",
+  taobao: "Taobao",
   alibaba: "Alibaba",
   aliexpress: "AliExpress",
   amazon: "Amazon",
@@ -59,11 +60,12 @@ export const PAGE_SIZE = 24;
  * Origins fanned out in parallel when the shopper picks "All origins".
  * Amazon is off: it burns credit fast and rarely fits the cargo use case.
  */
-export const FANOUT_ORIGINS: Marketplace[] = ["1688", "alibaba", "aliexpress"];
+export const FANOUT_ORIGINS: Marketplace[] = ["1688", "taobao", "alibaba", "aliexpress"];
 
 export function isMarketplace(v: string): v is Marketplace {
   return (
     v === "1688" ||
+    v === "taobao" ||
     v === "alibaba" ||
     v === "aliexpress" ||
     v === "amazon" ||

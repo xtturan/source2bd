@@ -5,7 +5,7 @@ import { cached, rateLimited, tooMany } from "@/lib/api/guard.server";
 
 const schema = z.object({
   id: z.string().trim().min(1).max(64),
-  marketplace: z.enum(["1688", "alibaba", "amazon", "global"]).default("1688"),
+  marketplace: z.enum(["1688", "taobao", "alibaba", "amazon", "global"]).default("1688"),
 });
 
 export const Route = createFileRoute("/api/products/detail")({

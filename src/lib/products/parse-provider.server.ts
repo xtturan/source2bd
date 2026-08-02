@@ -7,7 +7,6 @@ import type {
 } from "./types";
 import { FANOUT_ORIGINS, PAGE_SIZE } from "./types";
 import { mockProvider, parseProductUrl } from "./mock-provider";
-import { translateProducts, translateQuery } from "./translate.server";
 
 /**
  * parse.bot provider.
@@ -29,14 +28,14 @@ function env(key: string) {
   return process.env[key]?.trim() || "";
 }
 
-const DEFAULT_SCRAPERS: Record<Exclude<Marketplace, "global">, string> = {
+const DEFAULT_SCRAPERS: Record<Exclude<Marketplace, "global" | "taobao">, string> = {
   "1688": "aa6e2b5e-7963-46f5-a6c2-e326775ceae4",
   alibaba: "ba2822dd-f985-4faa-8d3b-81d795bda2a7",
   aliexpress: "f989ff95-1fce-426d-935d-2b3787e3f343",
   amazon: "e1dc349c-16b6-498a-a7e6-2462aef5b5b4",
 };
 
-function scraperFor(marketplace: Exclude<Marketplace, "global">) {
+function scraperFor(marketplace: Exclude<Marketplace, "global" | "taobao">) {
   switch (marketplace) {
     case "alibaba":
       return env("PARSE_ALIBABA_SCRAPER") || DEFAULT_SCRAPERS.alibaba;
@@ -259,14 +258,12 @@ function toSummary(d: ProductDetail): ProductSummary {
 }
 
 async function searchOne(
-  marketplace: Exclude<Marketplace, "global">,
+  marketplace: Exclude<Marketplace, "global" | "taobao">,
   query: string,
   page: number,
   limit: number,
 ): Promise<ProductSummary[]> {
-  // 1688 is a Chinese-language index: search it with the Chinese phrase so
-  // qualifiers like "red" survive, and leave the others on English.
-  const q = marketplace === "1688" ? await translateQuery(query) : query;
+  const q = query;
   const data = await call(scraperFor(marketplace), "search_products", { query: q, page });
   const map = mapperFor(marketplace);
   return rows(data, ...listKeys(marketplace))
@@ -433,7 +430,8 @@ export function createParseProvider(): ProductProvider {
 
       if (marketplace === "global") {
         const origins = FANOUT_ORIGINS.filter(
-          (m): m is Exclude<Marketplace, "global"> => m !== "global",
+          (m): m is Exclude<Marketplace, "global" | "taobao"> =>
+            m !== "global" && m !== "taobao",
         );
         const per = Math.ceil(PAGE_SIZE / origins.length);
         const settled = await Promise.allSettled(
@@ -455,19 +453,21 @@ export function createParseProvider(): ProductProvider {
             "Live marketplace search did not come back. Send the keyword on WhatsApp and we will source it by hand.",
           );
         }
-        return { items: await translateProducts(items.slice(0, PAGE_SIZE)), page };
+        return { items: items.slice(0, PAGE_SIZE), page };
       }
 
+      if (marketplace === "taobao")
+        throw new ProviderUnavailableError("Taobao is served by the live desk, not this source.");
       const single = await searchOne(marketplace, query, page, PAGE_SIZE);
-      return { items: await translateProducts(single), page };
+      return { items: single, page };
     },
 
     async getById(id, marketplace = "1688"): Promise<ProductDetail | null> {
-      const target = marketplace === "global" ? "1688" : marketplace;
+      const target = marketplace === "global" || marketplace === "taobao" ? "1688" : marketplace;
       try {
         const detail = await detailFor(target, id);
         if (!detail) return mockProvider.getById(id, marketplace);
-        return (await translateProducts([detail]))[0] ?? detail;
+        return detail;
       } catch (err) {
         console.error("parse detail failed", err);
         return mockProvider.getById(id, marketplace);
@@ -477,11 +477,14 @@ export function createParseProvider(): ProductProvider {
     async getByUrl(url): Promise<ProductDetail | null> {
       const parsed = parseProductUrl(url);
       if (!parsed) return mockProvider.getByUrl(url);
-      const target = parsed.marketplace === "global" ? "1688" : parsed.marketplace;
+      const target =
+        parsed.marketplace === "global" || parsed.marketplace === "taobao"
+          ? "1688"
+          : parsed.marketplace;
       try {
         const detail = await detailFor(target, parsed.id);
         if (!detail) return mockProvider.getByUrl(url);
-        return (await translateProducts([detail]))[0] ?? detail;
+        return detail;
       } catch (err) {
         console.error("parse by-url failed", err);
         return mockProvider.getByUrl(url);
@@ -502,7 +505,7 @@ export function createParseProvider(): ProductProvider {
       if (!items.length) {
         return mockProvider.searchByImage ? mockProvider.searchByImage(imageUrl) : { items: [] };
       }
-      return { items: await translateProducts(items) };
+      return { items: items };
     },
   };
 }

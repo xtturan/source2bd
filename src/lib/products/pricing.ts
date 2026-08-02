@@ -1,8 +1,8 @@
 /**
  * Supplier prices come back in CNY or USD. Shoppers in Bangladesh see BDT
- * with the standard 15% sourcing markup applied.
+ * with the standard 25% sourcing markup applied.
  */
-export const MARKUP = 1.15;
+export const MARKUP = 1.25;
 
 const RATE: Record<"CNY" | "USD", number> = {
   CNY: 17.2,
