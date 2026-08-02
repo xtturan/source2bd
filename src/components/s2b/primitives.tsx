@@ -2,14 +2,20 @@ import type { ReactNode, HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 export function Container({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("mx-auto w-full max-w-7xl px-5 sm:px-8", className)} {...props} />;
+  // Gutters grow with the viewport instead of jumping at one breakpoint.
+  return (
+    <div
+      className={cn("mx-auto w-full max-w-7xl px-[clamp(1rem,4vw,2.5rem)]", className)}
+      {...props}
+    />
+  );
 }
 
 export function Section({
   className,
   ...props
 }: HTMLAttributes<HTMLElement>) {
-  return <section className={cn("py-20 sm:py-28", className)} {...props} />;
+  return <section className={cn("py-[clamp(3rem,7vw,6.5rem)]", className)} {...props} />;
 }
 
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
@@ -42,12 +48,12 @@ export function SectionHeading({
   return (
     <div className={cn("max-w-2xl", className)}>
       {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
-      <h2 className="mt-4 text-3xl font-extrabold leading-[1.05] sm:text-4xl lg:text-[2.6rem]">
+      <h2 className="mt-4 text-[clamp(1.6rem,4.4vw,2.6rem)] font-extrabold leading-[1.08]">
         {title}
       </h2>
       {titleBn ? <p className="font-bn mt-2 text-base text-muted-foreground">{titleBn}</p> : null}
       {intro ? (
-        <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
+        <p className="mt-4 max-w-[62ch] text-[clamp(0.95rem,1.4vw,1.125rem)] leading-relaxed text-muted-foreground">
           {intro}
         </p>
       ) : null}
@@ -111,9 +117,9 @@ export function EmptyState({
 
 export function Stat({ value, label, sub }: { value: string; label: string; sub?: string }) {
   return (
-    <div className="panel matte rounded-[18px] px-5 py-6">
-      <div className="tnum text-3xl font-extrabold tracking-tight">{value}</div>
-      <div className="mt-1 text-sm font-semibold">{label}</div>
+    <div className="panel matte rounded-[18px] px-4 py-5 sm:px-5 sm:py-6">
+      <div className="tnum text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-tight">{value}</div>
+      <div className="mt-1 text-sm font-semibold leading-snug">{label}</div>
       {sub ? <div className="mt-1 text-xs text-muted-foreground">{sub}</div> : null}
     </div>
   );

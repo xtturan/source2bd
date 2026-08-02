@@ -75,17 +75,17 @@ function Hero() {
   return (
     <section className="relative overflow-hidden">
       <div className="grid-lines pointer-events-none absolute inset-0 opacity-60" aria-hidden />
-      <Container className="relative grid gap-10 pb-14 pt-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-20 lg:pt-16">
+      <Container className="relative grid items-center gap-8 pb-[clamp(2.5rem,6vw,5rem)] pt-[clamp(2rem,5vw,4rem)] md:grid-cols-[1.05fr_0.95fr] md:gap-10">
         <div className="reveal">
-          <h1 className="font-bn text-[2.2rem] font-extrabold leading-[1.15] sm:text-[2.9rem]">
+          <h1 className="font-bn text-[clamp(1.9rem,5.4vw,3rem)] font-extrabold leading-[1.15]">
             চীন থেকে পণ্য আনুন,
             <br />
             <span className="text-accent">বাসায় পৌঁছে দেব</span>
           </h1>
-          <p className="mt-3 text-lg font-semibold text-muted-foreground">
+          <p className="mt-3 text-[clamp(1rem,1.7vw,1.15rem)] font-semibold text-muted-foreground">
             Buy from China, Amazon or any shop. We deliver to your door in Bangladesh.
           </p>
-          <p className="font-bn mt-4 text-base leading-relaxed text-muted-foreground">
+          <p className="font-bn mt-4 text-[clamp(0.95rem,1.5vw,1.05rem)] leading-relaxed text-muted-foreground">
             কোনো ইংরেজি জানার দরকার নেই। শুধু ছবি বা লিংক পাঠান, আমরা দাম বলে দেব।
           </p>
         </div>
@@ -96,7 +96,7 @@ function Hero() {
             alt="Cartons and crates staged for consolidation in a sunlit warehouse"
             width={1280}
             height={1600}
-            className="h-[340px] w-full object-cover sm:h-[420px] lg:h-[520px]"
+            className="h-[clamp(220px,38vw,480px)] w-full object-cover"
           />
         </figure>
       </Container>
@@ -113,7 +113,7 @@ function BigChoices() {
     <Container className="pb-4">
       <p className="font-bn text-center text-xl font-bold">আপনি কী করতে চান?</p>
       <p className="mt-1 text-center text-sm text-muted-foreground">What do you want to do?</p>
-      <div className="mt-6 grid gap-3 lg:grid-cols-3">
+      <div className="mt-6 grid gap-3 md:grid-cols-3">
         <BigActionLink
           to="/sourcing"
           tone="accent"
@@ -121,14 +121,13 @@ function BigChoices() {
           bn="পণ্য খুঁজুন"
           en="Search for a product"
         />
-        <BigActionAnchor
-          href={generalInquiry("I want to send a product photo")}
-          target="_blank"
-          rel="noopener noreferrer"
+        <BigActionLink
+          to="/sourcing"
+          search={{ mode: "photo" } as never}
           tone="ink"
           icon={<IconCamera />}
-          bn="ছবি পাঠান"
-          en="Send a photo on WhatsApp"
+          bn="ছবি দিয়ে খুঁজুন"
+          en="Search by photo"
         />
         <BigActionAnchor
           href={`tel:${siteConfig.phoneTel}`}
@@ -163,7 +162,7 @@ function SimpleSteps() {
   return (
     <Section className="py-12 sm:py-14">
       <Container>
-        <ol className="grid gap-3 sm:grid-cols-3">
+        <ol className="grid gap-3 md:grid-cols-3">
           {simpleSteps.map((s) => (
             <li key={s.en} className="panel matte flex items-center gap-4 rounded-[18px] p-5">
               <span
@@ -188,7 +187,7 @@ function TrustStrip() {
   return (
     <Section className="py-10 sm:py-12">
       <Container>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
           {trustStats.map((s) => (
             <Stat key={s.label} value={s.value} label={s.label} sub={s.sub} />
           ))}
@@ -208,7 +207,7 @@ function OriginRail() {
           titleBn="তিনটি উৎস · একটাই ল্যান্ডেড প্রাইস"
           intro="Most agents in Dhaka only handle China. We quote the same order across China factory pricing, Amazon retail and any global store, then tell you which one actually lands cheaper."
         />
-        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {origins.map((o) => (
             <Card key={o.key} className="lift flex flex-col p-6">
               <div className="flex items-center justify-between">
@@ -248,7 +247,7 @@ function FeaturedCatalogue({ products }: { products: ReturnType<typeof featuredP
             Open the sourcing desk
           </ButtonLink>
         </div>
-        <div className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
           {products.map((p) => (
             <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
           ))}
@@ -286,7 +285,7 @@ function ShowcaseCatalogue({ rows }: { rows: ShowcaseRow[] }) {
                   See all results
                 </Link>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
                 {row.items.map((p) => (
                   <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
                 ))}

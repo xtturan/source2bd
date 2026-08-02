@@ -80,7 +80,7 @@ function FaqPage() {
           title="The questions people ask before the first order"
           titleBn="সাধারণ জিজ্ঞাসা"
         />
-        <div className="mt-12 grid gap-4 lg:grid-cols-2">
+        <div className="mt-12 grid gap-4 md:grid-cols-2">
           {faqs.map((f) => (
             <Card key={f.q} className="p-6">
               <h2 className="text-base font-bold leading-snug">{f.q}</h2>
