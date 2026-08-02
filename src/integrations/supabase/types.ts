@@ -14,7 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      search_cache: {
+        Row: {
+          created_at: string
+          hits: number
+          id: string
+          item_count: number
+          marketplace: string
+          page: number
+          query: string
+          results: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hits?: number
+          id?: string
+          item_count?: number
+          marketplace: string
+          page?: number
+          query: string
+          results: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hits?: number
+          id?: string
+          item_count?: number
+          marketplace?: string
+          page?: number
+          query?: string
+          results?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
