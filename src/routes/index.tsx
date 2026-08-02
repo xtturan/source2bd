@@ -76,25 +76,25 @@ function FirstScreen() {
   return (
     <Container className="pb-8 pt-4 sm:pt-6">
       <h1 className="font-bn max-w-[16ch] text-[clamp(1.7rem,7vw,2.9rem)] font-extrabold leading-[1.2]">
-        {t("ছবি বা লিংক পাঠান", "Send a photo or a link")}
+        {t("নাম লিখুন বা লিংক দিন", "Type the name or paste a link")}
         <br />
-        <span className="text-accent">{t("দাম বলে দেব", "We tell you the price")}</span>
-        <br />
-        {t("বাসায় পৌঁছে দেব", "We deliver to your home")}
+        <span className="text-accent">
+          {t("বাংলাদেশ পর্যন্ত পুরো দাম বলে দেব", "We tell you the full Bangladesh price")}
+        </span>
       </h1>
       <p className="font-bn mt-3 text-[clamp(1rem,4vw,1.2rem)] font-semibold text-muted-foreground">
-        {t("কোনো ইংরেজি জানার দরকার নেই", "No English needed")}
+        {t("শিপিং চার্জসহ · কোনো ইংরেজি জানার দরকার নেই", "Shipping included. No English needed.")}
       </p>
 
       <div className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-3 sm:gap-4">
         <ActionCard
           as="link"
           to="/sourcing"
-          search={{ mode: "photo" }}
+          search={{ mode: "search" }}
           tone="accent"
-          title={t("ছবি পাঠান", "Send a photo")}
-          sub={t("পণ্যের ছবি তুলুন", "Take a picture of the item")}
-          icon={<CameraGlyph />}
+          title={t("নাম লিখে খুঁজুন", "Search by name")}
+          sub={t("যেমন: লেড লাইট, ফোন কভার", "e.g. led light, phone cover")}
+          icon={<SearchGlyph />}
         />
 
         <ActionCard
@@ -102,25 +102,26 @@ function FirstScreen() {
           onClick={() => setLinkOpen((v) => !v)}
           expanded={linkOpen}
           tone="ink"
-          title={t("লিংক পাঠান", "Send a link")}
+          title={t("লিংক দিন", "Paste a link")}
           sub={t("১৬৮৮ / অ্যামাজন লিংক", "1688 or Amazon link")}
           icon={<LinkGlyph />}
         />
 
         <ActionCard
-          as="anchor"
-          href={telLink}
+          as="link"
+          to="/sourcing"
+          search={{ mode: "photo" }}
           tone="paper"
-          title={t("ফোন করুন", "Call us")}
-          sub={siteConfig.phoneDisplay}
-          icon={<PhoneGlyph />}
+          title={t("ছবি পাঠান", "Send a photo")}
+          sub={t("পণ্যের ছবি তুলুন", "Take a picture of the item")}
+          icon={<CameraGlyph />}
         />
       </div>
 
       {linkOpen ? (
         <div className="panel matte mt-3 rounded-[18px] p-4">
           <label htmlFor="home-link" className="font-bn block text-base font-bold">
-            {t("লিংক এখানে বসান", "Paste the link here")}
+            {t("পণ্যের লিংক পেস্ট করুন", "Paste the product link")}
           </label>
           <input
             id="home-link"
@@ -141,10 +142,15 @@ function FirstScreen() {
           <button
             type="button"
             onClick={sendLink}
-            className="font-bn mt-3 flex min-h-[60px] w-full items-center justify-center gap-2 rounded-full bg-wa text-lg font-bold text-wa-foreground"
+            className="mt-3 flex min-h-[60px] w-full flex-col items-center justify-center rounded-full bg-wa text-wa-foreground"
           >
-            <WhatsAppIcon className="h-6 w-6" />
-            {t("লিংক পাঠিয়ে দাম জানুন", "Send the link and get a price")}
+            <span className="font-bn flex items-center gap-2 text-[17px] font-bold leading-tight">
+              <WhatsAppIcon className="h-5 w-5" />
+              {t("বাংলাদেশ পর্যন্ত পুরো দাম জানুন", "Get the full Bangladesh price")}
+            </span>
+            <span className="font-bn text-[11px] font-semibold opacity-90">
+              {t("শিপিং চার্জসহ · WhatsApp-এ", "Shipping included · on WhatsApp")}
+            </span>
           </button>
         </div>
       ) : null}
@@ -157,14 +163,14 @@ function FirstScreen() {
           className="font-bn flex min-h-[52px] items-center justify-center gap-2 rounded-full border border-foreground/12 bg-paper text-[15px] font-bold"
         >
           <WhatsAppIcon className="h-5 w-5 text-wa" />
-          {t("লিখে জানান", "Message us")}
+          {t("WhatsApp-এ পাঠান", "Message us")}
         </a>
-        <Link
-          to="/sourcing"
+        <a
+          href={telLink}
           className="font-bn flex min-h-[52px] items-center justify-center rounded-full border border-foreground/12 bg-paper text-[15px] font-bold"
         >
-          {t("খুঁজে দেখুন", "Search products")}
-        </Link>
+          {t("ফোন করুন", "Call")} {siteConfig.phoneDisplay}
+        </a>
       </div>
     </Container>
   );
