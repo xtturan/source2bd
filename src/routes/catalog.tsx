@@ -54,13 +54,13 @@ export const Route = createFileRoute("/catalog")({
 });
 
 function CatalogPage() {
-  const items = Route.useLoaderData();
+  const items = Route.useLoaderData() as CatalogueItem[];
   const { cat, q } = Route.useSearch();
   const { t } = useLang();
   const [text, setText] = useState(q);
 
-  const tagged = useMemo(
-    () => items.map((p) => ({ p, key: categoryOfProduct(p, p.query) })),
+  const tagged = useMemo<{ p: CatalogueItem; key: CategoryKey }[]>(
+    () => items.map((p: CatalogueItem) => ({ p, key: categoryOfProduct(p, p.query) })),
     [items],
   );
 
@@ -71,9 +71,9 @@ function CatalogPage() {
   }, [tagged]);
 
   const needle = text.trim().toLowerCase();
-  const shown = tagged
-    .filter((row) => (cat ? row.key === cat : true))
-    .filter((row) =>
+  const shown: { p: CatalogueItem; key: CategoryKey }[] = tagged
+    .filter((row: { key: CategoryKey }) => (cat ? row.key === cat : true))
+    .filter((row: { p: CatalogueItem }) =>
       needle ? `${row.p.title} ${row.p.query}`.toLowerCase().includes(needle) : true,
     )
     .slice(0, 240);
@@ -132,7 +132,7 @@ function CatalogPage() {
 
         {shown.length ? (
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {shown.map(({ p }) => (
+            {shown.map(({ p }: { p: CatalogueItem }) => (
               <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
             ))}
           </div>
