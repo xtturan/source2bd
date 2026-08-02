@@ -12,6 +12,8 @@ import {
 } from "@/components/s2b/big-action";
 import { ProductCard } from "@/components/s2b/product-card";
 import { featuredProducts } from "@/lib/products/mock-provider";
+import { showcaseSearches } from "@/lib/products/queries.functions";
+import type { ShowcaseRow } from "@/lib/products/search-cache.server";
 import { origins, services, siteConfig, trustStats } from "@/config/site";
 import { generalInquiry } from "@/lib/whatsapp";
 import heroCargo from "@/assets/hero-cargo.jpg";
@@ -36,9 +38,18 @@ export const Route = createFileRoute("/")({
     ],
   }),
   component: HomePage,
+  // Public loader: showcase rows come from the shared search cache.
+  loader: async (): Promise<ShowcaseRow[]> => {
+    try {
+      return await showcaseSearches();
+    } catch {
+      return [];
+    }
+  },
 });
 
 function HomePage() {
+  const showcase = Route.useLoaderData();
   const products = featuredProducts(8);
 
   return (
@@ -48,7 +59,11 @@ function HomePage() {
       <SimpleSteps />
       <TrustStrip />
       <OriginRail />
-      <FeaturedCatalogue products={products} />
+      {showcase.length ? (
+        <ShowcaseCatalogue rows={showcase} />
+      ) : (
+        <FeaturedCatalogue products={products} />
+      )}
       <ServiceGrid />
       <Process />
       <ClosingCta />
@@ -236,6 +251,47 @@ function FeaturedCatalogue({ products }: { products: ReturnType<typeof featuredP
         <div className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {products.map((p) => (
             <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
+          ))}
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+/** Real listings pulled from what shoppers already searched on this site. */
+function ShowcaseCatalogue({ rows }: { rows: ShowcaseRow[] }) {
+  return (
+    <Section className="pt-0">
+      <Container>
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <SectionHeading
+            title="What people are sourcing right now"
+            titleBn="এখন যা খোঁজা হচ্ছে"
+            intro="Live listings saved from real searches on this site, priced in taka with delivery to Bangladesh. Tap any card to get a WhatsApp quote."
+          />
+          <ButtonLink to="/sourcing" variant="glass">
+            Open the sourcing desk
+          </ButtonLink>
+        </div>
+        <div className="mt-12 grid gap-10">
+          {rows.map((row) => (
+            <div key={row.query}>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h3 className="text-lg font-bold capitalize">{row.query}</h3>
+                <Link
+                  to="/sourcing"
+                  search={{ q: row.query }}
+                  className="text-xs font-semibold uppercase tracking-wider text-accent"
+                >
+                  See all results
+                </Link>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                {row.items.map((p) => (
+                  <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </Container>

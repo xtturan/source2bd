@@ -32,6 +32,9 @@ export const Route = createFileRoute("/sourcing")({
     ],
   }),
   component: SourcingPage,
+  validateSearch: (s: Record<string, unknown>) => ({
+    q: typeof s["q"] === "string" ? s["q"].slice(0, 120) : undefined,
+  }),
 });
 
 const markets: { key: Marketplace; label: string }[] = [
@@ -148,7 +151,8 @@ function LiveProgress({ label }: { label: string }) {
 }
 
 function SearchPanelInner() {
-  const [q, setQ] = useState("");
+  const { q: initialQ } = Route.useSearch();
+  const [q, setQ] = useState(initialQ ?? "");
   const [marketplace, setMarketplace] = useState<Marketplace>("1688");
   const [items, setItems] = useState<ProductSummary[] | null>(null);
   const search = useServerFn(searchProducts);
@@ -170,6 +174,12 @@ function SearchPanelInner() {
       search({ data: { q: vars.q, marketplace: vars.marketplace, page: 1 } }),
     onSuccess: (res) => setItems(res.items),
   });
+
+  const run = mutation.mutate;
+  // Deep links from the homepage showcase land here with a keyword ready.
+  useEffect(() => {
+    if (initialQ) run({ q: initialQ, marketplace: "1688" });
+  }, [initialQ, run]);
 
   // Speaking is easier than spelling. Falls back silently when unsupported.
   function startVoice() {
