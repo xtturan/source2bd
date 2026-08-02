@@ -8,6 +8,7 @@ import { generalInquiry, telLink } from "@/lib/whatsapp";
 import { useLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth/session";
+import { QuotaChip } from "./quota-bar";
 
 /** Minimal header: logo, language, WhatsApp, phone. Nothing else competes. */
 export function Header() {
@@ -59,6 +60,8 @@ export function Header() {
             </button>
           ))}
         </div>
+
+        <QuotaChip />
 
         <Link
           to={user ? "/account" : "/auth"}
