@@ -228,7 +228,7 @@ function rankByQuery(items: ProductSummary[], query: string): ProductSummary[] {
   if (!words.length) return items;
   const phrase = words.join(" ");
 
-  return items
+  const ranked = items
     .map((item, index) => {
       const title = item.title.toLowerCase();
       let score = 0;
@@ -238,7 +238,9 @@ function rankByQuery(items: ProductSummary[], query: string): ProductSummary[] {
       return { item, score, index };
     })
     .sort((a, b) => b.score - a.score || a.index - b.index)
-    .map((x) => x.item);
+  const strong = ranked.filter((x) => words.every((word) => x.item.title.toLowerCase().includes(word)));
+  const rest = ranked.filter((x) => !words.every((word) => x.item.title.toLowerCase().includes(word)));
+  return [...strong, ...rest].map((x) => x.item);
 }
 
 async function searchElim(

@@ -2,14 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { ProductDetail, SearchResult } from "./types";
 
-const marketplaceSchema = z.enum(["1688", "taobao", "alibaba", "aliexpress", "amazon", "global"]);
-
 export const searchProducts = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) =>
     z
       .object({
         q: z.string().trim().max(120).default(""),
-        marketplace: marketplaceSchema.default("1688"),
+        marketplace: z.enum(["1688", "taobao", "alibaba", "aliexpress", "amazon", "global"]).default("1688"),
         page: z.number().int().min(1).max(50).default(1),
       })
       .parse(d),
@@ -17,7 +15,7 @@ export const searchProducts = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<SearchResult> => {
     const { getProductProvider } = await import("./provider.server");
     const { cached } = await import("@/lib/api/guard.server");
-    return cached(`fn-search:${data.marketplace}:${data.q}:${data.page}`, () =>
+    return cached(`fn-search:v2:${data.marketplace}:${data.q}:${data.page}`, () =>
       getProductProvider().search(data.q, { marketplace: data.marketplace, page: data.page }),
     );
   });
@@ -32,7 +30,12 @@ export const productByUrl = createServerFn({ method: "POST" })
 
 export const productById = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) =>
-    z.object({ id: z.string().trim().min(1).max(64), marketplace: marketplaceSchema }).parse(d),
+    z
+      .object({
+        id: z.string().trim().min(1).max(64),
+        marketplace: z.enum(["1688", "taobao", "alibaba", "aliexpress", "amazon", "global"]),
+      })
+      .parse(d),
   )
   .handler(async ({ data }): Promise<ProductDetail | null> => {
     const { getProductProvider } = await import("./provider.server");
