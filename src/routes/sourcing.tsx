@@ -325,7 +325,14 @@ function PhotoPanel() {
         {mutation.isPending ? <Searching /> : null}
         {mutation.isError ? (
           <HelpBox
-            title={t("এখন খুঁজে পাওয়া গেল না · ছবিটা WhatsApp-এ পাঠান", "The search did not come back. Send the photo on WhatsApp.")}
+            title={
+              isQuota(mutation.error)
+                ? t(
+                    "আজকের ৩০টি ফ্রি সার্চ শেষ · ছবিটা WhatsApp-এ পাঠান",
+                    "Today's 30 free searches are used up. Send the photo on WhatsApp.",
+                  )
+                : t("এখন খুঁজে পাওয়া গেল না · ছবিটা WhatsApp-এ পাঠান", "The search did not come back. Send the photo on WhatsApp.")
+            }
             waHref={photoInquiry()}
           />
         ) : null}
@@ -415,7 +422,17 @@ function LinkPanel() {
       <div className="mt-6">
         {mutation.isPending ? <Searching /> : null}
         {mutation.isError ? (
-          <HelpBox title={t("লিংকটা পড়া গেল না", "We could not read that link")} waHref={linkInquiry(url)} />
+          <HelpBox
+            title={
+              isQuota(mutation.error)
+                ? t(
+                    "আজকের ৩০টি ফ্রি সার্চ শেষ · লিংকটা WhatsApp-এ পাঠান",
+                    "Today's 30 free searches are used up. Send the link on WhatsApp.",
+                  )
+                : t("লিংকটা পড়া গেল না", "We could not read that link")
+            }
+            waHref={linkInquiry(url)}
+          />
         ) : null}
         {item && !mutation.isPending ? (
           <Results items={[item]} />
