@@ -2,7 +2,6 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { Container, Section } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
-import { ProductCard } from "@/components/s2b/product-card";
 import { productById } from "@/lib/products/queries.functions";
 import type { Marketplace, ProductDetail } from "@/lib/products/types";
 import { isMarketplace, marketplaceLabels } from "@/lib/products/types";
@@ -305,4 +304,3 @@ function ProductPage() {
   );
 }
 
-export { ProductCard };
