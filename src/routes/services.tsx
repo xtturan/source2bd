@@ -1,23 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Container, Section, SectionHeading, Card, Badge } from "@/components/s2b/primitives";
-import { ButtonAnchor, ButtonLink, WhatsAppIcon } from "@/components/s2b/button";
-import { services, siteConfig } from "@/config/site";
-import { serviceQuote } from "@/lib/whatsapp";
+import { useState } from "react";
+import { Container, Section } from "@/components/s2b/primitives";
+import { WhatsAppIcon } from "@/components/s2b/button";
+import { services, simpleServices, siteConfig } from "@/config/site";
+import { serviceQuote, telLink } from "@/lib/whatsapp";
+import { useLang } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
-      { title: "Freight and sourcing services into Bangladesh | Source2BD" },
+      { title: "সার্ভিস · হ্যান্ড ক্যারি, এয়ার, সি, কুরিয়ার | Source2BD" },
       {
         name: "description",
         content:
-          "Air freight, sea freight, hand carry, courier, warehouse consolidation and sourcing agent work into Dhaka and Chattogram, priced per order.",
+          "হ্যান্ড ক্যারি, এয়ার, জাহাজ, কুরিয়ার, গুদাম আর এজেন্ট সার্ভিস। কার জন্য কোনটা আর কতদিন লাগে, সহজ বাংলায়।",
       },
-      { property: "og:title", content: "Source2BD services" },
-      {
-        property: "og:description",
-        content: "Six lanes into Bangladesh: air, sea, hand carry, courier, consolidation and sourcing.",
-      },
+      { property: "og:title", content: "সার্ভিস · Source2BD" },
+      { property: "og:description", content: "কোন সার্ভিস আপনার জন্য আর কতদিন লাগে, সহজ বাংলায়।" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -26,83 +26,93 @@ export const Route = createFileRoute("/services")({
 });
 
 function ServicesPage() {
+  const { t, lang } = useLang();
+  const [open, setOpen] = useState<string | null>(null);
+
   return (
-    <Section>
+    <Section className="py-8">
       <Container>
-        <SectionHeading
-          eyebrow="Services"
-          title="Every lane we run, with the honest transit window"
-          titleBn="আমাদের সব সার্ভিস ও সময়সীমা"
-          intro="No lane is best for everything. Read what each one is for, what we need from you, and what it realistically takes."
-        />
+        <h1 className="font-bn text-[clamp(1.6rem,6vw,2.4rem)] font-extrabold">
+          {t("সার্ভিস", "Services")}
+        </h1>
+        <p className="font-bn mt-2 text-[16px] font-semibold text-muted-foreground">
+          {t("যেটা আপনার দরকার সেটায় চাপ দিন।", "Tap the one you need.")}
+        </p>
 
-        <div className="mt-14 space-y-6">
-          {services.map((s) => (
-            <Card key={s.key} id={s.key} className="scroll-mt-24 p-6 sm:p-8">
-              <div className="grid gap-8 lg:grid-cols-[1fr_1fr_1fr]">
-                <div>
-                  <h2 className="text-2xl font-extrabold">{s.title}</h2>
-                  <p className="font-bn mt-1 text-sm text-muted-foreground">{s.titleBn}</p>
-                  <p className="mt-4 max-w-[54ch] text-sm leading-relaxed text-muted-foreground">
-                    {s.short}
-                  </p>
-                  <Badge tone="green" className="mt-5">
-                    {s.eta}
-                  </Badge>
-                </div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {simpleServices.map((s) => {
+            const detail = services.find((d) => d.key === s.key);
+            const isOpen = open === s.key;
+            return (
+              <div key={s.key} id={s.key} className="panel matte scroll-mt-24 rounded-[18px] p-5">
+                <span className="grid h-14 w-14 place-items-center rounded-[16px] bg-accent/12 text-accent" aria-hidden>
+                  <BoxGlyph />
+                </span>
+                <h2 className="font-bn mt-3 text-[20px] font-extrabold">{t(s.bn, s.en)}</h2>
+                <p className="font-bn mt-1 text-[15px] font-semibold text-muted-foreground">
+                  {t(s.forBn, s.forEn)}
+                </p>
+                <p className="font-bn mt-1 text-[15px] font-bold text-accent">{t(s.timeBn, s.timeEn)}</p>
 
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                    Use it when
-                  </h3>
-                  <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
-                    {s.whenToUse.map((i) => (
-                      <li key={i} className="flex gap-3">
-                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
-                        {i}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <a
+                  href={serviceQuote({ mode: lang === "bn" ? s.bn : s.en })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bn mt-4 flex min-h-[56px] items-center justify-center gap-2 rounded-full bg-wa text-[17px] font-bold text-wa-foreground"
+                >
+                  <WhatsAppIcon className="h-5 w-5" />
+                  {t("এটা দিয়ে দাম জানুন", "Get a price for this")}
+                </a>
 
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                    Have this ready
-                  </h3>
-                  <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
-                    {s.prepare.map((i) => (
-                      <li key={i} className="flex gap-3">
-                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-signal" aria-hidden />
-                        {i}
-                      </li>
-                    ))}
-                  </ul>
-                  <ButtonAnchor
-                    href={serviceQuote({ mode: s.title })}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="green"
-                    className="mt-6 w-full"
-                  >
-                    <WhatsAppIcon /> Quote {s.title.toLowerCase()}
-                  </ButtonAnchor>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpen(isOpen ? null : s.key)}
+                  aria-expanded={isOpen}
+                  className="font-bn mt-3 text-[15px] font-bold text-muted-foreground underline"
+                >
+                  {isOpen ? t("বন্ধ করুন", "Close") : t("আরও জানুন", "Read more")}
+                </button>
+
+                {isOpen ? (
+                  <div className={cn("mt-3 text-[15px] leading-relaxed text-muted-foreground", lang === "bn" && "font-bn")}>
+                    {lang === "bn" ? (
+                      <p>
+                        {t(
+                          "আপনার পণ্যের ছবি বা লিংক দিন, কয়টা লাগবে আর কোন শহরে যাবে বলুন। আমরা পুরো খরচ হিসাব করে জানাব।",
+                          "",
+                        )}
+                      </p>
+                    ) : (
+                      <p>{detail?.short}</p>
+                    )}
+                  </div>
+                ) : null}
               </div>
-            </Card>
-          ))}
+            );
+          })}
         </div>
 
-        <Card className="mt-10 p-6 text-sm text-muted-foreground">
-          {siteConfig.policy} Transit windows are estimates based on normal conditions and are not a
-          guarantee. Duty and clearance charges are set by Bangladesh Customs, not by us.
-        </Card>
-
-        <div className="mt-10">
-          <ButtonLink to="/quote" size="lg">
-            Get a written quote
-          </ButtonLink>
+        <div className="panel matte mt-6 rounded-[18px] p-5">
+          <p className="font-bn text-[15px] font-semibold text-muted-foreground">
+            {t(siteConfig.policyBn, siteConfig.policy)}
+          </p>
+          <a
+            href={telLink}
+            className="font-bn mt-4 flex min-h-[60px] items-center justify-center rounded-full bg-foreground text-lg font-bold text-background"
+          >
+            {t("বুঝতে সমস্যা হলে ফোন করুন", "Call us if this is confusing")}
+          </a>
         </div>
       </Container>
     </Section>
+  );
+}
+
+function BoxGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M3.5 7.8 12 3.5l8.5 4.3v8.4L12 20.5l-8.5-4.3z" />
+      <path d="M3.5 7.8 12 12.2l8.5-4.4M12 12.2v8.3" />
+    </svg>
   );
 }
