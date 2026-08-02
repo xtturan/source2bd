@@ -25,9 +25,6 @@ import { Route as ApiProductsByUrlRouteImport } from './routes/api/products/by-u
 import { Route as ApiProductsDetailRouteImport } from './routes/api/products/detail'
 import { Route as ApiProductsSearchRouteImport } from './routes/api/products/search'
 import { Route as ApiPublicImgRouteImport } from './routes/api/public/img'
-import { Route as ApiPublicProbeRouteImport } from './routes/api/public/probe'
-import { Route as ApiPublicProbe2RouteImport } from './routes/api/public/probe2'
-import { Route as ApiPublicProbe3RouteImport } from './routes/api/public/probe3'
 import { Route as ProductMarketplaceIdRouteImport } from './routes/product.$marketplace.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -110,21 +107,6 @@ const ApiPublicImgRoute = ApiPublicImgRouteImport.update({
   path: '/api/public/img',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicProbeRoute = ApiPublicProbeRouteImport.update({
-  id: '/api/public/probe',
-  path: '/api/public/probe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicProbe2Route = ApiPublicProbe2RouteImport.update({
-  id: '/api/public/probe2',
-  path: '/api/public/probe2',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicProbe3Route = ApiPublicProbe3RouteImport.update({
-  id: '/api/public/probe3',
-  path: '/api/public/probe3',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ProductMarketplaceIdRoute = ProductMarketplaceIdRouteImport.update({
   id: '/product/$marketplace/$id',
   path: '/product/$marketplace/$id',
@@ -148,9 +130,6 @@ export interface FileRoutesByFullPath {
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
   '/api/public/img': typeof ApiPublicImgRoute
-  '/api/public/probe': typeof ApiPublicProbeRoute
-  '/api/public/probe2': typeof ApiPublicProbe2Route
-  '/api/public/probe3': typeof ApiPublicProbe3Route
   '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
 export interface FileRoutesByTo {
@@ -170,9 +149,6 @@ export interface FileRoutesByTo {
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
   '/api/public/img': typeof ApiPublicImgRoute
-  '/api/public/probe': typeof ApiPublicProbeRoute
-  '/api/public/probe2': typeof ApiPublicProbe2Route
-  '/api/public/probe3': typeof ApiPublicProbe3Route
   '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
 export interface FileRoutesById {
@@ -193,9 +169,6 @@ export interface FileRoutesById {
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
   '/api/public/img': typeof ApiPublicImgRoute
-  '/api/public/probe': typeof ApiPublicProbeRoute
-  '/api/public/probe2': typeof ApiPublicProbe2Route
-  '/api/public/probe3': typeof ApiPublicProbe3Route
   '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
 export interface FileRouteTypes {
@@ -217,9 +190,6 @@ export interface FileRouteTypes {
     | '/api/products/detail'
     | '/api/products/search'
     | '/api/public/img'
-    | '/api/public/probe'
-    | '/api/public/probe2'
-    | '/api/public/probe3'
     | '/product/$marketplace/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -239,9 +209,6 @@ export interface FileRouteTypes {
     | '/api/products/detail'
     | '/api/products/search'
     | '/api/public/img'
-    | '/api/public/probe'
-    | '/api/public/probe2'
-    | '/api/public/probe3'
     | '/product/$marketplace/$id'
   id:
     | '__root__'
@@ -261,9 +228,6 @@ export interface FileRouteTypes {
     | '/api/products/detail'
     | '/api/products/search'
     | '/api/public/img'
-    | '/api/public/probe'
-    | '/api/public/probe2'
-    | '/api/public/probe3'
     | '/product/$marketplace/$id'
   fileRoutesById: FileRoutesById
 }
@@ -284,9 +248,6 @@ export interface RootRouteChildren {
   ApiProductsDetailRoute: typeof ApiProductsDetailRoute
   ApiProductsSearchRoute: typeof ApiProductsSearchRoute
   ApiPublicImgRoute: typeof ApiPublicImgRoute
-  ApiPublicProbeRoute: typeof ApiPublicProbeRoute
-  ApiPublicProbe2Route: typeof ApiPublicProbe2Route
-  ApiPublicProbe3Route: typeof ApiPublicProbe3Route
   ProductMarketplaceIdRoute: typeof ProductMarketplaceIdRoute
 }
 
@@ -404,27 +365,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicImgRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/probe': {
-      id: '/api/public/probe'
-      path: '/api/public/probe'
-      fullPath: '/api/public/probe'
-      preLoaderRoute: typeof ApiPublicProbeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/probe2': {
-      id: '/api/public/probe2'
-      path: '/api/public/probe2'
-      fullPath: '/api/public/probe2'
-      preLoaderRoute: typeof ApiPublicProbe2RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/probe3': {
-      id: '/api/public/probe3'
-      path: '/api/public/probe3'
-      fullPath: '/api/public/probe3'
-      preLoaderRoute: typeof ApiPublicProbe3RouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/product/$marketplace/$id': {
       id: '/product/$marketplace/$id'
       path: '/product/$marketplace/$id'
@@ -452,21 +392,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductsDetailRoute: ApiProductsDetailRoute,
   ApiProductsSearchRoute: ApiProductsSearchRoute,
   ApiPublicImgRoute: ApiPublicImgRoute,
-  ApiPublicProbeRoute: ApiPublicProbeRoute,
-  ApiPublicProbe2Route: ApiPublicProbe2Route,
-  ApiPublicProbe3Route: ApiPublicProbe3Route,
   ProductMarketplaceIdRoute: ProductMarketplaceIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
