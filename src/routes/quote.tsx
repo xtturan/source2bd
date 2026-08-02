@@ -10,13 +10,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/quote")({
   head: () => ({
     meta: [
-      { title: "দাম জানুন · কয়েকটা তথ্য দিলেই হবে | Source2BD" },
+      { title: "শিপিংসহ পুরো দাম জানুন | Source2BD" },
       {
         name: "description",
         content:
           "নাম, মোবাইল আর শহর দিন। কীভাবে পণ্য দেখাবেন বেছে নিন। হোয়াটসঅ্যাপে পাঠালেই আমরা বাংলাদেশে পৌঁছানোর দাম বলে দেব।",
       },
-      { property: "og:title", content: "দাম জানুন · Source2BD" },
+      { property: "og:title", content: "বাংলাদেশ পর্যন্ত পুরো দাম · Source2BD" },
       { property: "og:description", content: "কয়েকটা তথ্য দিন, হোয়াটসঅ্যাপে দাম পেয়ে যান।" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -61,7 +61,7 @@ function QuotePage() {
     <Section className="py-8">
       <Container className="max-w-2xl">
         <h1 className="font-bn text-[clamp(1.6rem,6vw,2.4rem)] font-extrabold leading-tight">
-          {t("দাম জানুন", "Get a price")}
+          {t("বাংলাদেশ পর্যন্ত পুরো দাম জানুন", "Get the full Bangladesh price")}
         </h1>
         <p className="font-bn mt-2 text-[16px] font-semibold text-muted-foreground">
           {t("কয়েকটা তথ্য দিন, আমরা হোয়াটসঅ্যাপে দাম বলে দেব।", "Give a few details and we reply on WhatsApp.")}

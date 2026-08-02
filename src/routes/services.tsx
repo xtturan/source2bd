@@ -61,7 +61,7 @@ function ServicesPage() {
                   className="font-bn mt-4 flex min-h-[56px] items-center justify-center gap-2 rounded-full bg-wa text-[17px] font-bold text-wa-foreground"
                 >
                   <WhatsAppIcon className="h-5 w-5" />
-                  {t("এটা দিয়ে দাম জানুন", "Get a price for this")}
+                  {t("বাংলাদেশ পর্যন্ত পুরো দাম জানুন", "Get the full Bangladesh price")}
                 </a>
 
                 <button

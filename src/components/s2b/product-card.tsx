@@ -1,21 +1,25 @@
+import { Link } from "@tanstack/react-router";
 import type { ProductSummary } from "@/lib/products/types";
 import { marketplaceLabels } from "@/lib/products/types";
-import { bdtLabel } from "@/lib/products/pricing";
+import { marketLabel, bdtLabel } from "@/lib/products/pricing";
 import { productQuote } from "@/lib/whatsapp";
 import { productImage } from "@/lib/images";
 import { WhatsAppIcon } from "./button";
 import { useLang } from "@/lib/i18n";
 
 /**
- * Price honesty: the number shown is the marketplace price only.
- * The label says so in Bangla so nobody reads it as the door price in Bangladesh.
+ * Price honesty: the number shown is the supplier price abroad, in its own
+ * currency, plus an approximate taka figure. The Bangladesh total is quoted
+ * only on WhatsApp. The whole card is a link to the detail page; the green
+ * button sits above it so it stays a separate tap target.
  */
 export function ProductCard({ product }: { product: ProductSummary }) {
   const { t } = useLang();
-  const price = bdtLabel(product.priceMin, product.priceMax, product.currency, t("দাম জিজ্ঞেস করুন", "Ask for price"));
+  const market = marketLabel(product.priceMin, product.priceMax, product.currency, t("দাম জানতে চাপুন", "Ask for price"));
+  const approx = product.priceMin != null ? bdtLabel(product.priceMin, product.priceMax, product.currency) : null;
 
   return (
-    <article className="panel matte group flex flex-col overflow-hidden rounded-[18px]">
+    <article className="panel matte group relative flex flex-col overflow-hidden rounded-[18px] transition-transform duration-150 focus-within:ring-2 focus-within:ring-accent active:scale-[0.995]">
       <div className="relative block aspect-square overflow-hidden bg-stone-1">
         {product.imageUrl ? (
           <img
@@ -27,19 +31,37 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           />
         ) : null}
         <span className="font-bn absolute left-2 top-2 rounded-full bg-foreground/85 px-2.5 py-1 text-[11px] font-bold text-background">
-          {t("চীনের দাম", "China price")} · {marketplaceLabels[product.marketplace]}
+          {t("মার্কেট/সাপ্লায়ার দাম", "Supplier price")} · {marketplaceLabels[product.marketplace]}
         </span>
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
-        <p className="line-clamp-2 text-[15px] font-semibold leading-snug">{product.title}</p>
+        <Link
+          to="/product/$marketplace/$id"
+          params={{ marketplace: product.marketplace, id: product.id }}
+          className="line-clamp-2 break-words text-[15px] font-semibold leading-snug outline-none after:absolute after:inset-0 after:content-['']"
+        >
+          {product.title}
+        </Link>
 
         <div>
-          <div className="tnum text-lg font-extrabold leading-tight tracking-tight">{price}</div>
-          <p className="font-bn mt-0.5 text-[12px] font-semibold leading-snug text-muted-foreground">
-            {t("এটা দোকানের দাম · বাসায় আনার খরচ আলাদা", "Seller price only, delivery to Bangladesh is extra")}
+          <div className="tnum text-lg font-extrabold leading-tight tracking-tight">{market}</div>
+          {approx ? (
+            <p className="font-bn tnum text-[13px] font-bold text-muted-foreground">
+              {t("আনুমানিক", "approx.")} {approx}
+            </p>
+          ) : null}
+          <p className="font-bn mt-0.5 text-[12px] font-semibold leading-snug text-foreground/70">
+            {t(
+              "বাংলাদেশে পৌঁছানোর পুরো দাম আলাদা — শিপিংসহ জানতে চাপুন",
+              "Bangladesh total is separate — tap for the shipping-inclusive price",
+            )}
           </p>
         </div>
+
+        <span className="font-bn text-[13px] font-bold text-accent underline underline-offset-2">
+          {t("বিস্তারিত দেখুন", "See details")}
+        </span>
 
         <a
           href={productQuote({
@@ -49,11 +71,14 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           })}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto inline-flex min-h-[56px] items-center justify-center gap-2 rounded-[14px] bg-wa px-3 text-wa-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.24)] transition-transform duration-150 active:scale-[0.98]"
+          className="relative z-10 mt-auto flex min-h-[56px] flex-col items-center justify-center rounded-[14px] bg-wa px-2 text-wa-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.24)] transition-transform duration-150 active:scale-[0.98]"
         >
-          <WhatsAppIcon className="h-5 w-5" />
-          <span className="font-bn text-[15px] font-bold leading-tight">
-            {t("বাংলাদেশের দাম জানুন", "Get the Bangladesh price")}
+          <span className="font-bn flex items-center gap-2 text-[14px] font-bold leading-tight">
+            <WhatsAppIcon className="h-5 w-5" />
+            {t("বাংলাদেশ পর্যন্ত পুরো দাম জানুন", "Get the full Bangladesh price")}
+          </span>
+          <span className="font-bn text-[11px] font-semibold opacity-90">
+            {t("শিপিং চার্জসহ · WhatsApp-এ", "Shipping included · on WhatsApp")}
           </span>
         </a>
       </div>

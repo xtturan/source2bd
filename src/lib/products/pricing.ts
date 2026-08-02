@@ -1,6 +1,7 @@
 /**
- * Supplier prices come back in CNY or USD. Shoppers in Bangladesh see BDT
- * with the standard 20% sourcing markup applied.
+ * Honesty rule: the marketplace number is the supplier price abroad.
+ * We show it in its own currency, plus an *approximate* taka figure that is
+ * always labelled আনুমানিক. The real Bangladesh total is quoted on WhatsApp.
  */
 export const MARKUP = 1.12;
 
@@ -17,7 +18,25 @@ export function formatBdt(amount: number) {
   return `\u09F3${amount.toLocaleString("en-US")}`;
 }
 
-/** Price label in BDT, e.g. "৳1,240 to ৳2,780". */
+export function formatMarket(amount: number, currency: "CNY" | "USD") {
+  const n = Number.isInteger(amount) ? amount.toLocaleString("en-US") : amount.toFixed(2);
+  return currency === "USD" ? `$${n}` : `¥${n}`;
+}
+
+/** Supplier price in its own currency, e.g. "¥12 – ¥18". */
+export function marketLabel(
+  priceMin: number | undefined,
+  priceMax: number | undefined,
+  currency: "CNY" | "USD",
+  fallback = "—",
+) {
+  if (priceMin == null) return fallback;
+  const lo = formatMarket(priceMin, currency);
+  if (priceMax != null && priceMax !== priceMin) return `${lo} – ${formatMarket(priceMax, currency)}`;
+  return lo;
+}
+
+/** Approximate taka figure, e.g. "৳1,240 – ৳2,780". Always shown with আনুমানিক. */
 export function bdtLabel(
   priceMin: number | undefined,
   priceMax: number | undefined,
@@ -27,7 +46,7 @@ export function bdtLabel(
   if (priceMin == null) return fallback;
   const lo = formatBdt(toBdt(priceMin, currency));
   if (priceMax != null && priceMax !== priceMin) {
-    return `${lo} to ${formatBdt(toBdt(priceMax, currency))}`;
+    return `${lo} – ${formatBdt(toBdt(priceMax, currency))}`;
   }
   return lo;
 }
