@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_usage: {
+        Row: {
+          created_at: string
+          day: string
+          id: string
+          updated_at: string
+          used: number
+          visitor_key: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          id?: string
+          updated_at?: string
+          used?: number
+          visitor_key: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          id?: string
+          updated_at?: string
+          used?: number
+          visitor_key?: string
+        }
+        Relationships: []
+      }
       search_cache: {
         Row: {
           created_at: string
@@ -55,7 +82,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      consume_daily_usage: {
+        Args: {
+          _cost: number
+          _day: string
+          _limit: number
+          _visitor_key: string
+        }
+        Returns: {
+          allowed: boolean
+          used: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

@@ -141,6 +141,11 @@ function Searching() {
 }
 
 /** Every dead end offers WhatsApp and a phone call. Never a technical error. */
+/** The daily allowance ran out: say so plainly instead of "search failed". */
+function isQuota(err: unknown) {
+  return err instanceof Error && err.message.includes("DAILY_SEARCH_LIMIT");
+}
+
 function HelpBox({
   title,
   waHref,
@@ -320,7 +325,14 @@ function PhotoPanel() {
         {mutation.isPending ? <Searching /> : null}
         {mutation.isError ? (
           <HelpBox
-            title={t("এখন খুঁজে পাওয়া গেল না · ছবিটা WhatsApp-এ পাঠান", "The search did not come back. Send the photo on WhatsApp.")}
+            title={
+              isQuota(mutation.error)
+                ? t(
+                    "আজকের ৩০টি ফ্রি সার্চ শেষ · ছবিটা WhatsApp-এ পাঠান",
+                    "Today's 30 free searches are used up. Send the photo on WhatsApp.",
+                  )
+                : t("এখন খুঁজে পাওয়া গেল না · ছবিটা WhatsApp-এ পাঠান", "The search did not come back. Send the photo on WhatsApp.")
+            }
             waHref={photoInquiry()}
           />
         ) : null}
@@ -410,7 +422,17 @@ function LinkPanel() {
       <div className="mt-6">
         {mutation.isPending ? <Searching /> : null}
         {mutation.isError ? (
-          <HelpBox title={t("লিংকটা পড়া গেল না", "We could not read that link")} waHref={linkInquiry(url)} />
+          <HelpBox
+            title={
+              isQuota(mutation.error)
+                ? t(
+                    "আজকের ৩০টি ফ্রি সার্চ শেষ · লিংকটা WhatsApp-এ পাঠান",
+                    "Today's 30 free searches are used up. Send the link on WhatsApp.",
+                  )
+                : t("লিংকটা পড়া গেল না", "We could not read that link")
+            }
+            waHref={linkInquiry(url)}
+          />
         ) : null}
         {item && !mutation.isPending ? (
           <Results items={[item]} />
@@ -530,7 +552,17 @@ function SearchPanel() {
       <div className="mt-6">
         {mutation.isPending ? <Searching /> : null}
         {mutation.isError ? (
-          <HelpBox title={t("এখন খুঁজে পাওয়া গেল না", "Search did not come back")} waHref={generalInquiry(q)} />
+          <HelpBox
+            title={
+              isQuota(mutation.error)
+                ? t(
+                    "আজকের ৩০টি ফ্রি সার্চ শেষ · WhatsApp-এ মেসেজ দিন, আমরা দাম বের করে দেব",
+                    "Today's 30 free searches are used up. Message us on WhatsApp and we will price it for you.",
+                  )
+                : t("এখন খুঁজে পাওয়া গেল না", "Search did not come back")
+            }
+            waHref={generalInquiry(q)}
+          />
         ) : null}
         {items && !mutation.isPending ? (
           items.length ? (

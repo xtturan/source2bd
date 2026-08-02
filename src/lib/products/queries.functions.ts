@@ -17,9 +17,12 @@ export const searchProducts = createServerFn({ method: "GET" })
     const { getProductProvider } = await import("./provider.server");
     const { cached } = await import("@/lib/api/guard.server");
     const { readSearchCache, writeSearchCache } = await import("./search-cache.server");
+    const { consumeQuota } = await import("@/lib/api/quota.server");
     return cached(`fn-search:v5:${data.marketplace}:${data.q}:${data.page}`, async () => {
       const stored = await readSearchCache(data.q, data.marketplace, data.page);
       if (stored) return stored;
+      // Only live upstream calls burn the daily allowance.
+      await consumeQuota(1);
       const fresh = await getProductProvider().search(data.q, {
         marketplace: data.marketplace,
         page: data.page,
@@ -57,6 +60,8 @@ export const productsByPhoto = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }): Promise<{ items: ProductSummary[] }> => {
     const { searchByPhoto } = await import("./image-search.server");
+    const { consumeQuota } = await import("@/lib/api/quota.server");
+    await consumeQuota(1);
     const res = await searchByPhoto(data.image, data.marketplace);
     return { items: res.items };
   });
@@ -66,7 +71,11 @@ export const productByUrl = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<ProductDetail | null> => {
     const { getProductProvider } = await import("./provider.server");
     const { cached } = await import("@/lib/api/guard.server");
-    return cached(`fn-url:${data.url}`, () => getProductProvider().getByUrl(data.url));
+    const { consumeQuota } = await import("@/lib/api/quota.server");
+    return cached(`fn-url:${data.url}`, async () => {
+      await consumeQuota(1);
+      return getProductProvider().getByUrl(data.url);
+    });
   });
 
 export const productById = createServerFn({ method: "GET" })
