@@ -12,6 +12,8 @@ import {
 } from "@/components/s2b/big-action";
 import { ProductCard } from "@/components/s2b/product-card";
 import { featuredProducts } from "@/lib/products/mock-provider";
+import { showcaseSearches } from "@/lib/products/queries.functions";
+import type { ShowcaseRow } from "@/lib/products/search-cache.server";
 import { origins, services, siteConfig, trustStats } from "@/config/site";
 import { generalInquiry } from "@/lib/whatsapp";
 import heroCargo from "@/assets/hero-cargo.jpg";
@@ -39,6 +41,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  const showcase = Route.useLoaderData();
   const products = featuredProducts(8);
 
   return (
@@ -48,7 +51,11 @@ function HomePage() {
       <SimpleSteps />
       <TrustStrip />
       <OriginRail />
-      <FeaturedCatalogue products={products} />
+      {showcase.length ? (
+        <ShowcaseCatalogue rows={showcase} />
+      ) : (
+        <FeaturedCatalogue products={products} />
+      )}
       <ServiceGrid />
       <Process />
       <ClosingCta />
