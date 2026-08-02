@@ -95,8 +95,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "Source2BD, source from anywhere and land it in Bangladesh" },
       { property: "og:description", content: "Source2BD sources from 1688, Alibaba, Amazon and any global store, then moves it to Dhaka and Chattogram by air, sea, courier or hand carry. WhatsApp quotes same day." },
       { name: "twitter:description", content: "Source2BD sources from 1688, Alibaba, Amazon and any global store, then moves it to Dhaka and Chattogram by air, sea, courier or hand carry. WhatsApp quotes same day." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7fbf7ae1-960a-4ceb-b80e-21bda28e9d88/id-preview-621676aa--4a6ce313-4aca-4e60-83c6-f315bfaf4891.lovable.app-1785592420741.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7fbf7ae1-960a-4ceb-b80e-21bda28e9d88/id-preview-621676aa--4a6ce313-4aca-4e60-83c6-f315bfaf4891.lovable.app-1785592420741.png" },
+      { property: "og:image", content: "https://source2bd.lovable.app/og-cover.jpg" },
+      { name: "twitter:image", content: "https://source2bd.lovable.app/og-cover.jpg" },
     ],
     links: [
       {
