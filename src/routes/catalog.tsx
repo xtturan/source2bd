@@ -22,6 +22,7 @@ export const Route = createFileRoute("/catalog")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://source2bd.lovable.app/catalog" }],
   }),
   validateSearch: (search: Record<string, unknown>): { cat: string; q: string } => ({
     cat: typeof search["cat"] === "string" ? search["cat"] : "",

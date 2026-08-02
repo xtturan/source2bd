@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Container, Section } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
+import { QuotaBar } from "@/components/s2b/quota-bar";
 import { ProductCard } from "@/components/s2b/product-card";
 import { showcaseSearches } from "@/lib/products/queries.functions";
 import type { ShowcaseRow } from "@/lib/products/search-cache.server";
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://source2bd.lovable.app/" }],
   }),
   component: HomePage,
   loader: async (): Promise<ShowcaseRow[]> => {
@@ -117,6 +119,8 @@ function FirstScreen() {
           icon={<CameraGlyph />}
         />
       </div>
+
+      <QuotaBar className="mt-4" />
 
       {linkOpen ? (
         <div className="panel matte mt-3 rounded-[18px] p-4">

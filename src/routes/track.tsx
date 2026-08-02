@@ -20,6 +20,7 @@ export const Route = createFileRoute("/track")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://source2bd.lovable.app/track" }],
   }),
   component: TrackPage,
 });
