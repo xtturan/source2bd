@@ -3,7 +3,7 @@ import { Container, Section } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
 import { generalInquiry, telLink } from "@/lib/whatsapp";
 import { siteConfig } from "@/config/site";
-import { findGuide, guides } from "@/lib/content/guides";
+import { findGuide, guides, type Guide } from "@/lib/content/guides";
 
 export const Route = createFileRoute("/guides/$slug")({
   loader: ({ params }) => {
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/guides/$slug")({
     return { guide };
   },
   head: ({ params, loaderData }) => {
-    const guide = loaderData?.guide;
+    const guide = loaderData?.guide as Guide | undefined;
     const url = `${siteConfig.url}/guides/${params.slug}`;
     if (!guide) return { meta: [{ title: "Guide | Source2BD" }] };
     return {
@@ -75,7 +75,7 @@ export const Route = createFileRoute("/guides/$slug")({
 });
 
 function GuidePage() {
-  const { guide } = Route.useLoaderData();
+  const { guide } = Route.useLoaderData() as { guide: Guide };
   const others = guides.filter((g) => g.slug !== guide.slug).slice(0, 3);
 
   return (
