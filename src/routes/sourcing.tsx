@@ -590,7 +590,7 @@ function VoiceButton({
     setState("idle");
   }
 
-  function start() {
+  async function start(lang = "bn-BD") {
     const Ctor = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
     if (!Ctor) {
       setState("unsupported");
@@ -598,12 +598,28 @@ function VoiceButton({
     }
     setError(null);
     setHeard("");
+    // Ask for the mic first: inside an iframe/preview the recognizer fails
+    // silently unless permission has already been granted.
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((tr) => tr.stop());
+    } catch {
+      setState("error");
+      setError(
+        t(
+          "মাইক বন্ধ আছে · ব্রাউজারে মাইক অনুমতি দিন অথবা টাইপ করুন",
+          "The mic is blocked. Allow microphone access in the browser, or type instead.",
+        ),
+      );
+      return;
+    }
     const rec = new Ctor();
     recRef.current = rec;
-    rec.lang = "bn-BD";
+    rec.lang = lang;
     rec.continuous = false;
     rec.interimResults = true;
     let finalText = "";
+    let fellBack = false;
     rec.onresult = (e: any) => {
       let interim = "";
       for (let i = e.resultIndex; i < e.results.length; i += 1) {
@@ -616,6 +632,18 @@ function VoiceButton({
     };
     rec.onerror = (e: any) => {
       const code = String(e?.error ?? "");
+      if (code === "language-not-supported" && lang !== "en-US") {
+        // Some browsers have no Bangla model — retry in English rather than fail.
+        fellBack = true;
+        recRef.current = null;
+        void start("en-US");
+        return;
+      }
+      if (code === "aborted" || code === "no-speech") {
+        setState("error");
+        setError(t("কিছু শুনতে পাইনি · আবার বলুন", "We did not hear anything. Please try again."));
+        return;
+      }
       setState("error");
       setError(
         code === "not-allowed" || code === "service-not-allowed"
@@ -624,6 +652,7 @@ function VoiceButton({
       );
     };
     rec.onend = () => {
+      if (fellBack) return;
       recRef.current = null;
       const text = finalText.trim();
       if (text.length >= 2) {
@@ -649,7 +678,7 @@ function VoiceButton({
     <>
       <button
         type="button"
-        onClick={() => (state === "listening" ? stop() : start())}
+        onClick={() => (state === "listening" ? stop() : void start())}
         aria-pressed={state === "listening"}
         aria-label={state === "listening" ? t("শোনা বন্ধ করুন", "Stop listening") : t("মাইকে বলুন", "Speak")}
         className={cn(
@@ -699,7 +728,7 @@ function VoiceButton({
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={start}
+                onClick={() => void start()}
                 className="font-bn min-h-[48px] rounded-full bg-foreground px-5 text-[15px] font-bold text-background"
               >
                 {t("আবার বলুন", "Speak again")}
