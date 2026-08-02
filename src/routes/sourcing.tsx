@@ -11,6 +11,7 @@ import { generalInquiry, linkInquiry, photoInquiry, telLink, voiceInquiry } from
 import { siteConfig } from "@/config/site";
 import { useLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { QuotaBar, LimitReached, useQuotaState } from "@/components/s2b/quota-bar";
 
 export const Route = createFileRoute("/sourcing")({
   head: () => ({
@@ -95,6 +96,8 @@ function SourcingPage() {
           <span aria-hidden className="text-accent">→</span>
         </Link>
 
+        <QuotaBar className="mt-4" />
+
         <div className="mt-5">
           {mode === "photo" ? <PhotoPanel /> : null}
           {mode === "link" ? <LinkPanel /> : null}
@@ -144,6 +147,31 @@ function Searching() {
 /** The daily allowance ran out: say so plainly instead of "search failed". */
 function isQuota(err: unknown) {
   return err instanceof Error && err.message.includes("DAILY_SEARCH_LIMIT");
+}
+
+function isLoginRequired(err: unknown) {
+  return err instanceof Error && err.message.includes("LOGIN_REQUIRED");
+}
+
+/** Signed-out users hit the login wall before we ever call upstream. */
+function LoginWall() {
+  const { t } = useLang();
+  return (
+    <div className="panel matte rounded-[18px] p-5 text-center">
+      <p className="font-bn text-[19px] font-extrabold">
+        {t("খুঁজতে আগে লগইন করুন", "Please log in to search")}
+      </p>
+      <p className="font-bn mt-2 text-[16px] font-semibold text-muted-foreground">
+        {t("ফোন নম্বর বা ইমেইল দিয়ে ১ মিনিটে অ্যাকাউন্ট খুলুন · দিনে ৩০ বার ফ্রি", "Open an account in a minute with a phone number or email. 30 free searches a day.")}
+      </p>
+      <Link
+        to="/auth"
+        className="font-bn mt-4 flex min-h-[58px] items-center justify-center rounded-full bg-foreground text-[17px] font-bold text-background"
+      >
+        {t("লগইন / রেজিস্টার", "Log in or sign up")}
+      </Link>
+    </div>
+  );
 }
 
 function HelpBox({
@@ -324,17 +352,16 @@ function PhotoPanel() {
       <div className="mt-6">
         {mutation.isPending ? <Searching /> : null}
         {mutation.isError ? (
-          <HelpBox
-            title={
-              isQuota(mutation.error)
-                ? t(
-                    "আজকের ৩০টি ফ্রি সার্চ শেষ · ছবিটা WhatsApp-এ পাঠান",
-                    "Today's 30 free searches are used up. Send the photo on WhatsApp.",
-                  )
-                : t("এখন খুঁজে পাওয়া গেল না · ছবিটা WhatsApp-এ পাঠান", "The search did not come back. Send the photo on WhatsApp.")
-            }
-            waHref={photoInquiry()}
-          />
+          isLoginRequired(mutation.error) ? (
+            <LoginWall />
+          ) : isQuota(mutation.error) ? (
+            <LimitReached />
+          ) : (
+            <HelpBox
+              title={t("এখন খুঁজে পাওয়া গেল না · ছবিটা WhatsApp-এ পাঠান", "The search did not come back. Send the photo on WhatsApp.")}
+              waHref={photoInquiry()}
+            />
+          )
         ) : null}
         {items && !mutation.isPending ? (
           items.length ? (
