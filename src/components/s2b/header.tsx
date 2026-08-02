@@ -60,6 +60,21 @@ export function Header() {
           ))}
         </div>
 
+        <Link
+          to={user ? "/account" : "/auth"}
+          aria-label={user ? t("আমার অ্যাকাউন্ট", "My account") : t("লগইন", "Log in")}
+          className="font-bn grid h-12 min-w-12 place-items-center rounded-full border border-foreground/12 px-3 text-[14px] font-bold text-foreground"
+        >
+          {user ? (
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <circle cx="12" cy="8" r="3.5" />
+              <path d="M5 20a7 7 0 0 1 14 0" />
+            </svg>
+          ) : (
+            t("লগইন", "Log in")
+          )}
+        </Link>
+
         <a
           href={generalInquiry()}
           target="_blank"
