@@ -141,6 +141,11 @@ function Searching() {
 }
 
 /** Every dead end offers WhatsApp and a phone call. Never a technical error. */
+/** The daily allowance ran out: say so plainly instead of "search failed". */
+function isQuota(err: unknown) {
+  return err instanceof Error && err.message.includes("DAILY_SEARCH_LIMIT");
+}
+
 function HelpBox({
   title,
   waHref,
