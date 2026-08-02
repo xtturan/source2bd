@@ -120,6 +120,8 @@ function FirstScreen() {
         />
       </div>
 
+      <QuotaBar className="mt-4" />
+
       {linkOpen ? (
         <div className="panel matte mt-3 rounded-[18px] p-4">
           <label htmlFor="home-link" className="font-bn block text-base font-bold">
