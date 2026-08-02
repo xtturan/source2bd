@@ -466,7 +466,7 @@ export function createParseProvider(): ProductProvider {
       try {
         const detail = await detailFor(target, id);
         if (!detail) return mockProvider.getById(id, marketplace);
-        return ([detail])[0] ?? detail;
+        return detail;
       } catch (err) {
         console.error("parse detail failed", err);
         return mockProvider.getById(id, marketplace);
@@ -480,7 +480,7 @@ export function createParseProvider(): ProductProvider {
       try {
         const detail = await detailFor(target, parsed.id);
         if (!detail) return mockProvider.getByUrl(url);
-        return ([detail])[0] ?? detail;
+        return detail;
       } catch (err) {
         console.error("parse by-url failed", err);
         return mockProvider.getByUrl(url);
