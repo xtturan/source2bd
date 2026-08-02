@@ -43,7 +43,7 @@ export const Route = createFileRoute("/product/$marketplace/$id")({
 });
 
 function ProductPage() {
-  const { item, marketplace, id } = Route.useLoaderData();
+  const { item, marketplace, id } = Route.useLoaderData() as LoaderData;
   const { t } = useLang();
   const router = useRouter();
   const [active, setActive] = useState(0);
