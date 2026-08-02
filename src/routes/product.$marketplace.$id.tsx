@@ -83,9 +83,9 @@ function ProductPage() {
           {t("ফলাফলে ফিরে যান", "Back to results")}
         </button>
 
-        <div className="mt-3 grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
+        <div className="mx-auto mt-3 grid max-w-[1080px] gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)] lg:items-start lg:gap-10">
           {/* gallery */}
-          <div>
+          <div className="mx-auto w-full max-w-[460px] lg:max-w-none lg:sticky lg:top-24">
             <div className="glass matte overflow-hidden rounded-[18px] bg-stone-1">
               {images.length ? (
                 <img
@@ -123,21 +123,22 @@ function ProductPage() {
               {t("মার্কেট/সাপ্লায়ার দাম", "Supplier price")} · {marketplaceLabels[marketplace]}
             </span>
 
-            <h1 className="font-bn mt-3 break-words text-[clamp(1.25rem,5vw,1.8rem)] font-extrabold leading-tight">
+            <h1 className="font-bn mt-3 break-words text-[clamp(1.15rem,2.4vw,1.6rem)] font-extrabold leading-tight">
               {title}
             </h1>
 
             {/* price block */}
             <div className="panel matte mt-4 rounded-[18px] p-4">
               <p className="font-bn text-[14px] font-bold text-muted-foreground">
-                {t("মার্কেট দাম", "Market price")}
+                {t("আনুমানিক দাম (টাকায়)", "Approximate price (BDT)")}
               </p>
-              <p className="tnum mt-1 text-[clamp(1.5rem,6vw,2rem)] font-extrabold leading-none">
-                {marketLabel(item?.priceMin, item?.priceMax, item?.currency ?? "CNY", t("দাম জিজ্ঞেস করুন", "Ask for price"))}
+              <p className="tnum mt-1 text-[clamp(1.4rem,3.2vw,2rem)] font-extrabold leading-none">
+                {bdtLabel(item?.priceMin, item?.priceMax, item?.currency ?? "CNY", t("দাম জিজ্ঞেস করুন", "Ask for price"))}
               </p>
               {item?.priceMin != null ? (
-                <p className="font-bn tnum mt-1 text-[15px] font-bold text-muted-foreground">
-                  {t("আনুমানিক", "approx.")} {bdtLabel(item.priceMin, item.priceMax, item.currency)}
+                <p className="font-bn tnum mt-1 text-[14px] font-semibold text-muted-foreground">
+                  {t("মার্কেট দাম", "Market price")}{" "}
+                  {marketLabel(item.priceMin, item.priceMax, item.currency)}
                 </p>
               ) : null}
               <p className="font-bn mt-2 text-[15px] font-bold leading-snug">
@@ -216,9 +217,9 @@ function ProductPage() {
                       <tr key={tier.minQty} className="border-t border-border">
                         <td className="py-2.5">{tier.minQty}+</td>
                         <td className="py-2.5 text-right font-bold">
-                          {formatMarket(tier.price, item.currency)}{" "}
+                          {formatBdt(toBdt(tier.price, item.currency))}{" "}
                           <span className="font-bn text-[13px] font-semibold text-muted-foreground">
-                            ({t("আনুমানিক", "approx.")} {formatBdt(toBdt(tier.price, item.currency))})
+                            ({formatMarket(tier.price, item.currency)})
                           </span>
                         </td>
                       </tr>
