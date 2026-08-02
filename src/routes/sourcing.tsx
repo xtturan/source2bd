@@ -42,14 +42,15 @@ type Mode = "photo" | "link" | "search" | "voice";
 function SourcingPage() {
   const { mode: initialMode, q } = Route.useSearch();
   const { t } = useLang();
-  // Photo is the default job. A keyword deep link jumps straight to search.
-  const [mode, setMode] = useState<Mode>(initialMode ?? (q ? "search" : "photo"));
+  // Typing a name is the real first job. Voice lives inside that panel.
+  const [mode, setMode] = useState<Mode>(
+    initialMode && initialMode !== "voice" ? initialMode : q ? "search" : (initialMode === "voice" ? "search" : "search"),
+  );
 
   const tabs: { key: Mode; bn: string; en: string; icon: ReactNode }[] = [
-    { key: "photo", bn: "ছবি", en: "Photo", icon: <CameraGlyph className="h-7 w-7" /> },
-    { key: "link", bn: "লিংক", en: "Link", icon: <LinkGlyph className="h-7 w-7" /> },
     { key: "search", bn: "নাম লিখুন", en: "Type name", icon: <SearchGlyph className="h-7 w-7" /> },
-    { key: "voice", bn: "বলে খুঁজুন", en: "Speak", icon: <MicGlyph className="h-7 w-7" /> },
+    { key: "link", bn: "লিংক", en: "Link", icon: <LinkGlyph className="h-7 w-7" /> },
+    { key: "photo", bn: "ছবি", en: "Photo", icon: <CameraGlyph className="h-7 w-7" /> },
   ];
 
   return (
@@ -59,10 +60,13 @@ function SourcingPage() {
           {t("পণ্য খুঁজুন", "Find your product")}
         </h1>
         <p className="font-bn mt-2 text-[16px] font-semibold text-muted-foreground">
-          {t("ছবি দিন, লিংক দিন, অথবা নাম লিখুন।", "Send a photo, paste a link, or type the name.")}
+          {t(
+            "নাম লিখুন বা মাইকে বলুন · লিংক বা ছবিও দিতে পারেন",
+            "Type the name or speak it. You can also paste a link or a photo.",
+          )}
         </p>
 
-        <div role="tablist" aria-label={t("খোঁজার উপায়", "Search method")} className="mt-5 grid grid-cols-4 gap-2">
+        <div role="tablist" aria-label={t("খোঁজার উপায়", "Search method")} className="mt-5 grid grid-cols-3 gap-2">
           {tabs.map((tab) => (
             <button
               key={tab.key}
@@ -85,8 +89,7 @@ function SourcingPage() {
         <div className="mt-5">
           {mode === "photo" ? <PhotoPanel /> : null}
           {mode === "link" ? <LinkPanel /> : null}
-          {mode === "search" ? <SearchPanel /> : null}
-          {mode === "voice" ? <VoicePanel onText={() => setMode("search")} /> : null}
+          {mode === "search" || mode === "voice" ? <SearchPanel /> : null}
         </div>
       </Container>
     </Section>
