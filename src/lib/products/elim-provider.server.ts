@@ -8,6 +8,7 @@ import type {
 import { FANOUT_ORIGINS, PAGE_SIZE } from "./types";
 import { mockProvider, parseProductUrl } from "./mock-provider";
 import { createParseProvider } from "./parse-provider.server";
+import { toChineseQuery } from "./query-cn.server";
 
 /**
  * Elim provider (openapi.elim.asia).
@@ -248,8 +249,10 @@ async function searchElim(
 ): Promise<ProductSummary[]> {
   // Over-fetch so the re-rank has room to pull the on-keyword rows up.
   const fetchSize = query.trim() ? Math.min(size * 2, 50) : size;
+  // 1688 and Taobao only index Chinese text, so search in Chinese.
+  const marketQuery = await toChineseQuery(query);
   const data = await call("/v1/products/search", {
-    q: query,
+    q: marketQuery,
     platform: platformFor(market),
     page,
     size: fetchSize,
