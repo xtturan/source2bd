@@ -55,6 +55,11 @@ export function Footer() {
             )}
           </li>
           <li className="pt-2">
+            <Link to="/guides" className="text-foreground underline">
+              {t("গাইড ও পরামর্শ", "Guides")}
+            </Link>
+          </li>
+          <li>
             <Link to="/more" className="text-foreground underline">
               {t("সব পেজ দেখুন", "All pages")}
             </Link>

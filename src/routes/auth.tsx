@@ -10,6 +10,7 @@ import { claimAccount, deviceCapacity } from "@/lib/auth/account.functions";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, nofollow" },
       { title: "অ্যাকাউন্ট খুলুন | Source2BD login and signup" },
       {
         name: "description",
