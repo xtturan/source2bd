@@ -2,10 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { getProductProvider, providerFallbackMessage } from "@/lib/products/provider.server";
 import { cached, rateLimited, tooMany } from "@/lib/api/guard.server";
-import { consumeQuota, QuotaError, DAILY_LIMIT, nextDhakaMidnight } from "@/lib/api/quota.server";
+import {
+  consumeQuota,
+  QuotaError,
+  AuthRequiredError,
+  limitFor,
+  nextDhakaMidnight,
+} from "@/lib/api/quota.server";
 
 const schema = z.object({
-  q: z.string().trim().max(120).default(""),
+  q: z.string().trim().max(100).default(""),
   marketplace: z.enum(["1688", "taobao", "alibaba", "aliexpress", "amazon", "global"]).default("1688"),
   page: z.coerce.number().int().min(1).max(50).default(1),
 });
@@ -26,25 +32,42 @@ export const Route = createFileRoute("/api/products/search")({
         const { q, marketplace, page } = parsed.data;
         try {
           const data = await cached(`search:${marketplace}:${q}:${page}`, async () => {
-            await consumeQuota(1);
+            await consumeQuota("search", 1);
             return getProductProvider().search(q, { marketplace, page });
           });
           return Response.json(data);
         } catch (err) {
+          if (err instanceof AuthRequiredError) {
+            return Response.json(
+              { ok: false, code: err.code, messageBn: err.messageBn },
+              { status: 401 },
+            );
+          }
           if (err instanceof QuotaError) {
             return Response.json(
               {
                 ok: false,
-                code: "DAILY_SEARCH_LIMIT",
-                limit: DAILY_LIMIT,
+                code: err.code,
+                limit: err.limit,
                 remaining: 0,
-                resetAt: nextDhakaMidnight(),
+                resetAt: err.resetAt,
+                messageBn: err.messageBn,
               },
-              { status: 429 },
+              {
+                status: 429,
+                headers: {
+                  "X-RateLimit-Limit": String(err.limit),
+                  "X-RateLimit-Remaining": "0",
+                  "X-RateLimit-Reset": err.resetAt,
+                },
+              },
             );
           }
           console.error("search failed", err);
-          return Response.json({ error: providerFallbackMessage }, { status: 502 });
+          return Response.json(
+            { ok: false, code: "UPSTREAM_UNAVAILABLE", messageBn: providerFallbackMessage },
+            { status: 502 },
+          );
         }
       },
     },

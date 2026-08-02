@@ -131,6 +131,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           openingHours: "Sa-Th 10:00-20:00",
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Source2BD",
+          url: "https://source2bd.lovable.app",
+          inLanguage: "bn-BD",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: "https://source2bd.lovable.app/sourcing?q={search_term_string}",
+            },
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      },
     ],
   }),
   shellComponent: RootShell,

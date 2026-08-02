@@ -7,6 +7,7 @@ import { adminOverview, adminSetUsage, adminDeleteUser } from "@/lib/auth/admin.
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, nofollow" },
       { title: "Admin panel | Source2BD" },
       { name: "description", content: "Source2BD owner dashboard: accounts, daily lookups and cached searches." },
       { property: "og:title", content: "Source2BD admin panel" },

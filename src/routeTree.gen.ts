@@ -26,10 +26,13 @@ import { Route as SourcingRouteImport } from './routes/sourcing'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as GuidesIndexRouteImport } from './routes/guides.index'
+import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as ApiProductsByImageRouteImport } from './routes/api/products/by-image'
 import { Route as ApiProductsByUrlRouteImport } from './routes/api/products/by-url'
 import { Route as ApiProductsDetailRouteImport } from './routes/api/products/detail'
 import { Route as ApiProductsSearchRouteImport } from './routes/api/products/search'
+import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicImgRouteImport } from './routes/api/public/img'
 import { Route as ProductMarketplaceIdRouteImport } from './routes/product.$marketplace.$id'
 
@@ -117,6 +120,16 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const GuidesIndexRoute = GuidesIndexRouteImport.update({
+  id: '/guides/',
+  path: '/guides/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesSlugRoute = GuidesSlugRouteImport.update({
+  id: '/guides/$slug',
+  path: '/guides/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiProductsByImageRoute = ApiProductsByImageRouteImport.update({
   id: '/api/products/by-image',
   path: '/api/products/by-image',
@@ -135,6 +148,11 @@ const ApiProductsDetailRoute = ApiProductsDetailRouteImport.update({
 const ApiProductsSearchRoute = ApiProductsSearchRouteImport.update({
   id: '/api/products/search',
   path: '/api/products/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicImgRoute = ApiPublicImgRouteImport.update({
@@ -165,10 +183,13 @@ export interface FileRoutesByFullPath {
   '/track': typeof TrackRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/guides/$slug': typeof GuidesSlugRoute
+  '/guides/': typeof GuidesIndexRoute
   '/api/products/by-image': typeof ApiProductsByImageRoute
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/img': typeof ApiPublicImgRoute
   '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
@@ -189,10 +210,13 @@ export interface FileRoutesByTo {
   '/track': typeof TrackRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/guides/$slug': typeof GuidesSlugRoute
+  '/guides': typeof GuidesIndexRoute
   '/api/products/by-image': typeof ApiProductsByImageRoute
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/img': typeof ApiPublicImgRoute
   '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
@@ -215,10 +239,13 @@ export interface FileRoutesById {
   '/track': typeof TrackRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/guides/$slug': typeof GuidesSlugRoute
+  '/guides/': typeof GuidesIndexRoute
   '/api/products/by-image': typeof ApiProductsByImageRoute
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
   '/api/products/search': typeof ApiProductsSearchRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/img': typeof ApiPublicImgRoute
   '/product/$marketplace/$id': typeof ProductMarketplaceIdRoute
 }
@@ -241,10 +268,13 @@ export interface FileRouteTypes {
     | '/track'
     | '/account'
     | '/admin'
+    | '/guides/$slug'
+    | '/guides/'
     | '/api/products/by-image'
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
+    | '/api/public/health'
     | '/api/public/img'
     | '/product/$marketplace/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -265,10 +295,13 @@ export interface FileRouteTypes {
     | '/track'
     | '/account'
     | '/admin'
+    | '/guides/$slug'
+    | '/guides'
     | '/api/products/by-image'
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
+    | '/api/public/health'
     | '/api/public/img'
     | '/product/$marketplace/$id'
   id:
@@ -290,10 +323,13 @@ export interface FileRouteTypes {
     | '/track'
     | '/_authenticated/account'
     | '/_authenticated/admin'
+    | '/guides/$slug'
+    | '/guides/'
     | '/api/products/by-image'
     | '/api/products/by-url'
     | '/api/products/detail'
     | '/api/products/search'
+    | '/api/public/health'
     | '/api/public/img'
     | '/product/$marketplace/$id'
   fileRoutesById: FileRoutesById
@@ -314,10 +350,13 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SourcingRoute: typeof SourcingRoute
   TrackRoute: typeof TrackRoute
+  GuidesSlugRoute: typeof GuidesSlugRoute
+  GuidesIndexRoute: typeof GuidesIndexRoute
   ApiProductsByImageRoute: typeof ApiProductsByImageRoute
   ApiProductsByUrlRoute: typeof ApiProductsByUrlRoute
   ApiProductsDetailRoute: typeof ApiProductsDetailRoute
   ApiProductsSearchRoute: typeof ApiProductsSearchRoute
+  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicImgRoute: typeof ApiPublicImgRoute
   ProductMarketplaceIdRoute: typeof ProductMarketplaceIdRoute
 }
@@ -443,6 +482,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/guides/': {
+      id: '/guides/'
+      path: '/guides'
+      fullPath: '/guides/'
+      preLoaderRoute: typeof GuidesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/$slug': {
+      id: '/guides/$slug'
+      path: '/guides/$slug'
+      fullPath: '/guides/$slug'
+      preLoaderRoute: typeof GuidesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/products/by-image': {
       id: '/api/products/by-image'
       path: '/api/products/by-image'
@@ -469,6 +522,13 @@ declare module '@tanstack/react-router' {
       path: '/api/products/search'
       fullPath: '/api/products/search'
       preLoaderRoute: typeof ApiProductsSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/img': {
@@ -517,10 +577,13 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SourcingRoute: SourcingRoute,
   TrackRoute: TrackRoute,
+  GuidesSlugRoute: GuidesSlugRoute,
+  GuidesIndexRoute: GuidesIndexRoute,
   ApiProductsByImageRoute: ApiProductsByImageRoute,
   ApiProductsByUrlRoute: ApiProductsByUrlRoute,
   ApiProductsDetailRoute: ApiProductsDetailRoute,
   ApiProductsSearchRoute: ApiProductsSearchRoute,
+  ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicImgRoute: ApiPublicImgRoute,
   ProductMarketplaceIdRoute: ProductMarketplaceIdRoute,
 }

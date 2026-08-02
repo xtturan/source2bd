@@ -8,6 +8,7 @@ import { myAccount } from "@/lib/auth/account.functions";
 export const Route = createFileRoute("/_authenticated/account")({
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, nofollow" },
       { title: "আমার অ্যাকাউন্ট | Source2BD account" },
       { name: "description", content: "Your Source2BD account: daily search allowance and profile." },
       { property: "og:title", content: "My Source2BD account" },

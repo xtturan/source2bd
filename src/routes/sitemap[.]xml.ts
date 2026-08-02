@@ -5,6 +5,7 @@ const BASE_URL = "https://source2bd.lovable.app";
 
 interface SitemapEntry {
   path: string;
+  lastmod?: string;
   changefreq?: "weekly" | "monthly" | "daily";
   priority?: string;
 }
@@ -13,23 +14,28 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const { mockProducts } = await import("@/lib/products/mock-data");
+        const { guides } = await import("@/lib/content/guides");
 
+        // Static money pages only. Product URLs are user driven and endless,
+        // so they stay out of the sitemap on purpose.
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/sourcing", changefreq: "weekly", priority: "0.9" },
           { path: "/services", changefreq: "monthly", priority: "0.8" },
           { path: "/how-it-works", changefreq: "monthly", priority: "0.7" },
-          { path: "/track", changefreq: "monthly", priority: "0.6" },
+          { path: "/guides", changefreq: "monthly", priority: "0.8" },
+          { path: "/catalog", changefreq: "weekly", priority: "0.6" },
           { path: "/quote", changefreq: "monthly", priority: "0.7" },
+          { path: "/track", changefreq: "monthly", priority: "0.6" },
           { path: "/faq", changefreq: "monthly", priority: "0.6" },
           { path: "/contact", changefreq: "monthly", priority: "0.6" },
           { path: "/about", changefreq: "monthly", priority: "0.5" },
           { path: "/privacy", changefreq: "monthly", priority: "0.3" },
-          ...mockProducts.map((p) => ({
-            path: `/product/${p.marketplace}/${p.id}`,
-            changefreq: "weekly" as const,
-            priority: "0.5",
+          ...guides.map((g) => ({
+            path: `/guides/${g.slug}`,
+            lastmod: g.updated,
+            changefreq: "monthly" as const,
+            priority: "0.8",
           })),
         ];
 
@@ -40,6 +46,7 @@ export const Route = createFileRoute("/sitemap.xml")({
             [
               `  <url>`,
               `    <loc>${BASE_URL}${e.path}</loc>`,
+              e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
               e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
               e.priority ? `    <priority>${e.priority}</priority>` : null,
               `  </url>`,
