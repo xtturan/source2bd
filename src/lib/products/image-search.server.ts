@@ -1,8 +1,11 @@
 import type { Marketplace, ProductSummary } from "./types";
 
 /**
- * Elim's image search needs a URL it can fetch, so the uploaded photo is
- * parked in a private bucket and handed over as a short lived signed link.
+ * Photo search runs straight through Elim: the bytes are uploaded to their
+ * image endpoint, and the returned image id drives the marketplace match.
+ * A copy is parked in our private bucket so the desk can review what people
+ * sent, but that URL is never used for matching (the marketplace rejects
+ * any image host it does not own).
  */
 
 const BUCKET = "search-photos";
@@ -24,7 +27,7 @@ function decode(dataUrl: string) {
   return { mime, bytes };
 }
 
-/** Uploads the photo and returns a signed URL Elim can read for an hour. */
+/** Archives the photo and returns a signed URL for our own review only. */
 export async function hostPhoto(dataUrl: string): Promise<string> {
   const file = decode(dataUrl);
   if (!file) throw new Error("Use a JPG, PNG or WEBP photo under 8MB.");
@@ -52,10 +55,19 @@ export async function searchByPhoto(
   dataUrl: string,
   marketplace: Marketplace,
 ): Promise<{ items: ProductSummary[]; imageUrl: string }> {
-  const imageUrl = await hostPhoto(dataUrl);
-  const { getProductProvider } = await import("./provider.server");
-  const provider = getProductProvider();
-  if (!provider.searchByImage) return { items: [], imageUrl };
-  const res = await provider.searchByImage(imageUrl, { marketplace });
-  return { items: res.items, imageUrl };
+  const file = decode(dataUrl);
+  if (!file) throw new Error("Use a JPG, PNG or WEBP photo under 8MB.");
+
+  const { uploadPhotoToElim, searchElimByImageId } = await import("./elim-provider.server");
+  const imageId = await uploadPhotoToElim(file.bytes, file.mime);
+  const items = await searchElimByImageId(imageId, marketplace);
+
+  // Keep a copy for the desk, but never block the match on it.
+  let imageUrl = dataUrl;
+  try {
+    imageUrl = await hostPhoto(dataUrl);
+  } catch (err) {
+    console.error("photo archive failed", err);
+  }
+  return { items, imageUrl };
 }
