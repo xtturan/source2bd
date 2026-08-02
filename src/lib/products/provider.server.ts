@@ -3,11 +3,11 @@ import { mockProvider } from "./mock-provider";
 import { createParseProvider } from "./parse-provider.server";
 import { createElimProvider } from "./elim-provider.server";
 
-/** PRODUCT_PROVIDER=elim (live, default) | parse (legacy) | mock (zero cost). */
+/** PRODUCT_PROVIDER=elim (live, default) | parse-legacy (parse.bot only) | mock (zero cost). */
 export function getProductProvider(): ProductProvider {
   const name = (process.env["PRODUCT_PROVIDER"] ?? "elim").toLowerCase();
   if (name === "mock") return mockProvider;
-  if (name === "parse") return createParseProvider();
+  if (name === "parse-legacy") return createParseProvider();
   return createElimProvider();
 }
 
