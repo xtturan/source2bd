@@ -359,7 +359,7 @@ function LinkPanel() {
   return (
     <div>
       <label htmlFor="url" className="font-bn text-[18px] font-bold">
-        {t("লিংক এখানে বসান", "Paste the link here")}
+        {t("পণ্যের লিংক পেস্ট করুন", "Paste the product link")}
       </label>
       <input
         id="url"
@@ -369,27 +369,24 @@ function LinkPanel() {
           setError(null);
         }}
         inputMode="url"
-        placeholder="https://detail.1688.com/..."
+        placeholder={t("পণ্যের লিংক পেস্ট করুন (১৬৮৮ / অ্যামাজন / অন্য)", "Paste the product link (1688 / Amazon / other)")}
         className="mt-2 h-16 w-full rounded-[16px] border border-input bg-paper px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
       />
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        {["১৬৮৮", "আলিবাবা", "অ্যামাজন", "অন্য লিংক"].map((chip) => (
-          <span key={chip} className="font-bn rounded-full bg-foreground/6 px-4 py-2 text-[14px] font-bold text-muted-foreground">
-            {chip}
-          </span>
-        ))}
-      </div>
 
       {error ? <p className="font-bn mt-3 text-[16px] font-bold text-accent">{error}</p> : null}
 
       <button
         type="button"
         onClick={send}
-        className="font-bn mt-4 flex min-h-[64px] w-full items-center justify-center gap-2 rounded-full bg-wa text-xl font-bold text-wa-foreground"
+        className="mt-4 flex min-h-[64px] w-full flex-col items-center justify-center rounded-full bg-wa text-wa-foreground"
       >
-        <WhatsAppIcon className="h-6 w-6" />
-        {t("লিংক পাঠিয়ে দাম জানুন", "Send the link and get a price")}
+        <span className="font-bn flex items-center gap-2 text-[18px] font-bold leading-tight">
+          <WhatsAppIcon className="h-6 w-6" />
+          {t("বাংলাদেশ পর্যন্ত পুরো দাম জানুন", "Get the full Bangladesh price")}
+        </span>
+        <span className="font-bn text-[12px] font-semibold opacity-90">
+          {t("শিপিং চার্জসহ · WhatsApp-এ", "Shipping included · on WhatsApp")}
+        </span>
       </button>
 
       <button
@@ -398,7 +395,7 @@ function LinkPanel() {
         disabled={url.trim().length < 8 || mutation.isPending}
         className="font-bn mt-3 flex min-h-[56px] w-full items-center justify-center rounded-full border border-foreground/15 bg-paper text-[17px] font-bold disabled:opacity-50"
       >
-        {t("আগে পণ্যটা দেখে নিন", "Preview the product first")}
+        {mutation.isPending ? t("দেখছি…", "Loading…") : t("আগে পণ্যটা দেখে নিন", "Preview the product first")}
       </button>
 
       <div className="mt-6">
