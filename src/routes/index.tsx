@@ -256,8 +256,8 @@ function ActionCard(
 function ThreeSteps() {
   const { t } = useLang();
   const steps = [
-    { n: "১", bn: "ছবি বা লিংক দিন", en: "Send a photo or link", icon: <CameraGlyph /> },
-    { n: "২", bn: "আমরা দাম বলি", en: "We tell you the price", icon: <TagGlyph /> },
+    { n: "১", bn: "নাম, ছবি বা লিংক দিন", en: "Send a photo or link", icon: <CameraGlyph /> },
+    { n: "২", bn: "শিপিংসহ পুরো দাম বলি", en: "We tell you the price", icon: <TagGlyph /> },
     { n: "৩", bn: "বাসায় ডেলিভারি", en: "Delivered to your home", icon: <TruckGlyph /> },
   ];
   return (
