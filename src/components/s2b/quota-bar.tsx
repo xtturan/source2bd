@@ -78,6 +78,39 @@ export function QuotaBar({ className }: { className?: string }) {
 
 /** Shown when the server returns the daily limit error. */
 export function LimitReached() {
+  return <LimitReachedInner />;
+}
+
+/** Compact header pill: "১২/৩০" left today, or a login nudge. */
+export function QuotaChip({ className }: { className?: string }) {
+  const { t } = useLang();
+  const { signedIn, loadingSession, quota } = useQuotaState();
+
+  if (loadingSession || !signedIn || !quota) return null;
+  const low = quota.remainingSearches <= 5;
+
+  return (
+    <span
+      aria-live="polite"
+      title={t("আজকের বাকি খোঁজা", "Searches left today")}
+      className={cn(
+        "font-bn hidden h-11 items-center gap-1 rounded-full border px-3 text-[14px] font-bold sm:inline-flex",
+        low
+          ? "border-accent/50 bg-accent/10 text-accent"
+          : "border-foreground/12 text-muted-foreground",
+        className,
+      )}
+    >
+      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </svg>
+      {quota.remainingSearches}/{quota.searchLimit}
+    </span>
+  );
+}
+
+function LimitReachedInner() {
   const { t } = useLang();
   return (
     <div className="panel matte rounded-[18px] p-5 text-center">
