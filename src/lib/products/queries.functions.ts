@@ -15,7 +15,7 @@ export const searchProducts = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<SearchResult> => {
     const { getProductProvider } = await import("./provider.server");
     const { cached } = await import("@/lib/api/guard.server");
-    return cached(`fn-search:v3:${data.marketplace}:${data.q}:${data.page}`, () =>
+    return cached(`fn-search:v4:${data.marketplace}:${data.q}:${data.page}`, () =>
       getProductProvider().search(data.q, { marketplace: data.marketplace, page: data.page }),
     );
   });
