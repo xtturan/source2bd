@@ -3,26 +3,36 @@ import { z } from "zod";
 import type { ProductDetail, ProductSummary, SearchResult } from "./types";
 import type { CatalogueItem, ShowcaseRow } from "./search-cache.server";
 
+/** Shape the UI reads to render "আজকের বাকি খোঁজা: X/30". */
+export interface QuotaInfo {
+  searchLimit: number;
+  remainingSearches: number;
+  resetAt: string;
+}
+
 export const searchProducts = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) =>
     z
       .object({
-        q: z.string().trim().max(120).default(""),
+        q: z.string().trim().max(100).default(""),
         marketplace: z.enum(["1688", "taobao", "alibaba", "aliexpress", "amazon", "global"]).default("1688"),
         page: z.number().int().min(1).max(50).default(1),
       })
       .parse(d),
   )
-  .handler(async ({ data }): Promise<SearchResult> => {
+  .handler(async ({ data }): Promise<SearchResult & Partial<QuotaInfo>> => {
     const { getProductProvider } = await import("./provider.server");
     const { cached } = await import("@/lib/api/guard.server");
     const { readSearchCache, writeSearchCache } = await import("./search-cache.server");
-    const { consumeQuota } = await import("@/lib/api/quota.server");
-    return cached(`fn-search:v5:${data.marketplace}:${data.q}:${data.page}`, async () => {
+    const { consumeQuota, readQuota } = await import("@/lib/api/quota.server");
+
+    let quota: { limit: number; remaining: number; resetAt: string } | null = null;
+
+    const result = await cached(`fn-search:v5:${data.marketplace}:${data.q}:${data.page}`, async () => {
       const stored = await readSearchCache(data.q, data.marketplace, data.page);
+      // Cache hit never burns the daily allowance.
       if (stored) return stored;
-      // Only live upstream calls burn the daily allowance.
-      await consumeQuota(1);
+      quota = await consumeQuota("search", 1);
       const fresh = await getProductProvider().search(data.q, {
         marketplace: data.marketplace,
         page: data.page,
@@ -30,7 +40,33 @@ export const searchProducts = createServerFn({ method: "GET" })
       await writeSearchCache(data.q, data.marketplace, data.page, fresh);
       return fresh;
     });
+
+    const state = quota ?? (await readQuota("search"));
+    return {
+      ...result,
+      ...(state
+        ? {
+            searchLimit: state.limit,
+            remainingSearches: state.remaining,
+            resetAt: state.resetAt,
+          }
+        : {}),
+    };
   });
+
+/** Today's remaining allowance, for the counter next to the search box. */
+export const myQuota = createServerFn({ method: "GET" }).handler(
+  async (): Promise<QuotaInfo | null> => {
+    const { readQuota } = await import("@/lib/api/quota.server");
+    const state = await readQuota("search");
+    if (!state) return null;
+    return {
+      searchLimit: state.limit,
+      remainingSearches: state.remaining,
+      resetAt: state.resetAt,
+    };
+  },
+);
 
 /** Popular saved searches, used to fill the homepage with real listings. */
 export const showcaseSearches = createServerFn({ method: "GET" }).handler(
@@ -48,33 +84,46 @@ export const catalogueProducts = createServerFn({ method: "GET" }).handler(
   },
 );
 
-/** Photo search: upload the picture, then match it on the marketplace. */
+/** Photo search: shares the same 30/day pot as keyword search. */
 export const productsByPhoto = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z
       .object({
-        image: z.string().trim().min(64).max(11_500_000),
+        image: z
+          .string()
+          .trim()
+          .min(64)
+          // ~5MB binary once base64 is decoded.
+          .max(7_000_000)
+          .regex(/^data:image\/(jpeg|jpg|png|webp);base64,/, "unsupported image type"),
         marketplace: z.enum(["1688", "taobao"]).default("1688"),
       })
       .parse(d),
   )
-  .handler(async ({ data }): Promise<{ items: ProductSummary[] }> => {
+  .handler(async ({ data }): Promise<{ items: ProductSummary[] } & Partial<QuotaInfo>> => {
     const { searchByPhoto } = await import("./image-search.server");
     const { consumeQuota } = await import("@/lib/api/quota.server");
-    await consumeQuota(1);
+    const state = await consumeQuota("search", 1);
     const res = await searchByPhoto(data.image, data.marketplace);
-    return { items: res.items };
+    return {
+      items: res.items,
+      searchLimit: state.limit,
+      remainingSearches: state.remaining,
+      resetAt: state.resetAt,
+    };
   });
 
 export const productByUrl = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ url: z.string().trim().min(8).max(600) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ url: z.string().trim().min(8).max(2048) }).parse(d))
   .handler(async ({ data }): Promise<ProductDetail | null> => {
     const { getProductProvider } = await import("./provider.server");
     const { cached } = await import("@/lib/api/guard.server");
     const { consumeQuota } = await import("@/lib/api/quota.server");
-    return cached(`fn-url:${data.url}`, async () => {
-      await consumeQuota(1);
-      return getProductProvider().getByUrl(data.url);
+    const { assertSafeUrl } = await import("@/lib/api/url-guard.server");
+    const safe = assertSafeUrl(data.url);
+    return cached(`fn-url:${safe}`, async () => {
+      await consumeQuota("link", 1);
+      return getProductProvider().getByUrl(safe);
     });
   });
 
@@ -90,7 +139,9 @@ export const productById = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<ProductDetail | null> => {
     const { getProductProvider } = await import("./provider.server");
     const { cached } = await import("@/lib/api/guard.server");
-    return cached(`fn-detail:${data.marketplace}:${data.id}`, () =>
-      getProductProvider().getById(data.id, data.marketplace),
-    );
+    const { consumeQuota } = await import("@/lib/api/quota.server");
+    return cached(`fn-detail:${data.marketplace}:${data.id}`, async () => {
+      await consumeQuota("detail", 1);
+      return getProductProvider().getById(data.id, data.marketplace);
+    });
   });
