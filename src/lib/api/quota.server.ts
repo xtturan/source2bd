@@ -17,9 +17,7 @@ export class QuotaError extends Error {
   readonly limit = DAILY_LIMIT;
   readonly resetAt: string;
   constructor(resetAt: string) {
-    super(
-      "আজকের ফ্রি সার্চ শেষ। WhatsApp-এ মেসেজ দিন, আমরা এখনই দাম বের করে দেব। (Daily search limit reached — message us on WhatsApp.)",
-    );
+    super("DAILY_SEARCH_LIMIT");
     this.name = "QuotaError";
     this.resetAt = resetAt;
   }
