@@ -121,14 +121,13 @@ function BigChoices() {
           bn="পণ্য খুঁজুন"
           en="Search for a product"
         />
-        <BigActionAnchor
-          href={generalInquiry("I want to send a product photo")}
-          target="_blank"
-          rel="noopener noreferrer"
+        <BigActionLink
+          to="/sourcing"
+          search={{ mode: "photo" }}
           tone="ink"
           icon={<IconCamera />}
-          bn="ছবি পাঠান"
-          en="Send a photo on WhatsApp"
+          bn="ছবি দিয়ে খুঁজুন"
+          en="Search by photo"
         />
         <BigActionAnchor
           href={`tel:${siteConfig.phoneTel}`}
