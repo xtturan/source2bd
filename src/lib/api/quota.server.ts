@@ -164,7 +164,10 @@ export async function consumeQuota(
 
   if (hasBypass()) return { limit, remaining: limit, resetAt };
 
-  const requireLogin = (process.env["REQUIRE_LOGIN_FOR_SEARCH"] ?? "true") !== "false";
+  // Only live keyword/photo search is gated behind login; opening a product
+  // detail page or resolving a pasted link stays public and crawlable.
+  const requireLogin =
+    action === "search" && (process.env["REQUIRE_LOGIN_FOR_SEARCH"] ?? "true") !== "false";
   const userId = await currentUserId();
 
   if (!userId) {
