@@ -132,12 +132,29 @@ function Searching() {
 }
 
 /** Every dead end offers WhatsApp and a phone call. Never a technical error. */
-function HelpBox({ title, waHref }: { title: string; waHref: string }) {
+function HelpBox({
+  title,
+  waHref,
+  onRetry,
+}: {
+  title: string;
+  waHref: string;
+  onRetry?: () => void;
+}) {
   const { t } = useLang();
   return (
     <div className="panel matte rounded-[18px] p-5 text-center">
       <p className="font-bn text-[18px] font-bold">{title}</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {onRetry ? (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="font-bn flex min-h-[60px] items-center justify-center rounded-full bg-accent text-[17px] font-bold text-accent-foreground sm:col-span-2"
+          >
+            {t("আবার খুঁজুন", "Search again")}
+          </button>
+        ) : null}
         <a
           href={waHref}
           target="_blank"
