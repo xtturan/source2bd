@@ -8,6 +8,17 @@
 const cache = new Map<string, string>();
 const MODEL = "google/gemini-3.1-flash-lite";
 
+// High-intent shopping phrases should be exact and must not depend on an AI
+// paraphrase. On 1688, 红灯 returns red lamps while 红色灯 skews generic.
+const exactQueries: Record<string, string> = {
+  "red light": "红灯",
+  "red lights": "红灯",
+  "red led light": "红色LED灯",
+  "red led lights": "红色LED灯",
+  "red light bulb": "红色灯泡",
+  "red light bulbs": "红色灯泡",
+};
+
 const hasCjk = (q: string) => /[\u4e00-\u9fff]/.test(q);
 
 export async function toChineseQuery(query: string): Promise<string> {
@@ -15,6 +26,8 @@ export async function toChineseQuery(query: string): Promise<string> {
   if (!q || hasCjk(q)) return q;
 
   const key = q.toLowerCase();
+  const exact = exactQueries[key];
+  if (exact) return exact;
   const hit = cache.get(key);
   if (hit) return hit;
 

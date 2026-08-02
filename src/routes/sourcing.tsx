@@ -141,7 +141,7 @@ function LiveProgress({ label }: { label: string }) {
         />
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Reading the marketplace, then translating the listings into English.
+        Searching the marketplace for the closest matching products.
       </p>
     </div>
   );
