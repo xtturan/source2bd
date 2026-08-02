@@ -15,8 +15,8 @@ import { useLang } from "@/lib/i18n";
  */
 export function ProductCard({ product }: { product: ProductSummary }) {
   const { t } = useLang();
-  const market = marketLabel(product.priceMin, product.priceMax, product.currency, t("দাম জানতে চাপুন", "Ask for price"));
-  const approx = product.priceMin != null ? bdtLabel(product.priceMin, product.priceMax, product.currency) : null;
+  const taka = bdtLabel(product.priceMin, product.priceMax, product.currency, t("দাম জানতে চাপুন", "Ask for price"));
+  const market = product.priceMin != null ? marketLabel(product.priceMin, product.priceMax, product.currency) : null;
 
   return (
     <article className="panel matte group relative flex flex-col overflow-hidden rounded-[18px] transition-transform duration-150 focus-within:ring-2 focus-within:ring-accent active:scale-[0.995]">
@@ -45,10 +45,13 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         </Link>
 
         <div>
-          <div className="tnum text-lg font-extrabold leading-tight tracking-tight">{market}</div>
-          {approx ? (
-            <p className="font-bn tnum text-[13px] font-bold text-muted-foreground">
-              {t("আনুমানিক", "approx.")} {approx}
+          <div className="tnum text-lg font-extrabold leading-tight tracking-tight">
+            {product.priceMin != null ? <span className="font-bn text-[13px] font-bold text-muted-foreground">{t("আনুমানিক", "approx.")} </span> : null}
+            {taka}
+          </div>
+          {market ? (
+            <p className="font-bn tnum text-[12px] font-semibold text-muted-foreground">
+              {t("মার্কেট দাম", "Market price")} {market}
             </p>
           ) : null}
           <p className="font-bn mt-0.5 text-[12px] font-semibold leading-snug text-foreground/70">
