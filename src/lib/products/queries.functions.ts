@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { ProductDetail, SearchResult } from "./types";
+import type { ShowcaseRow } from "./search-cache.server";
 
 export const searchProducts = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) =>
@@ -15,10 +16,26 @@ export const searchProducts = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<SearchResult> => {
     const { getProductProvider } = await import("./provider.server");
     const { cached } = await import("@/lib/api/guard.server");
-    return cached(`fn-search:v4:${data.marketplace}:${data.q}:${data.page}`, () =>
-      getProductProvider().search(data.q, { marketplace: data.marketplace, page: data.page }),
-    );
+    const { readSearchCache, writeSearchCache } = await import("./search-cache.server");
+    return cached(`fn-search:v5:${data.marketplace}:${data.q}:${data.page}`, async () => {
+      const stored = await readSearchCache(data.q, data.marketplace, data.page);
+      if (stored) return stored;
+      const fresh = await getProductProvider().search(data.q, {
+        marketplace: data.marketplace,
+        page: data.page,
+      });
+      await writeSearchCache(data.q, data.marketplace, data.page, fresh);
+      return fresh;
+    });
   });
+
+/** Popular saved searches, used to fill the homepage with real listings. */
+export const showcaseSearches = createServerFn({ method: "GET" }).handler(
+  async (): Promise<ShowcaseRow[]> => {
+    const { readShowcase } = await import("./search-cache.server");
+    return readShowcase(4);
+  },
+);
 
 export const productByUrl = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ url: z.string().trim().min(8).max(600) }).parse(d))
