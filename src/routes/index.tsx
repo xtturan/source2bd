@@ -40,6 +40,17 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
+// Loader stays public: showcase rows come from the shared search cache.
+Route.update({
+  loader: async (): Promise<ShowcaseRow[]> => {
+    try {
+      return await showcaseSearches();
+    } catch {
+      return [];
+    }
+  },
+});
+
 function HomePage() {
   const showcase = Route.useLoaderData();
   const products = featuredProducts(8);
