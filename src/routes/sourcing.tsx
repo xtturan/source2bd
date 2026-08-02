@@ -32,13 +32,13 @@ export const Route = createFileRoute("/sourcing")({
     ],
   }),
   component: SourcingPage,
-  validateSearch: (s: Record<string, unknown>) => ({
-    q: typeof s["q"] === "string" ? s["q"].slice(0, 120) : undefined,
-    mode:
-      s["mode"] === "photo" || s["mode"] === "link" || s["mode"] === "search"
-        ? (s["mode"] as "photo" | "link" | "search")
-        : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): { q?: string; mode?: Mode } => {
+    const out: { q?: string; mode?: Mode } = {};
+    if (typeof s["q"] === "string" && s["q"].trim()) out.q = s["q"].slice(0, 120);
+    if (s["mode"] === "photo" || s["mode"] === "link" || s["mode"] === "search")
+      out.mode = s["mode"];
+    return out;
+  },
 });
 
 const markets: { key: Marketplace; label: string }[] = [
