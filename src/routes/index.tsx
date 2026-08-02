@@ -113,7 +113,7 @@ function BigChoices() {
     <Container className="pb-4">
       <p className="font-bn text-center text-xl font-bold">আপনি কী করতে চান?</p>
       <p className="mt-1 text-center text-sm text-muted-foreground">What do you want to do?</p>
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+      <div className="mt-6 grid gap-3 md:grid-cols-3">
         <BigActionLink
           to="/sourcing"
           tone="accent"
@@ -162,7 +162,7 @@ function SimpleSteps() {
   return (
     <Section className="py-12 sm:py-14">
       <Container>
-        <ol className="grid gap-3 sm:grid-cols-3">
+        <ol className="grid gap-3 md:grid-cols-3">
           {simpleSteps.map((s) => (
             <li key={s.en} className="panel matte flex items-center gap-4 rounded-[18px] p-5">
               <span
@@ -187,7 +187,7 @@ function TrustStrip() {
   return (
     <Section className="py-10 sm:py-12">
       <Container>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
           {trustStats.map((s) => (
             <Stat key={s.label} value={s.value} label={s.label} sub={s.sub} />
           ))}

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  */
 
 const tile =
-  "group flex min-h-[104px] w-full items-center gap-4 rounded-[18px] p-4 text-left transition-transform duration-150 ease-[cubic-bezier(.2,.8,.2,1)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:p-5";
+  "group flex min-h-[92px] w-full items-center gap-3 rounded-[18px] p-4 sm:gap-4 text-left transition-transform duration-150 ease-[cubic-bezier(.2,.8,.2,1)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:p-5";
 
 const tones = {
   accent: "bg-accent text-accent-foreground shadow-[var(--shadow-2)]",
@@ -35,17 +35,17 @@ function Body({
       <span
         aria-hidden
         className={cn(
-          "grid h-16 w-16 shrink-0 place-items-center rounded-[16px]",
+          "grid h-12 w-12 shrink-0 place-items-center rounded-[16px] sm:h-14 sm:w-14 lg:h-16 lg:w-16",
           tone === "paper" ? "bg-accent/12 text-accent" : "bg-white/15",
         )}
       >
         {icon}
       </span>
       <span className="min-w-0">
-        <span className="font-bn block text-[1.35rem] font-bold leading-tight">{bn}</span>
+        <span className="font-bn block text-[clamp(1.05rem,1.5vw,1.35rem)] font-bold leading-tight">{bn}</span>
         <span
           className={cn(
-            "mt-1 block text-sm font-medium",
+            "mt-0.5 block text-[13px] font-medium leading-snug",
             tone === "paper" ? "text-muted-foreground" : "opacity-80",
           )}
         >
@@ -55,7 +55,7 @@ function Body({
       <svg
         viewBox="0 0 24 24"
         aria-hidden
-        className="ml-auto h-6 w-6 shrink-0 opacity-50 transition-transform duration-150 group-hover:translate-x-1"
+        className="ml-auto hidden h-6 w-6 shrink-0 opacity-50 sm:block transition-transform duration-150 group-hover:translate-x-1"
         fill="none"
         stroke="currentColor"
         strokeWidth="2.4"
