@@ -1,7 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { z } from "zod";
 import { Container, Section } from "@/components/s2b/primitives";
 import { ProductCard } from "@/components/s2b/product-card";
 import { catalogueProducts } from "@/lib/products/queries.functions";
@@ -25,12 +23,10 @@ export const Route = createFileRoute("/catalog")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  validateSearch: zodValidator(
-    z.object({
-      cat: fallback(z.string(), "").default(""),
-      q: fallback(z.string(), "").default(""),
-    }),
-  ),
+  validateSearch: (search: Record<string, unknown>): { cat: string; q: string } => ({
+    cat: typeof search["cat"] === "string" ? search["cat"] : "",
+    q: typeof search["q"] === "string" ? search["q"] : "",
+  }),
   loader: async (): Promise<CatalogueItem[]> => {
     try {
       return await catalogueProducts();
