@@ -7,11 +7,13 @@ import { siteConfig } from "@/config/site";
 import { generalInquiry, telLink } from "@/lib/whatsapp";
 import { useLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { useSession } from "@/lib/auth/session";
 
 /** Minimal header: logo, language, WhatsApp, phone. Nothing else competes. */
 export function Header() {
   const { lang, setLang, t } = useLang();
   const [scrolled, setScrolled] = useState(false);
+  const { user } = useSession();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);

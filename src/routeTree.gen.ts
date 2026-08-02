@@ -25,6 +25,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SourcingRouteImport } from './routes/sourcing'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiProductsByImageRouteImport } from './routes/api/products/by-image'
 import { Route as ApiProductsByUrlRouteImport } from './routes/api/products/by-url'
 import { Route as ApiProductsDetailRouteImport } from './routes/api/products/detail'
@@ -111,6 +112,11 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiProductsByImageRoute = ApiProductsByImageRouteImport.update({
   id: '/api/products/by-image',
   path: '/api/products/by-image',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/sourcing': typeof SourcingRoute
   '/track': typeof TrackRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/api/products/by-image': typeof ApiProductsByImageRoute
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/sourcing': typeof SourcingRoute
   '/track': typeof TrackRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/api/products/by-image': typeof ApiProductsByImageRoute
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/sourcing': typeof SourcingRoute
   '/track': typeof TrackRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/api/products/by-image': typeof ApiProductsByImageRoute
   '/api/products/by-url': typeof ApiProductsByUrlRoute
   '/api/products/detail': typeof ApiProductsDetailRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/sourcing'
     | '/track'
     | '/account'
+    | '/admin'
     | '/api/products/by-image'
     | '/api/products/by-url'
     | '/api/products/detail'
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
     | '/sourcing'
     | '/track'
     | '/account'
+    | '/admin'
     | '/api/products/by-image'
     | '/api/products/by-url'
     | '/api/products/detail'
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | '/sourcing'
     | '/track'
     | '/_authenticated/account'
+    | '/_authenticated/admin'
     | '/api/products/by-image'
     | '/api/products/by-url'
     | '/api/products/detail'
@@ -424,6 +436,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/products/by-image': {
       id: '/api/products/by-image'
       path: '/api/products/by-image'
@@ -471,10 +490,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
