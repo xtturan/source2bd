@@ -8,7 +8,14 @@ import type { Marketplace, ProductSummary, SearchResult } from "./types";
  * cost, and the homepage can show real listings people actually looked for.
  */
 
-const FRESH_MS = 7 * 24 * 60 * 60 * 1000;
+/** Prices move, so a cached search stops being served after this. */
+const FRESH_MS = 3 * 24 * 60 * 60 * 1000;
+/** Rows older than this are deleted outright, keeping the table small. */
+const EVICT_MS = 45 * 24 * 60 * 60 * 1000;
+/** Hard ceiling on stored rows; the least useful ones go first. */
+const MAX_ROWS = 4000;
+
+let lastPrune = 0;
 
 function key(query: string, marketplace: Marketplace, page: number) {
   return { query: query.trim().toLowerCase(), marketplace, page };
@@ -90,8 +97,40 @@ export async function writeSearchCache(
       },
       { onConflict: "query,marketplace,page" },
     );
+    void pruneSearchCache();
   } catch (err) {
     console.error("search cache write failed", err);
+  }
+}
+
+/**
+ * Eviction: runs at most once an hour, after a write. Drops anything past the
+ * retention window, then trims the table back to MAX_ROWS by removing the
+ * coldest (fewest hits, oldest) rows.
+ */
+export async function pruneSearchCache() {
+  if (Date.now() - lastPrune < 60 * 60 * 1000) return;
+  lastPrune = Date.now();
+  try {
+    const db = await admin();
+    const cutoff = new Date(Date.now() - EVICT_MS).toISOString();
+    await db.from("search_cache").delete().lt("updated_at", cutoff);
+
+    const { count } = await db
+      .from("search_cache")
+      .select("id", { count: "exact", head: true });
+    if (!count || count <= MAX_ROWS) return;
+
+    const { data } = await db
+      .from("search_cache")
+      .select("id")
+      .order("hits", { ascending: true })
+      .order("updated_at", { ascending: true })
+      .limit(count - MAX_ROWS);
+    const ids = (data ?? []).map((r) => r.id as string);
+    if (ids.length) await db.from("search_cache").delete().in("id", ids);
+  } catch (err) {
+    console.error("search cache prune failed", err);
   }
 }
 
