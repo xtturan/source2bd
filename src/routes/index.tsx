@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Container, Section } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
+import { QuotaBar } from "@/components/s2b/quota-bar";
 import { ProductCard } from "@/components/s2b/product-card";
 import { showcaseSearches } from "@/lib/products/queries.functions";
 import type { ShowcaseRow } from "@/lib/products/search-cache.server";
