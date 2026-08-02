@@ -44,18 +44,54 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+const SUPABASE_ORIGIN = "https://vtipuiuojbwcguuqnshu.supabase.co";
+
+const CSP = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' blob: data:",
+  "font-src 'self' https://fonts.gstatic.com data:",
+  // Vite/TanStack hydration inlines a bootstrap script and styles.
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  `connect-src 'self' ${SUPABASE_ORIGIN} wss://vtipuiuojbwcguuqnshu.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com`,
+].join("; ");
+
+/** Applied to every response leaving the worker. */
+function harden(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("X-Frame-Options", "DENY");
+  headers.set("Permissions-Policy", "camera=(self), microphone=(self), geolocation=()");
+  headers.set("Cross-Origin-Opener-Policy", "same-origin");
+  headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  if (!headers.has("Content-Security-Policy")) headers.set("Content-Security-Policy", CSP);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return harden(await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
-        status: 500,
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
+      return harden(
+        new Response(renderErrorPage(), {
+          status: 500,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        }),
+      );
     }
   },
 };
