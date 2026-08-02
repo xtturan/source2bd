@@ -4,16 +4,11 @@ export const Route = createFileRoute("/api/public/probe2")({
   server: {
     handlers: {
       POST: async () => {
-        const { hostPhoto } = await import("@/lib/products/image-search.server");
-        const fs = await import("node:fs/promises");
-        const b = await fs.readFile("/mnt/user-uploads/image-7.png");
-        const url = await hostPhoto(`data:image/png;base64,${b.toString("base64")}`);
-        const res = await fetch("https://openapi.elim.asia/v1/products/search-img", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "x-api-key": process.env["ELIM_API_KEY"] ?? "" },
-          body: JSON.stringify({ img_url: url, platform: "alibaba", page: 1, size: 3, lang: "en" }),
-        });
-        return Response.json({ urlHost: new URL(url).host, hasQuery: !!new URL(url).search, api: (await res.text()).slice(0, 600) });
+        const { searchByPhoto } = await import("@/lib/products/image-search.server");
+        const src = await fetch("https://cbu01.alicdn.com/img/ibank/O1CN01NOQUUq2HyMKHa7gGb_!!2218065979219-0-cib.jpg");
+        const b64 = Buffer.from(await src.arrayBuffer()).toString("base64");
+        const res = await searchByPhoto(`data:image/jpeg;base64,${b64}`, "1688");
+        return Response.json({ count: res.items.length, titles: res.items.slice(0, 5).map((i) => i.title) });
       },
     },
   },
