@@ -75,17 +75,17 @@ function Hero() {
   return (
     <section className="relative overflow-hidden">
       <div className="grid-lines pointer-events-none absolute inset-0 opacity-60" aria-hidden />
-      <Container className="relative grid gap-10 pb-14 pt-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-20 lg:pt-16">
+      <Container className="relative grid items-center gap-8 pb-[clamp(2.5rem,6vw,5rem)] pt-[clamp(2rem,5vw,4rem)] md:grid-cols-[1.05fr_0.95fr] md:gap-10">
         <div className="reveal">
-          <h1 className="font-bn text-[2.2rem] font-extrabold leading-[1.15] sm:text-[2.9rem]">
+          <h1 className="font-bn text-[clamp(1.9rem,5.4vw,3rem)] font-extrabold leading-[1.15]">
             চীন থেকে পণ্য আনুন,
             <br />
             <span className="text-accent">বাসায় পৌঁছে দেব</span>
           </h1>
-          <p className="mt-3 text-lg font-semibold text-muted-foreground">
+          <p className="mt-3 text-[clamp(1rem,1.7vw,1.15rem)] font-semibold text-muted-foreground">
             Buy from China, Amazon or any shop. We deliver to your door in Bangladesh.
           </p>
-          <p className="font-bn mt-4 text-base leading-relaxed text-muted-foreground">
+          <p className="font-bn mt-4 text-[clamp(0.95rem,1.5vw,1.05rem)] leading-relaxed text-muted-foreground">
             কোনো ইংরেজি জানার দরকার নেই। শুধু ছবি বা লিংক পাঠান, আমরা দাম বলে দেব।
           </p>
         </div>
@@ -96,7 +96,7 @@ function Hero() {
             alt="Cartons and crates staged for consolidation in a sunlit warehouse"
             width={1280}
             height={1600}
-            className="h-[340px] w-full object-cover sm:h-[420px] lg:h-[520px]"
+            className="h-[clamp(220px,38vw,480px)] w-full object-cover"
           />
         </figure>
       </Container>
