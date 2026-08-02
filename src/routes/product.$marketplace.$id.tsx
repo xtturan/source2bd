@@ -208,7 +208,7 @@ function ProductPage() {
         {related.length ? (
           <div className="mt-24">
             <h2 className="text-xl font-bold">Similar listings</h2>
-            <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {related.map((p) => (
                 <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
               ))}

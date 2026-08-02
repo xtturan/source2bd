@@ -113,7 +113,7 @@ function BigChoices() {
     <Container className="pb-4">
       <p className="font-bn text-center text-xl font-bold">আপনি কী করতে চান?</p>
       <p className="mt-1 text-center text-sm text-muted-foreground">What do you want to do?</p>
-      <div className="mt-6 grid gap-3 lg:grid-cols-3">
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <BigActionLink
           to="/sourcing"
           tone="accent"
@@ -188,7 +188,7 @@ function TrustStrip() {
   return (
     <Section className="py-10 sm:py-12">
       <Container>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
           {trustStats.map((s) => (
             <Stat key={s.label} value={s.value} label={s.label} sub={s.sub} />
           ))}
@@ -208,7 +208,7 @@ function OriginRail() {
           titleBn="তিনটি উৎস · একটাই ল্যান্ডেড প্রাইস"
           intro="Most agents in Dhaka only handle China. We quote the same order across China factory pricing, Amazon retail and any global store, then tell you which one actually lands cheaper."
         />
-        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {origins.map((o) => (
             <Card key={o.key} className="lift flex flex-col p-6">
               <div className="flex items-center justify-between">
@@ -248,7 +248,7 @@ function FeaturedCatalogue({ products }: { products: ReturnType<typeof featuredP
             Open the sourcing desk
           </ButtonLink>
         </div>
-        <div className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
           {products.map((p) => (
             <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
           ))}
@@ -286,7 +286,7 @@ function ShowcaseCatalogue({ rows }: { rows: ShowcaseRow[] }) {
                   See all results
                 </Link>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
                 {row.items.map((p) => (
                   <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
                 ))}

@@ -285,7 +285,7 @@ function SearchPanelInner() {
         {mutation.isPending ? (
           <div>
             <LiveProgress label="Pulling live listings from the marketplace" />
-            <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <Skeleton key={i} className="aspect-[3/4]" />
               ))}
@@ -314,7 +314,7 @@ function SearchPanelInner() {
         ) : items ? (
           <>
             <p className="mb-4 text-sm text-muted-foreground">{items.length} demo listings</p>
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {items.map((p) => (
                 <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
               ))}
@@ -579,7 +579,7 @@ function PhotoPanel() {
         {mutation.isPending ? (
           <>
             <LiveProgress label="Matching your photo with marketplace listings" />
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <Skeleton key={i} className="aspect-[3/4]" />
               ))}
@@ -606,7 +606,7 @@ function PhotoPanel() {
 
         {items && !mutation.isPending ? (
           items.length ? (
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {items.map((p) => (
                 <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
               ))}
