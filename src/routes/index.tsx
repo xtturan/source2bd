@@ -123,7 +123,7 @@ function BigChoices() {
         />
         <BigActionLink
           to="/sourcing"
-          search={{ mode: "photo" }}
+          search={{ mode: "photo" } as never}
           tone="ink"
           icon={<IconCamera />}
           bn="ছবি দিয়ে খুঁজুন"
