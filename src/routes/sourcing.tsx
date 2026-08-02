@@ -461,7 +461,7 @@ function SearchPanel() {
           submit(q);
         }}
       >
-        <div className="flex gap-2">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
           <input
             id="q"
             value={q}
