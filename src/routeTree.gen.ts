@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as MoreRouteImport } from './routes/more'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as QuoteRouteImport } from './routes/quote'
 import { Route as ServicesRouteImport } from './routes/services'
@@ -50,6 +51,11 @@ const FaqRoute = FaqRouteImport.update({
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoreRoute = MoreRouteImport.update({
+  id: '/more',
+  path: '/more',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
   '/quote': typeof QuoteRoute
   '/services': typeof ServicesRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
   '/quote': typeof QuoteRoute
   '/services': typeof ServicesRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
   '/quote': typeof QuoteRoute
   '/services': typeof ServicesRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/how-it-works'
+    | '/more'
     | '/privacy'
     | '/quote'
     | '/services'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/how-it-works'
+    | '/more'
     | '/privacy'
     | '/quote'
     | '/services'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/how-it-works'
+    | '/more'
     | '/privacy'
     | '/quote'
     | '/services'
@@ -237,6 +249,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  MoreRoute: typeof MoreRoute
   PrivacyRoute: typeof PrivacyRoute
   QuoteRoute: typeof QuoteRoute
   ServicesRoute: typeof ServicesRoute
@@ -286,6 +299,13 @@ declare module '@tanstack/react-router' {
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/more': {
+      id: '/more'
+      path: '/more'
+      fullPath: '/more'
+      preLoaderRoute: typeof MoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -381,6 +401,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   HowItWorksRoute: HowItWorksRoute,
+  MoreRoute: MoreRoute,
   PrivacyRoute: PrivacyRoute,
   QuoteRoute: QuoteRoute,
   ServicesRoute: ServicesRoute,

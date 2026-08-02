@@ -14,15 +14,157 @@ export const siteConfig = {
   originCities: ["Guangzhou", "Yiwu", "Shenzhen", "US warehouse"],
   destinationCities: ["Dhaka", "Chattogram"],
   policy: "Legal goods only. We do not handle restricted, counterfeit or prohibited items.",
+  policyBn: "শুধু বৈধ পণ্য আনি। নকল বা নিষিদ্ধ কিছু আমরা আনি না।",
+  hoursBn: "শনি থেকে বৃহস্পতি, সকাল ১০টা থেকে রাত ৮টা",
+  officeBn: "চকবাজার, ঢাকা",
+  mapUrl: "https://maps.google.com/?q=Chawkbazar+Dhaka",
 } as const;
 
 export const navLinks = [
-  { to: "/sourcing", label: "Sourcing" },
-  { to: "/services", label: "Services" },
-  { to: "/how-it-works", label: "How it works" },
-  { to: "/track", label: "Track" },
-  { to: "/faq", label: "FAQ" },
-  { to: "/contact", label: "Contact" },
+  { to: "/sourcing", label: "Sourcing", bn: "খুঁজুন" },
+  { to: "/quote", label: "Get a price", bn: "দাম জানুন" },
+  { to: "/services", label: "Services", bn: "সার্ভিস" },
+  { to: "/how-it-works", label: "How it works", bn: "কীভাবে কাজ করে" },
+  { to: "/track", label: "Track", bn: "ট্র্যাক" },
+  { to: "/faq", label: "Questions", bn: "প্রশ্ন" },
+  { to: "/contact", label: "Contact", bn: "যোগাযোগ" },
+] as const;
+
+/** Common delivery cities, Bangla first, for the quote form dropdown. */
+export const bdCities = [
+  "ঢাকা",
+  "চট্টগ্রাম",
+  "খুলনা",
+  "রাজশাহী",
+  "সিলেট",
+  "বরিশাল",
+  "রংপুর",
+  "ময়মনসিংহ",
+  "কুমিল্লা",
+  "নারায়ণগঞ্জ",
+  "গাজীপুর",
+  "যশোর",
+  "বগুড়া",
+  "কক্সবাজার",
+  "অন্যান্য",
+] as const;
+
+/** Picture buttons on the home page. Each opens the search with a keyword. */
+export const quickCategories = [
+  { bn: "লাইট", en: "Lights", q: "led light" },
+  { bn: "ফোন কভার", en: "Phone cases", q: "phone case" },
+  { bn: "জুতো", en: "Shoes", q: "shoes" },
+  { bn: "মেশিন", en: "Machines", q: "small machine" },
+] as const;
+
+/** Short Bangla service tiles. Long English copy lives in EN mode only. */
+export const simpleServices = [
+  {
+    key: "hand-carry",
+    bn: "হ্যান্ড ক্যারি",
+    en: "Hand carry",
+    forBn: "খুব জরুরি ছোট পণ্য",
+    forEn: "Urgent small parcels",
+    timeBn: "৩ থেকে ৬ দিন",
+    timeEn: "3 to 6 days",
+  },
+  {
+    key: "air-freight",
+    bn: "এয়ার",
+    en: "Air",
+    forBn: "মাঝারি ওজনের মাল, দ্রুত চাই",
+    forEn: "Medium weight, fast",
+    timeBn: "৭ থেকে ১২ দিন",
+    timeEn: "7 to 12 days",
+  },
+  {
+    key: "sea-freight",
+    bn: "সি (জাহাজ)",
+    en: "Sea",
+    forBn: "অনেক বেশি বা ভারী মাল",
+    forEn: "Big or heavy loads",
+    timeBn: "২৫ থেকে ৪৫ দিন",
+    timeEn: "25 to 45 days",
+  },
+  {
+    key: "courier",
+    bn: "কুরিয়ার",
+    en: "Courier",
+    forBn: "এক দুই কার্টন, ট্রায়াল অর্ডার",
+    forEn: "One or two cartons",
+    timeBn: "৫ থেকে ১০ দিন",
+    timeEn: "5 to 10 days",
+  },
+  {
+    key: "warehouse",
+    bn: "গুদাম",
+    en: "Warehouse",
+    forBn: "কয়েক দোকানের মাল এক বাক্সে",
+    forEn: "Many sellers, one box",
+    timeBn: "মাল আসা পর্যন্ত ফ্রি রাখা",
+    timeEn: "Free short holding",
+  },
+  {
+    key: "sourcing-agent",
+    bn: "এজেন্ট",
+    en: "Buying agent",
+    forBn: "পণ্য খুঁজে দেওয়া ও দরদাম",
+    forEn: "We find and bargain",
+    timeBn: "সাধারণত একই দিনে উত্তর",
+    timeEn: "Usually same day reply",
+  },
+] as const;
+
+/** Eight short questions, Bangla first. */
+export const simpleFaqs = [
+  {
+    qBn: "ইংরেজি না জানলে হবে?",
+    qEn: "What if I do not know English?",
+    aBn: "হবে। শুধু ছবি বা লিংক পাঠান। আমরা বাংলায় কথা বলি।",
+    aEn: "Yes. Just send a photo or a link. We reply in Bangla.",
+  },
+  {
+    qBn: "শুধু ছবি দিলে হবে?",
+    qEn: "Is a photo enough?",
+    aBn: "হ্যাঁ। এক পণ্যের পরিষ্কার ছবি দিন। আমরা খুঁজে বের করি।",
+    aEn: "Yes. One clear photo of the item is enough for us to find it.",
+  },
+  {
+    qBn: "দামে কী কী থাকে?",
+    qEn: "What is inside the price?",
+    aBn: "পণ্যের দাম, আমাদের সার্ভিস চার্জ, আর আনার খরচ। তিনটাই আলাদা করে বলি।",
+    aEn: "Product cost, our service fee and freight. We show all three separately.",
+  },
+  {
+    qBn: "কতদিন লাগে?",
+    qEn: "How long does it take?",
+    aBn: "জরুরি হলে ৩ থেকে ৬ দিন। সাধারণ বিমানে ৭ থেকে ১২ দিন। জাহাজে ২৫ থেকে ৪৫ দিন।",
+    aEn: "Hand carry 3 to 6 days, air 7 to 12 days, sea 25 to 45 days.",
+  },
+  {
+    qBn: "কাস্টমস বা ট্যাক্স কে দেয়?",
+    qEn: "Who pays customs?",
+    aBn: "কাগজপত্র আমরা করি। সরকার যে ট্যাক্স ধরে সেটা দামের সাথে আগেই জানিয়ে দিই।",
+    aEn: "We handle the paperwork. Government duty is told to you before you agree.",
+  },
+  {
+    qBn: "টাকা কখন দিতে হয়?",
+    qEn: "When do I pay?",
+    aBn: "দাম দেখে আপনি রাজি হলে তবেই টাকা। আগে কিছু দিতে হয় না।",
+    aEn: "Only after you see the price and agree. Nothing before that.",
+  },
+  {
+    qBn: "কোন পণ্য আনা যায় না?",
+    qEn: "What can you not bring?",
+    aBn: "নকল ব্র্যান্ড, অস্ত্র, নিষিদ্ধ কেমিক্যাল বা লাইসেন্স লাগে এমন কিছু আমরা আনি না।",
+    aEn: "No counterfeits, weapons, restricted chemicals or licensed goods.",
+  },
+  {
+    qBn: "অফিস কোথায়?",
+    qEn: "Where is the office?",
+    aBn: "চকবাজার, ঢাকা। শনি থেকে বৃহস্পতি, সকাল ১০টা থেকে রাত ৮টা।",
+    aEn: "Chawkbazar, Dhaka. Saturday to Thursday, 10:00 to 20:00.",
+  },
 ] as const;
 
 export type OriginKey = "china" | "amazon" | "global";

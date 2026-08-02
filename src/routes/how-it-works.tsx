@@ -1,23 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Container, Section, SectionHeading, Card } from "@/components/s2b/primitives";
-import { ButtonAnchor, ButtonLink, WhatsAppIcon } from "@/components/s2b/button";
-import { generalInquiry } from "@/lib/whatsapp";
+import { Container, Section } from "@/components/s2b/primitives";
+import { WhatsAppIcon } from "@/components/s2b/button";
 import { siteConfig } from "@/config/site";
+import { generalInquiry, telLink } from "@/lib/whatsapp";
+import { useLang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How Source2BD sourcing and shipping works" },
+      { title: "কীভাবে কাজ করে · ৫ ধাপ | Source2BD" },
       {
         name: "description",
         content:
-          "From a pasted link to a delivered carton in Dhaka: verification, supplier payment, consolidation, freight, clearance and last mile, step by step.",
+          "ছবি বা লিংক পাঠানো থেকে বাসায় ডেলিভারি পর্যন্ত পাঁচটি ধাপ, ছবি আর সহজ বাংলায় ব্যাখ্যা করা।",
       },
-      { property: "og:title", content: "How Source2BD works" },
-      {
-        property: "og:description",
-        content: "The full path from a product link to a carton delivered in Bangladesh.",
-      },
+      { property: "og:title", content: "কীভাবে কাজ করে · Source2BD" },
+      { property: "og:description", content: "ছবি পাঠানো থেকে বাসায় ডেলিভারি, পাঁচ ধাপে।" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -25,85 +23,71 @@ export const Route = createFileRoute("/how-it-works")({
   component: HowItWorks,
 });
 
-const stages = [
-  {
-    n: "01",
-    title: "You send the request",
-    body: "A link, a keyword, a photo or a spec sheet. Anything that identifies the product. Tell us the quantity you are aiming for and the city it needs to reach.",
-    bn: "লিংক, কীওয়ার্ড বা ছবি পাঠান",
-  },
-  {
-    n: "02",
-    title: "We verify the listing",
-    body: "Our desk opens the original page, reads the Chinese or English detail, confirms MOQ and tier price with the supplier, and flags anything that looks like a reseller markup.",
-    bn: "লিস্টিং যাচাই করা হয়",
-  },
-  {
-    n: "03",
-    title: "You get a landed estimate",
-    body: "Product cost, our service fee, freight by lane, and an indication of duty exposure. If sea beats air for your volume, we say so even when air pays us more.",
-    bn: "ল্যান্ডেড কোট পাবেন",
-  },
-  {
-    n: "04",
-    title: "Purchase and inbound",
-    body: "You approve, we pay the supplier and receive at our China or US address. Cartons are counted and photographed before anything ships.",
-    bn: "ক্রয় ও রিসিভ",
-  },
-  {
-    n: "05",
-    title: "Consolidation and freight",
-    body: "Multiple suppliers become one shipment so you pay one freight bill. We book the lane and share tracking as it moves.",
-    bn: "কনসলিডেশন ও শিপিং",
-  },
-  {
-    n: "06",
-    title: "Clearance and delivery",
-    body: "Customs documentation, duty payment as agreed, then delivery to your address or pickup from our Chawkbazar office.",
-    bn: "কাস্টমস ও ডেলিভারি",
-  },
-];
+const steps = [
+  { bn: "ছবি বা লিংক পাঠান", en: "Send a photo or a link", icon: "camera" },
+  { bn: "আমরা পণ্যটা দেখে দাম হিসাব করি", en: "We check the item and work out the cost", icon: "search" },
+  { bn: "পুরো দাম বলি, আপনি রাজি হলে টাকা", en: "We tell you the full price, you pay only if you agree", icon: "tag" },
+  { bn: "আমরা কিনে এক বাক্সে পাঠাই", en: "We buy it and ship it in one box", icon: "box" },
+  { bn: "বাসায় বা অফিসে ডেলিভারি", en: "Delivered to your home or our office", icon: "truck" },
+] as const;
+
+const paths: Record<string, string> = {
+  camera: "M3 8.5A1.5 1.5 0 0 1 4.5 7h2.2l1.2-2h8.2l1.2 2h2.2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z",
+  search: "M11 4.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM20 20l-4.2-4.2",
+  tag: "M3.5 12.5 12 4h7.5v7.5L11 20z",
+  box: "M3.5 7.8 12 3.5l8.5 4.3v8.4L12 20.5l-8.5-4.3z",
+  truck: "M2.5 7h11v9h-11zM13.5 10.5H17l3.5 3v2.5h-7z",
+};
 
 function HowItWorks() {
+  const { t } = useLang();
   return (
-    <Section>
+    <Section className="py-8">
       <Container>
-        <SectionHeading
-          eyebrow="Process"
-          title="What actually happens after you press send"
-          titleBn="লিংক পাঠানোর পর কী হয়"
-          intro="Sourcing goes wrong in the gaps between people. We keep the whole chain on one desk so nothing is handed off and lost."
-        />
+        <h1 className="font-bn text-[clamp(1.6rem,6vw,2.4rem)] font-extrabold">
+          {t("কীভাবে কাজ করে", "How it works")}
+        </h1>
 
-        <ol className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {stages.map((s) => (
-            <li key={s.n}>
-              <Card className="h-full p-6">
-                <span className="tnum text-xs font-bold tracking-widest text-signal">{s.n}</span>
-                <h2 className="mt-3 text-lg font-bold leading-snug">{s.title}</h2>
-                <p className="font-bn mt-1 text-sm text-muted-foreground">{s.bn}</p>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
-              </Card>
+        <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {steps.map((s, i) => (
+            <li key={s.en} className="panel matte flex items-center gap-4 rounded-[18px] p-5">
+              <span className="grid h-16 w-16 shrink-0 place-items-center rounded-[18px] bg-accent/12 text-accent" aria-hidden>
+                <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                  <path d={paths[s.icon]!} />
+                </svg>
+              </span>
+              <span className="min-w-0">
+                <span className="font-bn block text-[14px] font-bold text-accent">
+                  {t(["১", "২", "৩", "৪", "৫"][i]!, `Step ${i + 1}`)}
+                </span>
+                <span className="font-bn mt-1 block text-[17px] font-bold leading-snug">{t(s.bn, s.en)}</span>
+              </span>
             </li>
           ))}
         </ol>
 
-        <Card className="mt-12 p-8">
-          <h2 className="text-2xl font-extrabold">What we will not do</h2>
-          <p className="mt-3 max-w-[64ch] text-sm leading-relaxed text-muted-foreground">
-            {siteConfig.policy} We will not undervalue an invoice, mislabel cargo, or move
-            counterfeit branded goods. If an order needs that to work, it is not an order we can
-            take, and we will tell you on day one rather than at the port.
+        <div className="panel matte mt-6 rounded-[18px] p-5">
+          <p className="font-bn text-[16px] font-semibold text-muted-foreground">
+            {t(siteConfig.policyBn, siteConfig.policy)}
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <ButtonAnchor href={generalInquiry()} target="_blank" rel="noopener noreferrer" variant="green" size="lg">
-              <WhatsAppIcon /> Ask a question
-            </ButtonAnchor>
-            <ButtonLink to="/sourcing" variant="glass" size="lg">
-              Try the sourcing desk
-            </ButtonLink>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <a
+              href={generalInquiry()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bn flex min-h-[60px] items-center justify-center gap-2 rounded-full bg-wa text-lg font-bold text-wa-foreground"
+            >
+              <WhatsAppIcon className="h-6 w-6" />
+              {t("শুরু করুন", "Start now")}
+            </a>
+            <a
+              href={telLink}
+              className="font-bn flex min-h-[60px] items-center justify-center rounded-full bg-foreground text-lg font-bold text-background"
+            >
+              {t("ফোন করুন", "Call")} {siteConfig.phoneDisplay}
+            </a>
           </div>
-        </Card>
+        </div>
       </Container>
     </Section>
   );
