@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -48,9 +48,9 @@ function SourcingPage() {
   );
 
   const tabs: { key: Mode; bn: string; en: string; icon: ReactNode }[] = [
-    { key: "search", bn: "নাম লিখুন", en: "Type name", icon: <SearchGlyph className="h-7 w-7" /> },
-    { key: "link", bn: "লিংক", en: "Link", icon: <LinkGlyph className="h-7 w-7" /> },
-    { key: "photo", bn: "ছবি", en: "Photo", icon: <CameraGlyph className="h-7 w-7" /> },
+    { key: "search", bn: "নাম লিখে খুঁজুন", en: "Search by name", icon: <SearchGlyph className="h-7 w-7" /> },
+    { key: "link", bn: "লিংক দিয়ে খুঁজুন", en: "Search by link", icon: <LinkGlyph className="h-7 w-7" /> },
+    { key: "photo", bn: "ছবি দিয়ে খুঁজুন", en: "Search by photo", icon: <CameraGlyph className="h-7 w-7" /> },
   ];
 
   return (
@@ -74,17 +74,26 @@ function SourcingPage() {
               aria-selected={mode === tab.key}
               onClick={() => setMode(tab.key)}
               className={cn(
-                "flex min-h-[76px] flex-col items-center justify-center gap-1.5 rounded-[16px] px-1 transition-colors",
+                "flex min-h-[84px] flex-col items-center justify-center gap-1.5 rounded-[16px] px-1 text-center transition-colors",
                 mode === tab.key
                   ? "bg-foreground text-background"
                   : "panel matte text-muted-foreground",
               )}
             >
               {tab.icon}
-              <span className="font-bn text-[13px] font-bold leading-none">{t(tab.bn, tab.en)}</span>
+              <span className="font-bn text-[12.5px] font-bold leading-tight">{t(tab.bn, tab.en)}</span>
             </button>
           ))}
         </div>
+
+        <Link
+          to="/catalog"
+          search={{ cat: "", q: "" }}
+          className="panel matte font-bn mt-3 flex min-h-[56px] items-center justify-between gap-3 rounded-[16px] px-4 text-[15px] font-bold"
+        >
+          <span>{t("বুঝতে পারছেন না কী আনবেন? ক্যাটালগ দেখুন", "Not sure what to import? Browse the catalogue")}</span>
+          <span aria-hidden className="text-accent">→</span>
+        </Link>
 
         <div className="mt-5">
           {mode === "photo" ? <PhotoPanel /> : null}

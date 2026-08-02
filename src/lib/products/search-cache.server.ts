@@ -97,6 +97,45 @@ export async function writeSearchCache(
 
 export type ShowcaseRow = { query: string; items: ProductSummary[] };
 
+export type CatalogueItem = ProductSummary & { query: string };
+
+/**
+ * Everything we have ever cached, flattened for the browsable catalogue.
+ * De-duplicated by marketplace + id so the same product never repeats.
+ */
+export async function readCatalogue(limit = 600): Promise<CatalogueItem[]> {
+  try {
+    const db = await admin();
+    const { data, error } = await db
+      .from("search_cache")
+      .select("query, results")
+      .gt("item_count", 0)
+      .order("hits", { ascending: false })
+      .order("updated_at", { ascending: false })
+      .limit(120);
+    if (error || !data) return [];
+    const seen = new Set<string>();
+    const out: CatalogueItem[] = [];
+    for (const row of data) {
+      const query = row.query as string;
+      const items = row.results as unknown as ProductSummary[];
+      if (!Array.isArray(items)) continue;
+      for (const item of items) {
+        if (!item?.id) continue;
+        const k = `${item.marketplace}-${item.id}`;
+        if (seen.has(k)) continue;
+        seen.add(k);
+        out.push({ ...item, query });
+        if (out.length >= limit) return out;
+      }
+    }
+    return out;
+  } catch (err) {
+    console.error("catalogue read failed", err);
+    return [];
+  }
+}
+
 /** Most searched keywords with their saved listings, for the homepage. */
 export async function readShowcase(limit = 4): Promise<ShowcaseRow[]> {
   try {

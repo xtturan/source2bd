@@ -1,7 +1,8 @@
 /**
  * Honesty rule: the marketplace number is the supplier price abroad.
- * We show it in its own currency, plus an *approximate* taka figure that is
- * always labelled আনুমানিক. The real Bangladesh total is quoted on WhatsApp.
+ * Both the foreign-currency figure and the taka figure carry the same 12%
+ * service markup, so the two numbers always agree with each other and nobody
+ * can argue that the yuan price is cheaper than the taka price.
  */
 export const MARKUP = 1.12;
 
@@ -19,7 +20,8 @@ export function formatBdt(amount: number) {
 }
 
 export function formatMarket(amount: number, currency: "CNY" | "USD") {
-  const n = Number.isInteger(amount) ? amount.toLocaleString("en-US") : amount.toFixed(2);
+  const marked = amount * MARKUP;
+  const n = marked >= 100 ? Math.round(marked).toLocaleString("en-US") : marked.toFixed(2);
   return currency === "USD" ? `$${n}` : `¥${n}`;
 }
 

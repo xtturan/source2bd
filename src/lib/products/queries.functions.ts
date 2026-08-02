@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { ProductDetail, ProductSummary, SearchResult } from "./types";
-import type { ShowcaseRow } from "./search-cache.server";
+import type { CatalogueItem, ShowcaseRow } from "./search-cache.server";
 
 export const searchProducts = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) =>
@@ -34,6 +34,14 @@ export const showcaseSearches = createServerFn({ method: "GET" }).handler(
   async (): Promise<ShowcaseRow[]> => {
     const { readShowcase } = await import("./search-cache.server");
     return readShowcase(4);
+  },
+);
+
+/** Every cached product, flattened, for the browsable catalogue. */
+export const catalogueProducts = createServerFn({ method: "GET" }).handler(
+  async (): Promise<CatalogueItem[]> => {
+    const { readCatalogue } = await import("./search-cache.server");
+    return readCatalogue(600);
   },
 );
 
