@@ -29,7 +29,9 @@ export const adminOverview = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { dhakaDay, DAILY_LIMIT } = await import("@/lib/api/quota.server");
 
-    const [profilesRes, rolesRes, devicesRes, usageRes, cacheRes] = await Promise.all([
+    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    const [profilesRes, rolesRes, devicesRes, usageRes, cacheRes, errorsRes] = await Promise.all([
       supabaseAdmin
         .from("profiles")
         .select("id, email, phone, full_name, signup_method, created_at")
@@ -43,6 +45,11 @@ export const adminOverview = createServerFn({ method: "GET" })
         .select("query, marketplace, item_count, hits, updated_at")
         .order("updated_at", { ascending: false })
         .limit(60),
+      supabaseAdmin
+        .from("system_errors")
+        .select("id, scope, message, detail, created_at")
+        .order("created_at", { ascending: false })
+        .limit(80),
     ]);
 
     const admins = new Set(
@@ -72,6 +79,14 @@ export const adminOverview = createServerFn({ method: "GET" })
       usedToday: usageByUser.get(p.id) ?? 0,
     }));
 
+    const errors = (errorsRes.data ?? []).map((e) => ({
+      id: e.id as string,
+      scope: e.scope as string,
+      message: e.message as string,
+      detail: (e.detail as string | null) ?? null,
+      createdAt: e.created_at as string,
+    }));
+
     return {
       limit: DAILY_LIMIT,
       day: dhakaDay(),
@@ -81,8 +96,10 @@ export const adminOverview = createServerFn({ method: "GET" })
         lookupsToday: usage.reduce((sum, r) => sum + r.used, 0),
         guestsToday: usage.filter((r) => !r.visitor_key.startsWith("user:")).length,
         cachedSearches: cacheRes.data?.length ?? 0,
+        errors24h: errors.filter((e) => e.createdAt >= since24h).length,
       },
       users,
+      errors,
       searches: (cacheRes.data ?? []).map((s) => ({
         query: s.query,
         marketplace: s.marketplace,

@@ -33,12 +33,18 @@ export const searchProducts = createServerFn({ method: "GET" })
       // Cache hit never burns the daily allowance.
       if (stored) return stored;
       quota = await consumeQuota("search", 1);
-      const fresh = await getProductProvider().search(data.q, {
-        marketplace: data.marketplace,
-        page: data.page,
-      });
-      await writeSearchCache(data.q, data.marketplace, data.page, fresh);
-      return fresh;
+      try {
+        const fresh = await getProductProvider().search(data.q, {
+          marketplace: data.marketplace,
+          page: data.page,
+        });
+        await writeSearchCache(data.q, data.marketplace, data.page, fresh);
+        return fresh;
+      } catch (err) {
+        const { noteIncident } = await import("@/lib/api/error-log.server");
+        noteIncident("search.keyword", err, `${data.marketplace} · "${data.q}" · page ${data.page}`);
+        throw err;
+      }
     });
 
     const state = quota ?? (await readQuota("search"));
@@ -104,7 +110,14 @@ export const productsByPhoto = createServerFn({ method: "POST" })
     const { searchByPhoto } = await import("./image-search.server");
     const { consumeQuota } = await import("@/lib/api/quota.server");
     const state = await consumeQuota("search", 1);
-    const res = await searchByPhoto(data.image, data.marketplace);
+    let res: Awaited<ReturnType<typeof searchByPhoto>>;
+    try {
+      res = await searchByPhoto(data.image, data.marketplace);
+    } catch (err) {
+      const { noteIncident } = await import("@/lib/api/error-log.server");
+      noteIncident("search.photo", err, data.marketplace);
+      throw err;
+    }
     return {
       items: res.items,
       searchLimit: state.limit,
