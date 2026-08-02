@@ -6,7 +6,7 @@ import { Container, Section, SectionHeading, Badge, EmptyState, Skeleton, Card }
 import { Button, ButtonAnchor, WhatsAppIcon } from "@/components/s2b/button";
 import { ProductCard } from "@/components/s2b/product-card";
 import { IconMic, IconSearch } from "@/components/s2b/big-action";
-import { searchProducts, productByUrl } from "@/lib/products/queries.functions";
+import { searchProducts, productByUrl, productsByPhoto } from "@/lib/products/queries.functions";
 import type { Marketplace, ProductDetail, ProductSummary } from "@/lib/products/types";
 import { currencySymbol, marketplaceLabels } from "@/lib/products/types";
 import { generalInquiry, productQuote } from "@/lib/whatsapp";
@@ -447,48 +447,211 @@ function LinkResult({ item }: { item: ProductDetail }) {
 }
 
 function PhotoPanel() {
+  const [preview, setPreview] = useState<string | null>(null);
+  const [marketplace, setMarketplace] = useState<"1688" | "taobao">("1688");
+  const [items, setItems] = useState<ProductSummary[] | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const byPhoto = useServerFn(productsByPhoto);
+
+  const mutation = useMutation({
+    mutationFn: (vars: { image: string; marketplace: "1688" | "taobao" }) =>
+      byPhoto({ data: vars }),
+    onSuccess: (res) => setItems(res.items),
+  });
+
+  // Phone cameras produce 4MB+ files, so shrink to a 1024px JPEG before upload.
+  async function pickFile(file: File) {
+    setFileError(null);
+    setItems(null);
+    if (!file.type.startsWith("image/")) {
+      setFileError("Choose a photo file (JPG, PNG or WEBP).");
+      return;
+    }
+    try {
+      const dataUrl = await shrinkImage(file);
+      setPreview(dataUrl);
+      mutation.mutate({ image: dataUrl, marketplace });
+    } catch {
+      setFileError("We could not read that photo. Try another one.");
+    }
+  }
+
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div>
-        <h3 className="text-lg font-bold">Send a photo, get matching suppliers</h3>
-        <p className="mt-2 max-w-[56ch] text-sm leading-relaxed text-muted-foreground">
-          Take a clear photo of the item on a plain background. Our desk runs it against the China
-          marketplaces and comes back with the closest factory listings, MOQ and a landed estimate
-          for {siteConfig.destinationCities.join(" and ")}.
-        </p>
-        <p className="font-bn mt-3 text-sm text-muted-foreground">
-          পণ্যের ছবি পাঠান, আমরা সাপ্লায়ার খুঁজে দেব।
-        </p>
-        <div className="mt-6">
+    <div>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
+        <div className="min-w-0">
+          <p className="font-bn text-base font-bold sm:text-lg">
+            পণ্যের ছবি দিন, মিল থাকা পণ্য দেখুন
+          </p>
+          <p className="mt-2 max-w-[56ch] text-sm leading-relaxed text-muted-foreground">
+            Take or upload one clear photo. We match it against the China marketplaces and show the
+            closest listings with a taka price.
+          </p>
+
+          <label className="mt-5 flex min-h-[168px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[16px] border-2 border-dashed border-border bg-background/50 px-5 py-8 text-center transition-colors hover:border-accent/60">
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="sr-only"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void pickFile(f);
+                e.target.value = "";
+              }}
+            />
+            {preview ? (
+              <img
+                src={preview}
+                alt="Your uploaded product"
+                className="max-h-40 w-auto rounded-[12px] object-contain"
+              />
+            ) : (
+              <IconCamera className="h-10 w-10 text-accent" />
+            )}
+            <span className="font-bn text-base font-bold">
+              {preview ? "অন্য ছবি দিন" : "ছবি তুলুন বা আপলোড করুন"}
+            </span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {preview ? "Change photo" : "Take or upload a photo"}
+            </span>
+          </label>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {([
+              { key: "1688", label: "1688" },
+              { key: "taobao", label: "Taobao" },
+            ] as const).map((m) => (
+              <button
+                key={m.key}
+                type="button"
+                onClick={() => {
+                  setMarketplace(m.key);
+                  if (preview) mutation.mutate({ image: preview, marketplace: m.key });
+                }}
+                className={cn(
+                  "min-h-11 rounded-full px-4 text-sm font-semibold transition-colors",
+                  marketplace === m.key
+                    ? "bg-foreground text-background"
+                    : "border border-border text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+
+          {fileError ? (
+            <p className="mt-3 text-sm font-semibold text-accent">{fileError}</p>
+          ) : null}
+        </div>
+
+        <Card className="min-w-0 p-5">
+          <h4 className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground sm:text-sm">
+            Photo checklist
+          </h4>
+          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+            {[
+              "One item per photo, plain background",
+              "Include the label or model number if there is one",
+              "Add a coin or hand for scale on small parts",
+              "Tell us the quantity you plan to order",
+            ].map((t) => (
+              <li key={t} className="flex gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
+                {t}
+              </li>
+            ))}
+          </ul>
           <ButtonAnchor
             href={generalInquiry("I want to send a product photo for sourcing")}
             target="_blank"
             rel="noopener noreferrer"
             variant="green"
-            size="lg"
+            className="mt-5 w-full"
           >
-            <WhatsAppIcon /> Send the photo on WhatsApp
+            <WhatsAppIcon /> Send it on WhatsApp
           </ButtonAnchor>
-        </div>
+        </Card>
       </div>
-      <Card className="p-5">
-        <h4 className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">
-          Photo checklist
-        </h4>
-        <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-          {[
-            "One item per photo, plain background",
-            "Include the label or model number if there is one",
-            "Add a coin or hand for scale on small parts",
-            "Tell us the quantity you plan to order",
-          ].map((t) => (
-            <li key={t} className="flex gap-3">
-              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
-              {t}
-            </li>
-          ))}
-        </ul>
-      </Card>
+
+      <div className="mt-8">
+        {mutation.isPending ? (
+          <>
+            <LiveProgress label="Matching your photo with marketplace listings" />
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-[3/4]" />
+              ))}
+            </div>
+          </>
+        ) : null}
+
+        {mutation.isError ? (
+          <EmptyState
+            title="Photo search did not come back"
+            body="Send the photo to our desk on WhatsApp and we will match it by hand today."
+            action={
+              <ButtonAnchor
+                href={generalInquiry("Photo search failed, here is my product photo")}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="green"
+              >
+                <WhatsAppIcon /> Send on WhatsApp
+              </ButtonAnchor>
+            }
+          />
+        ) : null}
+
+        {items && !mutation.isPending ? (
+          items.length ? (
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+              {items.map((p) => (
+                <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No close match found"
+              body="Try a photo with a plain background, or send it to our desk and we will search by hand."
+              action={
+                <ButtonAnchor
+                  href={generalInquiry("Photo search found nothing, please help me source this")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="green"
+                >
+                  <WhatsAppIcon /> Send on WhatsApp
+                </ButtonAnchor>
+              }
+            />
+          )
+        ) : null}
+      </div>
     </div>
+  );
+}
+
+/** Downscales a camera photo to a 1024px JPEG so the upload stays small. */
+async function shrinkImage(file: File): Promise<string> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, 1024 / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("no canvas");
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  return canvas.toDataURL("image/jpeg", 0.82);
+}
+
+function IconCamera({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className} aria-hidden>
+      <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" strokeLinejoin="round" />
+      <circle cx="12" cy="13.5" r="3.5" />
+    </svg>
   );
 }
