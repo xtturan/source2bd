@@ -27,3 +27,30 @@ npm run dev
 - TypeScript
 - React
 - Tailwind CSS
+
+## Owner checklist (Source2BD)
+
+**Daily**
+- Open `/admin` → check today's usage, new accounts, recent searches.
+- Watch for any account burning the full 30 searches every day.
+
+**Limits**
+- Every signed-in account gets **30 live lookups per day** (text + photo share one pot), reset at midnight Dhaka time.
+- Cached results are free and never count.
+- Reset someone's day from `/admin` → Reset quota.
+
+**Pricing**
+- Markup lives in `src/lib/products/pricing.ts` (`SOURCE_MARKUP`). Both the BDT price and the shown market price carry it.
+
+**Keys**
+- `ELIM_API_KEY` (1688/Taobao), `PARSE_API_KEY` (Alibaba/Amazon), `LOVABLE_API_KEY` (translation). Update them in Project Settings → Secrets.
+
+**Health**
+- `GET /api/public/health` returns `{ ok: true }`. Use it for uptime monitoring.
+
+**SEO**
+- Guides live in `src/lib/content/guides.ts`; adding one automatically adds it to `/guides` and `sitemap.xml`.
+- `/auth`, `/account`, `/admin` are set to `noindex`.
+
+**Contacts**
+- WhatsApp 8801752457930 · Phone 01752-457930 · Chawkbazar, Dhaka · Sat–Thu 10:00–20:00 · legal goods only.
