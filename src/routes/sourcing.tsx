@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Container, Section, Skeleton } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
 import { ProductCard } from "@/components/s2b/product-card";
@@ -403,6 +403,7 @@ const markets: { key: Marketplace; label: string }[] = [
 
 function SearchPanel() {
   const { t } = useLang();
+  const navigate = Route.useNavigate();
   const { q: initialQ } = Route.useSearch();
   const [q, setQ] = useState(initialQ ?? "");
   const [marketplace, setMarketplace] = useState<Marketplace>("1688");
@@ -421,6 +422,14 @@ function SearchPanel() {
     if (initialQ) run({ q: initialQ, marketplace: "1688" });
   }, [initialQ, run]);
 
+  function submit(value: string, market = marketplace) {
+    const text = value.trim();
+    if (!text) return;
+    // Keeps the query in the URL so back navigation restores the last search.
+    void navigate({ search: { q: text, mode: "search" }, replace: true });
+    mutation.mutate({ q: text, marketplace: market });
+  }
+
   return (
     <div>
       <label htmlFor="q" className="font-bn text-[18px] font-bold">
@@ -430,16 +439,26 @@ function SearchPanel() {
         className="mt-2 grid gap-3"
         onSubmit={(e) => {
           e.preventDefault();
-          if (q.trim()) mutation.mutate({ q, marketplace });
+          submit(q);
         }}
       >
-        <input
-          id="q"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder={t("যেমন: লেড লাইট", "for example: led light")}
-          className="font-bn h-16 w-full rounded-[16px] border border-input bg-paper px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        />
+        <div className="flex gap-2">
+          <input
+            id="q"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            enterKeyHint="search"
+            placeholder={t("কী লাগবে? যেমন: লেড লাইট, ফোন কভার", "What do you need? e.g. led light, phone cover")}
+            className="font-bn h-16 min-w-0 flex-1 rounded-[16px] border border-input bg-paper px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          />
+          <VoiceButton
+            onFinal={(text) => {
+              setQ(text);
+              submit(text);
+            }}
+            onInterim={(text) => setQ(text)}
+          />
+        </div>
         <button
           type="submit"
           disabled={mutation.isPending}
@@ -454,7 +473,7 @@ function SearchPanel() {
         type="button"
         onClick={() => setShowOptions((v) => !v)}
         aria-expanded={showOptions}
-        className="font-bn mt-3 text-[15px] font-bold text-muted-foreground underline"
+        className="font-bn mt-3 min-h-[48px] text-[15px] font-bold text-foreground/70 underline"
       >
         {t("আরও অপশন", "More options")}
       </button>
@@ -467,11 +486,11 @@ function SearchPanel() {
               type="button"
               onClick={() => {
                 setMarketplace(m.key);
-                if (q.trim()) mutation.mutate({ q, marketplace: m.key });
+                if (q.trim()) submit(q, m.key);
               }}
               className={cn(
                 "min-h-[48px] rounded-full px-5 text-[15px] font-bold transition-colors",
-                marketplace === m.key ? "bg-foreground text-background" : "border border-border text-muted-foreground",
+                marketplace === m.key ? "bg-foreground text-background" : "border border-border text-foreground/70",
               )}
             >
               {m.label}
@@ -490,8 +509,16 @@ function SearchPanel() {
             <Results items={items} />
           ) : (
             <HelpBox
-              title={t("কিছু পাওয়া যায়নি · ছবি পাঠান বা ফোন করুন", "Nothing found. Send a photo or call us.")}
+              title={t(
+                "কিছু পাইনি · অন্য নাম লিখুন, লিংক দিন, বা WhatsApp করুন",
+                "Nothing found. Try another name, paste a link, or message us.",
+              )}
               waHref={generalInquiry(q)}
+              onRetry={() => {
+                setItems(null);
+                setQ("");
+                document.getElementById("q")?.focus();
+              }}
             />
           )
         ) : null}
@@ -502,88 +529,192 @@ function SearchPanel() {
 
 /* ------------------------------ voice ----------------------------- */
 
-function VoicePanel({ onText }: { onText: () => void }) {
+type VoiceState = "idle" | "listening" | "processing" | "error" | "unsupported";
+
+/**
+ * Mic sits beside the search box and fills the very same input.
+ * Every state is spoken out loud in Bangla: idle, listening, heard, failed.
+ */
+function VoiceButton({
+  onFinal,
+  onInterim,
+}: {
+  onFinal: (text: string) => void;
+  onInterim: (text: string) => void;
+}) {
   const { t } = useLang();
-  const [ready, setReady] = useState(false);
-  const [listening, setListening] = useState(false);
+  const [state, setState] = useState<VoiceState>("idle");
   const [heard, setHeard] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const recRef = useRef<any>(null);
 
   useEffect(() => {
-    setReady(
-      typeof window !== "undefined" &&
-        Boolean(
-          (window as unknown as { SpeechRecognition?: unknown }).SpeechRecognition ??
-            (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition,
-        ),
-    );
+    const Ctor =
+      (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!Ctor) setState("unsupported");
+    return () => {
+      try {
+        recRef.current?.stop();
+      } catch {
+        /* already stopped */
+      }
+    };
   }, []);
 
+  function stop() {
+    try {
+      recRef.current?.stop();
+    } catch {
+      /* ignore */
+    }
+    recRef.current = null;
+    setState("idle");
+  }
+
   function start() {
-    const Ctor =
-      (window as unknown as { SpeechRecognition?: new () => any }).SpeechRecognition ??
-      (window as unknown as { webkitSpeechRecognition?: new () => any }).webkitSpeechRecognition;
-    if (!Ctor) return;
+    const Ctor = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!Ctor) {
+      setState("unsupported");
+      return;
+    }
+    setError(null);
+    setHeard("");
     const rec = new Ctor();
+    recRef.current = rec;
     rec.lang = "bn-BD";
-    rec.interimResults = false;
+    rec.continuous = false;
+    rec.interimResults = true;
+    let finalText = "";
     rec.onresult = (e: any) => {
-      const text = String(e.results?.[0]?.[0]?.transcript ?? "").trim();
-      if (text) setHeard(text);
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i += 1) {
+        const r = e.results[i];
+        if (r.isFinal) finalText += r[0].transcript;
+        else interim += r[0].transcript;
+      }
+      setHeard((finalText + interim).trim());
+      if (interim.trim()) onInterim((finalText + interim).trim());
     };
-    rec.onend = () => setListening(false);
-    rec.onerror = () => setListening(false);
-    setListening(true);
-    rec.start();
+    rec.onerror = (e: any) => {
+      const code = String(e?.error ?? "");
+      setState("error");
+      setError(
+        code === "not-allowed" || code === "service-not-allowed"
+          ? t("মাইক বন্ধ আছে · সেটিংস থেকে মাইক অন করুন অথবা টাইপ করুন", "The mic is blocked. Turn it on in settings, or type instead.")
+          : t("বুঝতে পারিনি · আবার বলুন বা টাইপ করুন", "We did not catch that. Say it again or type it."),
+      );
+    };
+    rec.onend = () => {
+      recRef.current = null;
+      const text = finalText.trim();
+      if (text.length >= 2) {
+        setState("processing");
+        setHeard(text);
+        onFinal(text);
+        setTimeout(() => setState("idle"), 600);
+      } else {
+        setState((s) => (s === "error" ? s : "error"));
+        setError((prev) => prev ?? t("বুঝতে পারিনি · আবার বলুন বা টাইপ করুন", "We did not catch that. Say it again or type it."));
+      }
+    };
+    setState("listening");
+    try {
+      rec.start();
+    } catch {
+      setState("error");
+      setError(t("মাইক চালু করা গেল না · টাইপ করুন", "The mic could not start. Please type instead."));
+    }
   }
 
   return (
-    <div className="panel matte rounded-[20px] p-6 text-center">
-      <p className="font-bn text-[18px] font-bold">{t("পণ্যের নাম বলুন", "Say the product name")}</p>
+    <>
+      <button
+        type="button"
+        onClick={() => (state === "listening" ? stop() : start())}
+        aria-pressed={state === "listening"}
+        aria-label={state === "listening" ? t("শোনা বন্ধ করুন", "Stop listening") : t("মাইকে বলুন", "Speak")}
+        className={cn(
+          "grid h-16 w-16 shrink-0 place-items-center rounded-[16px] transition-colors",
+          state === "listening"
+            ? "animate-pulse bg-accent text-accent-foreground"
+            : "bg-foreground text-background",
+        )}
+      >
+        <MicGlyph className="h-8 w-8" />
+      </button>
 
-      {ready ? (
-        <>
-          <button
-            type="button"
-            onClick={start}
-            aria-label={t("বলুন", "Speak")}
-            className={cn(
-              "mx-auto mt-5 grid h-28 w-28 place-items-center rounded-full text-accent-foreground",
-              listening ? "animate-pulse bg-accent" : "bg-foreground text-background",
-            )}
-          >
-            <MicGlyph className="h-12 w-12" />
-          </button>
-          {heard ? (
-            <>
-              <p className="font-bn mt-4 text-[18px] font-bold">{heard}</p>
+      <div className="col-span-full w-full" aria-live="polite">
+        {state === "idle" && !heard ? (
+          <p className="font-bn mt-1 text-[14px] font-semibold text-foreground/70">
+            {t("মাইক চাপলে ফোন অনুমতি চাইবে · তারপর স্পষ্ট করে বলুন", "Tapping the mic asks for permission, then speak clearly.")}
+          </p>
+        ) : null}
+        {state === "listening" ? (
+          <div className="mt-2 rounded-[16px] border-2 border-accent bg-accent/10 p-4">
+            <p className="font-bn text-[18px] font-extrabold">{t("শুনছি…", "Listening…")}</p>
+            <p className="font-bn mt-1 text-[15px] font-semibold">
+              {t("বলুন · শেষ হলে আবার মাইকে চাপুন", "Speak, then tap the mic again when you finish.")}
+            </p>
+            {heard ? (
+              <p className="font-bn mt-3 text-[17px] font-bold">
+                {t("আপনি বলছেন:", "You are saying:")} {heard}
+              </p>
+            ) : null}
+            <button
+              type="button"
+              onClick={stop}
+              className="font-bn mt-3 min-h-[48px] rounded-full border border-foreground/20 bg-paper px-5 text-[15px] font-bold"
+            >
+              {t("বাতিল", "Cancel")}
+            </button>
+          </div>
+        ) : null}
+        {state === "processing" && heard ? (
+          <p className="font-bn mt-2 text-[15px] font-bold">
+            {t("আপনি বলেছেন:", "You said:")} {heard} · {t("লিখেছি · এখন ‘খুঁজুন’ চাপুন", "Filled in. Now press Search.")}
+          </p>
+        ) : null}
+        {state === "error" && error ? (
+          <div className="mt-2 rounded-[16px] border-2 border-accent/40 bg-accent/10 p-4">
+            <p className="font-bn text-[16px] font-bold">{error}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={onText}
-                className="font-bn mt-3 min-h-[56px] w-full rounded-full bg-accent px-5 text-lg font-bold text-accent-foreground"
+                onClick={start}
+                className="font-bn min-h-[48px] rounded-full bg-foreground px-5 text-[15px] font-bold text-background"
               >
-                {t("এটা দিয়ে খুঁজুন", "Search with this")}
+                {t("আবার বলুন", "Speak again")}
               </button>
-            </>
-          ) : null}
-        </>
-      ) : null}
-
-      <a
-        href={voiceInquiry()}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="font-bn mt-5 flex min-h-[64px] items-center justify-center gap-2 rounded-full bg-wa text-xl font-bold text-wa-foreground"
-      >
-        <WhatsAppIcon className="h-6 w-6" />
-        {t("বলতে হোয়াটসঅ্যাপ খুলুন", "Open WhatsApp to speak")}
-      </a>
-      <a
-        href={telLink}
-        className="font-bn mt-3 flex min-h-[60px] items-center justify-center rounded-full bg-foreground text-lg font-bold text-background"
-      >
-        {t("ফোন করুন", "Call")} {siteConfig.phoneDisplay}
-      </a>
-    </div>
+              <a
+                href={voiceInquiry()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bn flex min-h-[48px] items-center gap-2 rounded-full bg-wa px-5 text-[15px] font-bold text-wa-foreground"
+              >
+                <WhatsAppIcon className="h-4 w-4" />
+                {t("WhatsApp-এ বলুন", "Say it on WhatsApp")}
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  setState("idle");
+                  setError(null);
+                  document.getElementById("q")?.focus();
+                }}
+                className="font-bn min-h-[48px] rounded-full border border-foreground/20 bg-paper px-5 text-[15px] font-bold"
+              >
+                {t("টাইপ করুন", "Type instead")}
+              </button>
+            </div>
+          </div>
+        ) : null}
+        {state === "unsupported" ? (
+          <p className="font-bn mt-1 text-[14px] font-semibold text-foreground/70">
+            {t("এই ফোনে ভয়েস চলছে না · নাম টাইপ করুন বা WhatsApp-এ বলুন", "Voice is not available on this phone. Type the name or tell us on WhatsApp.")}
+          </p>
+        ) : null}
+      </div>
+    </>
   );
 }
 
