@@ -1,14 +1,14 @@
 import type { ProductProvider } from "./types";
 import { mockProvider } from "./mock-provider";
-import { createApifyProvider } from "./apify-provider.server";
 import { createParseProvider } from "./parse-provider.server";
+import { createElimProvider } from "./elim-provider.server";
 
-/** PRODUCT_PROVIDER=parse (live, default) | apify (legacy) | mock (zero cost). */
+/** PRODUCT_PROVIDER=elim (live, default) | parse-legacy (parse.bot only) | mock (zero cost). */
 export function getProductProvider(): ProductProvider {
-  const name = (process.env["PRODUCT_PROVIDER"] ?? "parse").toLowerCase();
+  const name = (process.env["PRODUCT_PROVIDER"] ?? "elim").toLowerCase();
   if (name === "mock") return mockProvider;
-  if (name === "apify" && process.env["USE_APIFY"] === "true") return createApifyProvider();
-  return createParseProvider();
+  if (name === "parse-legacy") return createParseProvider();
+  return createElimProvider();
 }
 
 export const providerFallbackMessage =
