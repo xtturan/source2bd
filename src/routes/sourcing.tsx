@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Container, Section, Skeleton } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
@@ -11,7 +11,7 @@ import { generalInquiry, linkInquiry, photoInquiry, telLink, voiceInquiry } from
 import { siteConfig } from "@/config/site";
 import { useLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import { QuotaBar, LimitReached, useQuotaState } from "@/components/s2b/quota-bar";
+import { QuotaBar, LimitReached } from "@/components/s2b/quota-bar";
 
 export const Route = createFileRoute("/sourcing")({
   head: () => ({
@@ -254,9 +254,13 @@ function PhotoPanel() {
   const [dragging, setDragging] = useState(false);
   const byPhoto = useServerFn(productsByPhoto);
 
+  const qc = useQueryClient();
   const mutation = useMutation({
     mutationFn: (image: string) => byPhoto({ data: { image, marketplace: "1688" as const } }),
-    onSuccess: (res) => setItems(res.items),
+    onSuccess: (res) => {
+      setItems(res.items);
+      void qc.invalidateQueries({ queryKey: ["my-quota"] });
+    },
   });
 
   async function pickFile(file: File) {
@@ -488,10 +492,14 @@ function SearchPanel() {
   const [items, setItems] = useState<ProductSummary[] | null>(null);
   const search = useServerFn(searchProducts);
 
+  const qc = useQueryClient();
   const mutation = useMutation({
     mutationFn: (vars: { q: string; marketplace: Marketplace }) =>
       search({ data: { q: vars.q, marketplace: vars.marketplace, page: 1 } }),
-    onSuccess: (res) => setItems(res.items),
+    onSuccess: (res) => {
+      setItems(res.items);
+      void qc.invalidateQueries({ queryKey: ["my-quota"] });
+    },
   });
 
   const run = mutation.mutate;
