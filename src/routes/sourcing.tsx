@@ -456,6 +456,7 @@ function PhotoPanel() {
   const [marketplace, setMarketplace] = useState<"1688" | "taobao">("1688");
   const [items, setItems] = useState<ProductSummary[] | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
   const byPhoto = useServerFn(productsByPhoto);
 
   const mutation = useMutation({
@@ -481,6 +482,21 @@ function PhotoPanel() {
     }
   }
 
+  // Ctrl+V / Cmd+V anywhere on the page drops a copied image straight in.
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const file = Array.from(e.clipboardData?.files ?? []).find((f) =>
+        f.type.startsWith("image/"),
+      );
+      if (!file) return;
+      e.preventDefault();
+      void pickFile(file);
+    }
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marketplace]);
+
   return (
     <div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
@@ -493,7 +509,25 @@ function PhotoPanel() {
             closest listings with a taka price.
           </p>
 
-          <label className="mt-5 flex min-h-[168px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[16px] border-2 border-dashed border-border bg-background/50 px-5 py-8 text-center transition-colors hover:border-accent/60">
+          <label
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              const f = Array.from(e.dataTransfer.files).find((x) => x.type.startsWith("image/"));
+              if (f) void pickFile(f);
+            }}
+            className={cn(
+              "mt-5 flex min-h-[168px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[16px] border-2 border-dashed px-5 py-8 text-center transition-colors",
+              dragging
+                ? "border-accent bg-accent/10"
+                : "border-border bg-background/50 hover:border-accent/60",
+            )}
+          >
             <input
               type="file"
               accept="image/*"
@@ -519,6 +553,9 @@ function PhotoPanel() {
             </span>
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {preview ? "Change photo" : "Take or upload a photo"}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              Drag and drop, or paste with Ctrl + V
             </span>
           </label>
 

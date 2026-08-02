@@ -271,6 +271,52 @@ async function detailElim(market: Marketplace, id: string): Promise<ProductDetai
   return mapDetail(market, data, id);
 }
 
+/**
+ * Elim's image search only accepts an image the marketplace itself has
+ * indexed, so the photo is pushed through their upload endpoint first and the
+ * returned image id drives the match. Any URL we host is rejected outright.
+ */
+export async function uploadPhotoToElim(bytes: Uint8Array, mime: string): Promise<string> {
+  const key = env("ELIM_API_KEY");
+  if (!key) throw new ProviderUnavailableError("Photo search is not switched on yet.");
+  const form = new FormData();
+  const ext = mime === "image/png" ? "png" : mime === "image/webp" ? "webp" : "jpg";
+  form.append("file", new Blob([bytes as unknown as BlobPart], { type: mime }), `photo.${ext}`);
+  const res = await fetch(`${BASE}/v1/products/upload-image`, {
+    method: "POST",
+    headers: { "x-api-key": key },
+    body: form,
+    signal: AbortSignal.timeout(45_000),
+  });
+  const json = (await res.json().catch(() => ({}))) as Raw;
+  const id = str(obj(json["data"])["image_id"]) ?? str(json["image_id"]);
+  if (!res.ok || !id) {
+    console.error("elim photo upload failed", res.status, JSON.stringify(json).slice(0, 300));
+    throw new ProviderUnavailableError("We could not read that photo. Try a clearer one.");
+  }
+  return id;
+}
+
+/** Runs the marketplace photo match for an already uploaded image id. */
+export async function searchElimByImageId(
+  imageId: string,
+  marketplace: Marketplace,
+): Promise<ProductSummary[]> {
+  const market: Marketplace = marketplace === "taobao" ? "taobao" : "1688";
+  const data = await call("/v1/products/search-img", {
+    img_id: imageId,
+    platform: platformFor(market),
+    page: 1,
+    size: PAGE_SIZE,
+    lang: "en",
+  });
+  return list(data["items"])
+    .map((row) => mapItem(market, row))
+    .filter((x): x is ProductDetail => !!x)
+    .slice(0, PAGE_SIZE)
+    .map(toSummary);
+}
+
 function offerIdFromUrl(url: string) {
   return (
     /\/offer\/(\d+)\.html/.exec(url)?.[1] ??
