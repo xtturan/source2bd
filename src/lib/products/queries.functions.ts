@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { ProductDetail, SearchResult } from "./types";
+import type { ProductDetail, ProductSummary, SearchResult } from "./types";
 import type { ShowcaseRow } from "./search-cache.server";
 
 export const searchProducts = createServerFn({ method: "GET" })
