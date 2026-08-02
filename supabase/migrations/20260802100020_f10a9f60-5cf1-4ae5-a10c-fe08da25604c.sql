@@ -1,0 +1,2 @@
+REVOKE ALL ON FUNCTION public.consume_daily_usage(text, date, integer, integer) FROM anon, authenticated, PUBLIC;
+GRANT EXECUTE ON FUNCTION public.consume_daily_usage(text, date, integer, integer) TO service_role;
