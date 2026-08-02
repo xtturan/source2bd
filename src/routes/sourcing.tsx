@@ -27,6 +27,7 @@ export const Route = createFileRoute("/sourcing")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://source2bd.lovable.app/sourcing" }],
   }),
   component: SourcingPage,
   validateSearch: (s: Record<string, unknown>): { q?: string; mode?: Mode } => {

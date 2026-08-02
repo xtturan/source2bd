@@ -24,7 +24,7 @@ export const Route = createFileRoute("/product/$marketplace/$id")({
       return { item: null, marketplace, id: params.id };
     }
   },
-  head: ({ loaderData }) => {
+  head: ({ loaderData, params }) => {
     const title = loaderData?.item?.title ?? "পণ্যের বিস্তারিত";
     const desc =
       "মার্কেটের দাম দেখুন, তারপর WhatsApp-এ বাংলাদেশ পর্যন্ত পুরো দাম (শিপিং চার্জসহ) জেনে নিন।";
@@ -36,6 +36,12 @@ export const Route = createFileRoute("/product/$marketplace/$id")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "product" },
         { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [
+        {
+          rel: "canonical",
+          href: `https://source2bd.lovable.app/product/${params.marketplace}/${params.id}`,
+        },
       ],
     };
   },
