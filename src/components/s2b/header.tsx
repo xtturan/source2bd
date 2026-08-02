@@ -7,11 +7,13 @@ import { siteConfig } from "@/config/site";
 import { generalInquiry, telLink } from "@/lib/whatsapp";
 import { useLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { useSession } from "@/lib/auth/session";
 
 /** Minimal header: logo, language, WhatsApp, phone. Nothing else competes. */
 export function Header() {
   const { lang, setLang, t } = useLang();
   const [scrolled, setScrolled] = useState(false);
+  const { user } = useSession();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -57,6 +59,21 @@ export function Header() {
             </button>
           ))}
         </div>
+
+        <Link
+          to={user ? "/account" : "/auth"}
+          aria-label={user ? t("আমার অ্যাকাউন্ট", "My account") : t("লগইন", "Log in")}
+          className="font-bn grid h-12 min-w-12 place-items-center rounded-full border border-foreground/12 px-3 text-[14px] font-bold text-foreground"
+        >
+          {user ? (
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <circle cx="12" cy="8" r="3.5" />
+              <path d="M5 20a7 7 0 0 1 14 0" />
+            </svg>
+          ) : (
+            t("লগইন", "Log in")
+          )}
+        </Link>
 
         <a
           href={generalInquiry()}

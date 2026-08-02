@@ -53,8 +53,32 @@ async function sha(input: string) {
     .slice(0, 32);
 }
 
+/** Signed in accounts get their own pot; guests fall back to device + IP. */
+async function signedInUserId(): Promise<string | null> {
+  try {
+    const request = getRequest();
+    const auth = request.headers.get("authorization");
+    const token = auth?.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : null;
+    if (!token) return null;
+    const { createClient } = await import("@supabase/supabase-js");
+    const url = process.env["SUPABASE_URL"];
+    const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
+    if (!url || !key) return null;
+    const client = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data } = await client.auth.getUser(token);
+    return data.user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** IP + a server-set http-only cookie, hashed so we never store raw IPs. */
 async function visitorKey() {
+  const userId = await signedInUserId();
+  if (userId) return `user:${userId}`;
+
   const request = getRequest();
   const headers = request.headers;
   const ip =
