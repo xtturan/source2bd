@@ -37,6 +37,22 @@ export const showcaseSearches = createServerFn({ method: "GET" }).handler(
   },
 );
 
+/** Photo search: upload the picture, then match it on the marketplace. */
+export const productsByPhoto = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        image: z.string().trim().min(64).max(11_500_000),
+        marketplace: z.enum(["1688", "taobao"]).default("1688"),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }): Promise<{ items: ProductSummary[] }> => {
+    const { searchByPhoto } = await import("./image-search.server");
+    const res = await searchByPhoto(data.image, data.marketplace);
+    return { items: res.items };
+  });
+
 export const productByUrl = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ url: z.string().trim().min(8).max(600) }).parse(d))
   .handler(async ({ data }): Promise<ProductDetail | null> => {
