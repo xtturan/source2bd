@@ -128,6 +128,33 @@ export type Database = {
         }
         Relationships: []
       }
+      system_errors: {
+        Row: {
+          created_at: string
+          detail: string | null
+          id: string
+          message: string
+          scope: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          message: string
+          scope: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          message?: string
+          scope?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_burst_log: {
         Row: {
           action: string
