@@ -253,8 +253,12 @@ export function createElimProvider(): ProductProvider {
       const page = opts?.page ?? 1;
 
       if (marketplace === "global") {
-        const native = FANOUT_ORIGINS.filter((m) => m === "1688" || m === "taobao");
-        const others = FANOUT_ORIGINS.filter((m) => !native.includes(m) && m !== "global");
+        const native = FANOUT_ORIGINS.filter(
+          (m): m is "1688" | "taobao" => m === "1688" || m === "taobao",
+        );
+        const others = FANOUT_ORIGINS.filter(
+          (m) => m !== "1688" && m !== "taobao" && m !== "global",
+        );
         const per = Math.ceil(PAGE_SIZE / (native.length + others.length));
         const settled = await Promise.allSettled([
           ...native.map((m) => searchElim(m, query, page, per)),

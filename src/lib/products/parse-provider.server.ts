@@ -28,14 +28,14 @@ function env(key: string) {
   return process.env[key]?.trim() || "";
 }
 
-const DEFAULT_SCRAPERS: Record<Exclude<Marketplace, "global">, string> = {
+const DEFAULT_SCRAPERS: Record<Exclude<Marketplace, "global" | "taobao">, string> = {
   "1688": "aa6e2b5e-7963-46f5-a6c2-e326775ceae4",
   alibaba: "ba2822dd-f985-4faa-8d3b-81d795bda2a7",
   aliexpress: "f989ff95-1fce-426d-935d-2b3787e3f343",
   amazon: "e1dc349c-16b6-498a-a7e6-2462aef5b5b4",
 };
 
-function scraperFor(marketplace: Exclude<Marketplace, "global">) {
+function scraperFor(marketplace: Exclude<Marketplace, "global" | "taobao">) {
   switch (marketplace) {
     case "alibaba":
       return env("PARSE_ALIBABA_SCRAPER") || DEFAULT_SCRAPERS.alibaba;
