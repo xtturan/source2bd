@@ -18,6 +18,11 @@
   --color-clay-600: #bc4415;
   --color-paper: #fcfbf9;
 
+  /* Official WhatsApp green, reserved for chat actions only */
+  --color-wa: #1faa54;
+  --color-wa-600: #179146;
+  --color-wa-foreground: #ffffff;
+
   /* Radius rule: surfaces 18, controls 12, primary buttons pill */
   --radius-card: 18px;
   --radius-control: 12px;
