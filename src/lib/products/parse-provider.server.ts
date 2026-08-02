@@ -7,7 +7,6 @@ import type {
 } from "./types";
 import { FANOUT_ORIGINS, PAGE_SIZE } from "./types";
 import { mockProvider, parseProductUrl } from "./mock-provider";
-import { translateProducts, translateQuery } from "./translate.server";
 
 /**
  * parse.bot provider.
@@ -266,7 +265,7 @@ async function searchOne(
 ): Promise<ProductSummary[]> {
   // 1688 is a Chinese-language index: search it with the Chinese phrase so
   // qualifiers like "red" survive, and leave the others on English.
-  const q = marketplace === "1688" ? await translateQuery(query) : query;
+  const q = query;
   const data = await call(scraperFor(marketplace), "search_products", { query: q, page });
   const map = mapperFor(marketplace);
   return rows(data, ...listKeys(marketplace))
@@ -455,11 +454,11 @@ export function createParseProvider(): ProductProvider {
             "Live marketplace search did not come back. Send the keyword on WhatsApp and we will source it by hand.",
           );
         }
-        return { items: await translateProducts(items.slice(0, PAGE_SIZE)), page };
+        return { items: items.slice(0, PAGE_SIZE), page };
       }
 
       const single = await searchOne(marketplace, query, page, PAGE_SIZE);
-      return { items: await translateProducts(single), page };
+      return { items: single, page };
     },
 
     async getById(id, marketplace = "1688"): Promise<ProductDetail | null> {
@@ -467,7 +466,7 @@ export function createParseProvider(): ProductProvider {
       try {
         const detail = await detailFor(target, id);
         if (!detail) return mockProvider.getById(id, marketplace);
-        return (await translateProducts([detail]))[0] ?? detail;
+        return ([detail])[0] ?? detail;
       } catch (err) {
         console.error("parse detail failed", err);
         return mockProvider.getById(id, marketplace);
@@ -481,7 +480,7 @@ export function createParseProvider(): ProductProvider {
       try {
         const detail = await detailFor(target, parsed.id);
         if (!detail) return mockProvider.getByUrl(url);
-        return (await translateProducts([detail]))[0] ?? detail;
+        return ([detail])[0] ?? detail;
       } catch (err) {
         console.error("parse by-url failed", err);
         return mockProvider.getByUrl(url);
@@ -502,7 +501,7 @@ export function createParseProvider(): ProductProvider {
       if (!items.length) {
         return mockProvider.searchByImage ? mockProvider.searchByImage(imageUrl) : { items: [] };
       }
-      return { items: await translateProducts(items) };
+      return { items: items };
     },
   };
 }

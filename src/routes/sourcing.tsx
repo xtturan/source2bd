@@ -36,6 +36,7 @@ export const Route = createFileRoute("/sourcing")({
 
 const markets: { key: Marketplace; label: string }[] = [
   { key: "1688", label: "1688" },
+  { key: "taobao", label: "Taobao" },
   { key: "global", label: "All origins" },
   { key: "alibaba", label: "Alibaba" },
   { key: "aliexpress", label: "AliExpress" },
