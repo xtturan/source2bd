@@ -7,7 +7,7 @@ import { useLang } from "@/lib/i18n";
 const items = [
   { to: "/", bn: "হোম", en: "Home", icon: "M3 11.5 12 4l9 7.5M6 10v9h12v-9" },
   { to: "/sourcing", bn: "খুঁজুন", en: "Find", icon: "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14ZM20 20l-4-4" },
-  { to: "/quote", bn: "দাম জানুন", en: "Price", icon: "M12 3v18M8 7.5h6.5a2.5 2.5 0 0 1 0 5h-5a2.5 2.5 0 0 0 0 5H16" },
+  { to: "/quote", bn: "শিপিংসহ দাম", en: "Full price", icon: "M12 3v18M8 7.5h6.5a2.5 2.5 0 0 1 0 5h-5a2.5 2.5 0 0 0 0 5H16" },
   {
     to: "/track",
     bn: "ট্র্যাক",

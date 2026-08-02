@@ -22,7 +22,7 @@ export const siteConfig = {
 
 export const navLinks = [
   { to: "/sourcing", label: "Sourcing", bn: "খুঁজুন" },
-  { to: "/quote", label: "Get a price", bn: "দাম জানুন" },
+  { to: "/quote", label: "Full price", bn: "শিপিংসহ দাম" },
   { to: "/services", label: "Services", bn: "সার্ভিস" },
   { to: "/how-it-works", label: "How it works", bn: "কীভাবে কাজ করে" },
   { to: "/track", label: "Track", bn: "ট্র্যাক" },

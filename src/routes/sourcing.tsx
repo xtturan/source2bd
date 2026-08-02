@@ -19,10 +19,10 @@ export const Route = createFileRoute("/sourcing")({
       {
         name: "description",
         content:
-          "পণ্যের ছবি তুলুন বা ১৬৮৮, আলিবাবা, অ্যামাজনের লিংক দিন। মিল থাকা পণ্য দেখুন, তারপর হোয়াটসঅ্যাপে বাংলাদেশের দাম জেনে নিন।",
+          "পণ্যের ছবি তুলুন বা ১৬৮৮, আলিবাবা, অ্যামাজনের লিংক দিন। মিল থাকা পণ্য দেখুন, তারপর WhatsApp-এ বাংলাদেশ পর্যন্ত পুরো দাম (শিপিংসহ) জেনে নিন।",
       },
       { property: "og:title", content: "পণ্য খুঁজুন · Source2BD" },
-      { property: "og:description", content: "ছবি বা লিংক দিন, মিল থাকা পণ্য দেখুন, দাম জেনে নিন।" },
+      { property: "og:description", content: "নাম লিখুন, লিংক বা ছবি দিন, বাংলাদেশ পর্যন্ত পুরো দাম জেনে নিন।" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
