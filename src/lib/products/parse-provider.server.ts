@@ -430,7 +430,8 @@ export function createParseProvider(): ProductProvider {
 
       if (marketplace === "global") {
         const origins = FANOUT_ORIGINS.filter(
-          (m): m is Exclude<Marketplace, "global"> => m !== "global",
+          (m): m is Exclude<Marketplace, "global" | "taobao"> =>
+            m !== "global" && m !== "taobao",
         );
         const per = Math.ceil(PAGE_SIZE / origins.length);
         const settled = await Promise.allSettled(
@@ -455,12 +456,14 @@ export function createParseProvider(): ProductProvider {
         return { items: items.slice(0, PAGE_SIZE), page };
       }
 
+      if (marketplace === "taobao")
+        throw new ProviderUnavailableError("Taobao is served by the live desk, not this source.");
       const single = await searchOne(marketplace, query, page, PAGE_SIZE);
       return { items: single, page };
     },
 
     async getById(id, marketplace = "1688"): Promise<ProductDetail | null> {
-      const target = marketplace === "global" ? "1688" : marketplace;
+      const target = marketplace === "global" || marketplace === "taobao" ? "1688" : marketplace;
       try {
         const detail = await detailFor(target, id);
         if (!detail) return mockProvider.getById(id, marketplace);
@@ -474,7 +477,10 @@ export function createParseProvider(): ProductProvider {
     async getByUrl(url): Promise<ProductDetail | null> {
       const parsed = parseProductUrl(url);
       if (!parsed) return mockProvider.getByUrl(url);
-      const target = parsed.marketplace === "global" ? "1688" : parsed.marketplace;
+      const target =
+        parsed.marketplace === "global" || parsed.marketplace === "taobao"
+          ? "1688"
+          : parsed.marketplace;
       try {
         const detail = await detailFor(target, parsed.id);
         if (!detail) return mockProvider.getByUrl(url);
