@@ -579,17 +579,16 @@ function SearchPanel() {
       <div className="mt-6">
         {mutation.isPending ? <Searching /> : null}
         {mutation.isError ? (
-          <HelpBox
-            title={
-              isQuota(mutation.error)
-                ? t(
-                    "আজকের ৩০টি ফ্রি সার্চ শেষ · WhatsApp-এ মেসেজ দিন, আমরা দাম বের করে দেব",
-                    "Today's 30 free searches are used up. Message us on WhatsApp and we will price it for you.",
-                  )
-                : t("এখন খুঁজে পাওয়া গেল না", "Search did not come back")
-            }
-            waHref={generalInquiry(q)}
-          />
+          isLoginRequired(mutation.error) ? (
+            <LoginWall />
+          ) : isQuota(mutation.error) ? (
+            <LimitReached />
+          ) : (
+            <HelpBox
+              title={t("এখন খুঁজে পাওয়া গেল না", "Search did not come back")}
+              waHref={generalInquiry(q)}
+            />
+          )
         ) : null}
         {items && !mutation.isPending ? (
           items.length ? (
