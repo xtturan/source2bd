@@ -258,13 +258,11 @@ function toSummary(d: ProductDetail): ProductSummary {
 }
 
 async function searchOne(
-  marketplace: Exclude<Marketplace, "global">,
+  marketplace: Exclude<Marketplace, "global" | "taobao">,
   query: string,
   page: number,
   limit: number,
 ): Promise<ProductSummary[]> {
-  // 1688 is a Chinese-language index: search it with the Chinese phrase so
-  // qualifiers like "red" survive, and leave the others on English.
   const q = query;
   const data = await call(scraperFor(marketplace), "search_products", { query: q, page });
   const map = mapperFor(marketplace);
