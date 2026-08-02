@@ -299,29 +299,6 @@ function ShowcaseCatalogue({ rows }: { rows: ShowcaseRow[] }) {
   );
 }
 
-function LegacyFeaturedCatalogue({ products }: { products: ReturnType<typeof featuredProducts> }) {
-  return (
-    <Section className="pt-0">
-      <Container>
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <SectionHeading
-            title="What a quote looks like before you send it"
-            intro="These are demo listings running on zero API cost. Every card deep links into a prefilled WhatsApp message so nothing gets retyped."
-          />
-          <ButtonLink to="/sourcing" variant="glass">
-            Open the sourcing desk
-          </ButtonLink>
-        </div>
-        <div className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {products.map((p) => (
-            <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
-          ))}
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
 function ServiceGrid() {
   return (
     <Section className="pt-0">
