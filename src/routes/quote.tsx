@@ -1,24 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Container, Section, SectionHeading, Card } from "@/components/s2b/primitives";
-import { ButtonAnchor, WhatsAppIcon } from "@/components/s2b/button";
-import { services, siteConfig } from "@/config/site";
-import { serviceQuote } from "@/lib/whatsapp";
+import { Container, Section } from "@/components/s2b/primitives";
+import { WhatsAppIcon } from "@/components/s2b/button";
+import { bdCities, siteConfig } from "@/config/site";
+import { quoteRequest, telLink } from "@/lib/whatsapp";
+import { useLang } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/quote")({
   head: () => ({
     meta: [
-      { title: "Get a cargo and sourcing quote | Source2BD" },
+      { title: "দাম জানুন · কয়েকটা তথ্য দিলেই হবে | Source2BD" },
       {
         name: "description",
         content:
-          "Tell us the lane, the weight or volume and your delivery city. The form builds a complete WhatsApp message so our desk can price it in one reply.",
+          "নাম, মোবাইল আর শহর দিন। কীভাবে পণ্য দেখাবেন বেছে নিন। হোয়াটসঅ্যাপে পাঠালেই আমরা বাংলাদেশে পৌঁছানোর দাম বলে দেব।",
       },
-      { property: "og:title", content: "Get a Source2BD quote" },
-      {
-        property: "og:description",
-        content: "Build a complete quote request in under a minute and send it straight to WhatsApp.",
-      },
+      { property: "og:title", content: "দাম জানুন · Source2BD" },
+      { property: "og:description", content: "কয়েকটা তথ্য দিন, হোয়াটসঅ্যাপে দাম পেয়ে যান।" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -26,111 +25,154 @@ export const Route = createFileRoute("/quote")({
   component: QuotePage,
 });
 
-const inputClass =
-  "mt-1.5 h-11 w-full rounded-[12px] border border-input bg-background/60 px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent";
+const field =
+  "mt-2 h-14 w-full rounded-[14px] border border-input bg-background/70 px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent";
 
 function QuotePage() {
-  const [mode, setMode] = useState(services[0]!.title);
-  const [weight, setWeight] = useState("");
+  const { t } = useLang();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
+  const [how, setHow] = useState<"photo" | "link" | "text">("photo");
+  const [qty, setQty] = useState("");
   const [notes, setNotes] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  const href = serviceQuote({ mode, weight, city, notes });
+  const howLabel = {
+    photo: t("ছবি দেব", "I will send a photo"),
+    link: t("লিংক দেব", "I will send a link"),
+    text: t("লিখে বলব", "I will describe it"),
+  }[how];
+
+  function send() {
+    if (!phone.trim() || !city.trim()) {
+      setError(t("মোবাইল নম্বর আর শহর দিন", "Please give your mobile number and city"));
+      return;
+    }
+    setError(null);
+    window.open(
+      quoteRequest({ name, phone, city, how: howLabel, qty, notes }),
+      "_blank",
+      "noopener,noreferrer",
+    );
+  }
 
   return (
-    <Section>
-      <Container className="grid gap-12 lg:grid-cols-[1fr_0.85fr]">
-        <div>
-          <SectionHeading
-            eyebrow="Quote request"
-            title="Give us four details and we can price it"
-            titleBn="চারটি তথ্য দিলেই কোট পাবেন"
-            intro="Nothing is stored on a server here. The form assembles a message and hands it to WhatsApp, so you keep the record in your own chat."
-          />
+    <Section className="py-8">
+      <Container className="max-w-2xl">
+        <h1 className="font-bn text-[clamp(1.6rem,6vw,2.4rem)] font-extrabold leading-tight">
+          {t("দাম জানুন", "Get a price")}
+        </h1>
+        <p className="font-bn mt-2 text-[16px] font-semibold text-muted-foreground">
+          {t("কয়েকটা তথ্য দিন, আমরা হোয়াটসঅ্যাপে দাম বলে দেব।", "Give a few details and we reply on WhatsApp.")}
+        </p>
 
-          <form className="mt-10 grid gap-5" onSubmit={(e) => e.preventDefault()}>
-            <div>
-              <label htmlFor="mode" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Service
-              </label>
-              <select id="mode" value={mode} onChange={(e) => setMode(e.target.value)} className={inputClass}>
-                {services.map((s) => (
-                  <option key={s.key} value={s.title} className="bg-background">
-                    {s.title}
-                  </option>
-                ))}
-              </select>
+        <form className="mt-6 grid gap-5" onSubmit={(e) => e.preventDefault()}>
+          <div>
+            <label htmlFor="name" className="font-bn text-[16px] font-bold">
+              {t("আপনার নাম", "Your name")}
+            </label>
+            <input id="name" value={name} onChange={(e) => setName(e.target.value)} className={field} />
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="font-bn text-[16px] font-bold">
+              {t("মোবাইল নম্বর", "Mobile number")}
+            </label>
+            <input
+              id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              inputMode="tel"
+              placeholder="01XXXXXXXXX"
+              className={cn(field, "tnum")}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="city" className="font-bn text-[16px] font-bold">
+              {t("কোন শহর", "Which city")}
+            </label>
+            <select id="city" value={city} onChange={(e) => setCity(e.target.value)} className={field}>
+              <option value="">{t("বেছে নিন", "Choose")}</option>
+              {bdCities.map((c) => (
+                <option key={c} value={c} className="bg-background">
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <p className="font-bn text-[16px] font-bold">{t("কীভাবে পণ্য দেখাবেন", "How will you show the item")}</p>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {(
+                [
+                  ["photo", t("ছবি", "Photo")],
+                  ["link", t("লিংক", "Link")],
+                  ["text", t("লিখে বলব", "Describe")],
+                ] as const
+              ).map(([key, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setHow(key)}
+                  aria-pressed={how === key}
+                  className={cn(
+                    "font-bn min-h-[56px] rounded-[14px] text-[16px] font-bold",
+                    how === key ? "bg-foreground text-background" : "border border-border text-muted-foreground",
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
+          </div>
 
-            <div className="grid gap-5 sm:grid-cols-2">
-              <div>
-                <label htmlFor="weight" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Approx weight or volume
-                </label>
-                <input
-                  id="weight"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  placeholder="45 kg, or 0.8 CBM"
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label htmlFor="city" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Delivery city in Bangladesh
-                </label>
-                <input
-                  id="city"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="Dhaka"
-                  className={inputClass}
-                />
-              </div>
-            </div>
+          <div>
+            <label htmlFor="qty" className="font-bn text-[16px] font-bold">
+              {t("কয়টা লাগবে", "How many")}
+            </label>
+            <input
+              id="qty"
+              value={qty}
+              onChange={(e) => setQty(e.target.value)}
+              inputMode="numeric"
+              className={cn(field, "tnum")}
+            />
+          </div>
 
-            <div>
-              <label htmlFor="notes" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                What are you shipping
-              </label>
-              <textarea
-                id="notes"
-                rows={5}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Product links, carton count, target date, anything else that helps"
-                className="mt-1.5 w-full rounded-[12px] border border-input bg-background/60 p-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-accent"
-              />
-            </div>
+          <div>
+            <label htmlFor="notes" className="font-bn text-[16px] font-bold">
+              {t("আরও কিছু বলার আছে", "Anything else")}
+            </label>
+            <textarea
+              id="notes"
+              rows={4}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="mt-2 w-full rounded-[14px] border border-input bg-background/70 p-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            />
+          </div>
 
-            <ButtonAnchor href={href} target="_blank" rel="noopener noreferrer" variant="green" size="lg">
-              <WhatsAppIcon /> Send this to WhatsApp
-            </ButtonAnchor>
-          </form>
-        </div>
+          {error ? <p className="font-bn text-[16px] font-bold text-accent">{error}</p> : null}
 
-        <Card className="h-fit p-6">
-          <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">
-            What we send back
-          </h2>
-          <ul className="mt-5 space-y-4 text-sm text-muted-foreground">
-            {[
-              "Supplier or retail cost, with tier pricing where it applies",
-              "Freight by the lane that suits your volume, not the one we prefer",
-              "A duty exposure indication so the landed number is not a surprise",
-              "A realistic transit window, stated as an estimate",
-            ].map((t) => (
-              <li key={t} className="flex gap-3">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
-                {t}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-6 border-t border-border pt-5 text-xs text-muted-foreground">
-            Desk hours {siteConfig.hours}. Messages outside those hours are answered the next working
-            morning.
-          </p>
-        </Card>
+          <button
+            type="button"
+            onClick={send}
+            className="font-bn flex min-h-[64px] items-center justify-center gap-2 rounded-full bg-wa text-xl font-bold text-wa-foreground"
+          >
+            <WhatsAppIcon className="h-6 w-6" />
+            {t("হোয়াটসঅ্যাপে পাঠান", "Send on WhatsApp")}
+          </button>
+
+          <a
+            href={telLink}
+            className="font-bn flex min-h-[60px] items-center justify-center rounded-full bg-foreground text-lg font-bold text-background"
+          >
+            {t("অথবা ফোন করুন", "Or call")} {siteConfig.phoneDisplay}
+          </a>
+        </form>
       </Container>
     </Section>
   );
