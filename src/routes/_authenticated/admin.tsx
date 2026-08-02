@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 function AdminPage() {
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<"users" | "searches">("users");
+  const [tab, setTab] = useState<"users" | "searches" | "errors">("users");
   const [filter, setFilter] = useState("");
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-overview"],
@@ -70,10 +70,11 @@ function AdminPage() {
         <Stat label="Lookups today" value={data?.totals.lookupsToday ?? 0} />
         <Stat label="Guest devices" value={data?.totals.guestsToday ?? 0} />
         <Stat label="Cached searches" value={data?.totals.cachedSearches ?? 0} />
+        <Stat label="Errors (24h)" value={data?.totals.errors24h ?? 0} />
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-2">
-        {(["users", "searches"] as const).map((k) => (
+        {(["users", "searches", "errors"] as const).map((k) => (
           <button
             key={k}
             type="button"
@@ -165,7 +166,7 @@ function AdminPage() {
             </tbody>
           </table>
         </div>
-      ) : (
+      ) : tab === "searches" ? (
         <div className="mt-4 overflow-x-auto rounded-3xl border border-foreground/10">
           <table className="w-full min-w-[620px] text-left text-[14px]">
             <thead className="bg-foreground/[0.04] text-[12px] uppercase tracking-wide text-muted-foreground">
@@ -187,6 +188,45 @@ function AdminPage() {
                   <td className="px-4 py-3 text-muted-foreground">{s.updatedAt.slice(0, 16).replace("T", " ")}</td>
                 </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="mt-4 overflow-x-auto rounded-3xl border border-foreground/10">
+          <table className="w-full min-w-[620px] text-left text-[14px]">
+            <thead className="bg-foreground/[0.04] text-[12px] uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3">When</th>
+                <th className="px-4 py-3">Where</th>
+                <th className="px-4 py-3">What happened</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(data?.errors ?? []).map((e) => (
+                <tr key={e.id} className="border-t border-foreground/8 align-top">
+                  <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                    {e.createdAt.slice(0, 16).replace("T", " ")}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[12px] font-bold text-destructive">
+                      {e.scope}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="font-semibold text-foreground">{e.message}</div>
+                    {e.detail ? (
+                      <div className="mt-1 break-all text-[12px] text-muted-foreground">{e.detail}</div>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+              {!isLoading && (data?.errors ?? []).length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">
+                    No upstream failures logged. Everything is healthy.
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>
