@@ -128,6 +128,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_burst_log: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_daily_usage: {
+        Row: {
+          created_at: string
+          day: string
+          detail_count: number
+          id: string
+          link_count: number
+          search_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          detail_count?: number
+          id?: string
+          link_count?: number
+          search_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          detail_count?: number
+          id?: string
+          link_count?: number
+          search_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -166,12 +220,35 @@ export type Database = {
           used: number
         }[]
       }
+      consume_user_usage: {
+        Args: {
+          _action: string
+          _burst_limit?: number
+          _cost: number
+          _day: string
+          _limit: number
+          _user_id: string
+        }
+        Returns: {
+          allowed: boolean
+          reason: string
+          used: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      read_user_usage: {
+        Args: { _day: string; _user_id: string }
+        Returns: {
+          detail_count: number
+          link_count: number
+          search_count: number
+        }[]
       }
     }
     Enums: {
