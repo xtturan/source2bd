@@ -181,8 +181,8 @@ function MarketDisclaimer() {
     <div className="mb-4 rounded-[16px] border-2 border-accent/30 bg-accent/10 p-4">
       <p className="font-bn text-[16px] font-bold leading-snug">
         {t(
-          "এগুলো চীনের দোকানের দাম। বাসায় পৌঁছানোর দাম আলাদা, নিচের সবুজ বাটনে চাপুন।",
-          "These are seller prices in China. Delivery to Bangladesh is separate, press the green button below.",
+          "এগুলো মার্কেট/সাপ্লায়ার দাম। বাংলাদেশে পৌঁছানোর পুরো দাম আলাদা — শিপিংসহ জানতে সবুজ বাটনে চাপুন। পণ্যে চাপ দিলে বিস্তারিত দেখা যাবে।",
+          "These are supplier prices. The Bangladesh total is separate — tap the green button for the shipping-inclusive price. Tap a product for details.",
         )}
       </p>
     </div>
@@ -283,7 +283,7 @@ function PhotoPanel() {
         <span className="font-bn max-w-[24ch] text-[18px] font-bold leading-snug">
           {preview
             ? t("অন্য ছবি দিন", "Use another photo")
-            : t("পণ্যের ছবি তুলুন বা গ্যালারি থেকে দিন", "Take a photo or pick one from your gallery")}
+            : t("পণ্যের ছবি তুলুন বা গ্যালারি থেকে বাছুন", "Take a photo or pick one from your gallery")}
         </span>
       </label>
 
@@ -293,12 +293,17 @@ function PhotoPanel() {
         href={photoInquiry()}
         target="_blank"
         rel="noopener noreferrer"
-        className="font-bn mt-4 flex min-h-[64px] items-center justify-center gap-2 rounded-full bg-wa text-xl font-bold text-wa-foreground"
+        className="mt-4 flex min-h-[64px] flex-col items-center justify-center rounded-full bg-wa text-wa-foreground"
       >
-        <WhatsAppIcon className="h-6 w-6" />
-        {t("এই ছবি দিয়ে দাম জানুন", "Get a price with this photo")}
+        <span className="font-bn flex items-center gap-2 text-[18px] font-bold leading-tight">
+          <WhatsAppIcon className="h-6 w-6" />
+          {t("বাংলাদেশ পর্যন্ত পুরো দাম জানুন", "Get the full Bangladesh price")}
+        </span>
+        <span className="font-bn text-[12px] font-semibold opacity-90">
+          {t("শিপিং চার্জসহ · WhatsApp-এ", "Shipping included · on WhatsApp")}
+        </span>
       </a>
-      <p className="font-bn mt-2 text-center text-[14px] font-semibold text-muted-foreground">
+      <p className="font-bn mt-2 text-center text-[14px] font-semibold text-foreground/70">
         {t("হোয়াটসঅ্যাপ খুলবে, সেখানে ছবিটা পাঠিয়ে দিন।", "WhatsApp opens, then attach your photo there.")}
       </p>
 
@@ -306,7 +311,7 @@ function PhotoPanel() {
         {mutation.isPending ? <Searching /> : null}
         {mutation.isError ? (
           <HelpBox
-            title={t("এখন খুঁজে পাওয়া গেল না", "The search did not come back")}
+            title={t("এখন খুঁজে পাওয়া গেল না · ছবিটা WhatsApp-এ পাঠান", "The search did not come back. Send the photo on WhatsApp.")}
             waHref={photoInquiry()}
           />
         ) : null}
@@ -315,7 +320,7 @@ function PhotoPanel() {
             <Results items={items} />
           ) : (
             <HelpBox
-              title={t("কিছু পাওয়া যায়নি · ছবি পাঠান বা ফোন করুন", "Nothing found. Send the photo or call us.")}
+              title={t("কিছু পাইনি · ছবিটা WhatsApp-এ পাঠান বা ফোন করুন", "Nothing found. Send the photo on WhatsApp or call us.")}
               waHref={photoInquiry()}
             />
           )
