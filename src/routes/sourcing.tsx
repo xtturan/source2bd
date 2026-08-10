@@ -90,7 +90,7 @@ function SourcingPage() {
 
         <Link
           to="/catalog"
-          search={{ cat: "", q: "" }}
+          search={{}}
           className="panel matte font-bn mt-3 flex min-h-[56px] items-center justify-between gap-3 rounded-[16px] px-4 text-[15px] font-bold"
         >
           <span>{t("বুঝতে পারছেন না কী আনবেন? ক্যাটালগ দেখুন", "Not sure what to import? Browse the catalogue")}</span>

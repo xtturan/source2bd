@@ -375,7 +375,7 @@ function Showcase({ rows }: { rows: ShowcaseRow[] }) {
         </div>
         <Link
           to="/catalog"
-          search={{ cat: "", q: "" }}
+          search={{}}
           className="panel matte font-bn mt-6 flex min-h-[64px] items-center justify-between gap-3 rounded-[18px] px-5 text-[16px] font-bold"
         >
           <span>{t("সব ক্যাটাগরি ও পণ্য দেখুন", "Browse every category and product")}</span>
