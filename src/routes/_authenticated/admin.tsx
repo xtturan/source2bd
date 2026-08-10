@@ -55,8 +55,12 @@ function AdminPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-overview"] }),
   });
   const block = useMutation({
-    mutationFn: (input: { subjectType: "user" | "ip"; subject: string; reason?: string }) =>
-      adminBlock({ data: { ...input, hours: 0 } }),
+    mutationFn: (input: {
+      subjectType: "user" | "ip";
+      subject: string;
+      reason?: string | undefined;
+      hours?: number | undefined;
+    }) => adminBlock({ data: { ...input, hours: input.hours ?? 0 } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-blocks"] });
       queryClient.invalidateQueries({ queryKey: ["admin-activity"] });
