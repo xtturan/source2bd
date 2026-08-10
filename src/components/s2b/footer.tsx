@@ -76,6 +76,12 @@ export function Footer() {
             <Link to="/privacy" className="hover:text-foreground">
               {t("প্রাইভেসি", "Privacy")}
             </Link>
+            <Link to="/terms" className="hover:text-foreground">
+              {t("শর্তাবলী", "Terms")}
+            </Link>
+            <Link to="/refunds" className="hover:text-foreground">
+              {t("রিফান্ড", "Refunds")}
+            </Link>
             <Link to="/faq" className="hover:text-foreground">
               {t("প্রশ্ন", "Questions")}
             </Link>
