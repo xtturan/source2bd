@@ -34,6 +34,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/privacy", changefreq: "monthly", priority: "0.3" },
           { path: "/terms", changefreq: "monthly", priority: "0.3" },
           { path: "/refunds", changefreq: "monthly", priority: "0.4" },
+          { path: "/prohibited", changefreq: "monthly", priority: "0.4" },
           ...guides.map((g) => ({
             path: `/guides/${g.slug}`,
             lastmod: g.updated,
