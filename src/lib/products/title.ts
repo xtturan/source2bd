@@ -41,28 +41,90 @@ const NOISE = [
   "tiktok",
 ];
 
+/** Extra keyword-dump filler that marketplace sellers stuff into titles. */
+const FILLER = [
+  "customized",
+  "customizable",
+  "custom made",
+  "oem",
+  "odm",
+  "high quality",
+  "good quality",
+  "top quality",
+  "best selling",
+  "best seller",
+  "trending",
+  "popular",
+  "cheap",
+  "low price",
+  "wholesale price",
+  "large quantity",
+  "small quantity",
+  "supply",
+  "supplier",
+  "trade",
+  "export",
+  "brand new",
+  "genuine",
+  "authentic",
+  "2023",
+  "2024",
+  "2025",
+  "2026",
+  "new style",
+  "new design",
+  "fashion new",
+  "korean version",
+  "ins style",
+  "internet celebrity",
+  "same style",
+];
+
 /** True when the listing markets itself as a counterfeit. Hide these. */
 export function isProhibitedTitle(title: string): boolean {
   const low = title.toLowerCase();
   return BANNED.some((w) => low.includes(w.toLowerCase()));
 }
 
+function stripWords(text: string, words: string[]) {
+  let out = text;
+  for (const w of words) {
+    out = out.replace(new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi"), " ");
+  }
+  return out;
+}
+
 /**
  * Short, readable card title: drop counterfeit and SEO-spam words, collapse
- * separators, keep the first meaningful phrase and cap the length.
+ * separators, drop repeated words, keep the first meaningful phrase and cap
+ * the length. Marketplace titles are keyword dumps; this makes them scannable.
  */
-export function cleanTitle(title: string, max = 58): string {
+export function cleanTitle(title: string, max = 62): string {
   let out = title.replace(/\s+/g, " ").trim();
 
-  for (const w of [...BANNED, ...NOISE]) {
-    out = out.replace(new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), " ");
-  }
+  // Bracketed marketing blocks are always noise.
+  out = out.replace(/[[(【（][^\])】）]*[\])】）]/g, " ");
+  out = stripWords(out, [...BANNED, ...NOISE, ...FILLER]);
 
   out = out
     .replace(/[|/·、，,]+/g, " ")
     .replace(/\s*[-–—]\s*/g, " ")
+    .replace(/[!！*#~]+/g, " ")
     .replace(/\s{2,}/g, " ")
     .trim();
+
+  // Collapse repeated words ("shoes women shoes" -> "shoes women").
+  const seen = new Set<string>();
+  const words: string[] = [];
+  for (const w of out.split(" ")) {
+    const k = w.toLowerCase().replace(/[^a-z0-9\u0980-\u09ff]/g, "");
+    if (!w) continue;
+    if (k && seen.has(k)) continue;
+    if (k) seen.add(k);
+    words.push(w);
+  }
+  // Nine words is enough to name a product; the rest is SEO stuffing.
+  out = words.slice(0, 9).join(" ").replace(/^[\s'’"-]+|[\s'’"-]+$/g, "");
 
   if (!out) out = title.trim();
 

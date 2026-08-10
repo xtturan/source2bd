@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Container, Section } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
 import { QuotaBar } from "@/components/s2b/quota-bar";
 import { ProductCard } from "@/components/s2b/product-card";
 import { PriceHonesty } from "@/components/s2b/price-honesty";
-import { showcaseSearches } from "@/lib/products/queries.functions";
-import type { ShowcaseRow } from "@/lib/products/search-cache.server";
+import { catalogueProducts } from "@/lib/products/queries.functions";
+import type { CatalogueItem } from "@/lib/products/search-cache.server";
+import { categories, categoryOfProduct, type CategoryKey } from "@/lib/products/categories";
+import { isProhibitedTitle } from "@/lib/products/title";
 import { quickCategories, siteConfig } from "@/config/site";
 import { generalInquiry, linkInquiry, photoInquiry, telLink } from "@/lib/whatsapp";
 import { useLang } from "@/lib/i18n";
@@ -20,7 +22,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "চীন বা যেকোনো দেশ থেকে পণ্য আনুন। ছবি বা লিংক পাঠান, আমরা বাংলাদেশে পৌঁছানোর পুরো দাম বলে দেব। ফোন 01752-457930, চকবাজার ঢাকা।",
+          `চীন বা যেকোনো দেশ থেকে পণ্য আনুন। ছবি বা লিংক পাঠান, আমরা বাংলাদেশে পৌঁছানোর পুরো দাম বলে দেব। ফোন ${siteConfig.phoneDisplay}, চকবাজার ঢাকা।`,
       },
       { property: "og:title", content: "Source2BD, ছবি বা লিংক পাঠান, বাসায় পৌঁছে দেব" },
       {
@@ -33,9 +35,9 @@ export const Route = createFileRoute("/")({
     links: [{ rel: "canonical", href: "https://source2bd.com/" }],
   }),
   component: HomePage,
-  loader: async (): Promise<ShowcaseRow[]> => {
+  loader: async (): Promise<CatalogueItem[]> => {
     try {
-      return await showcaseSearches();
+      return await catalogueProducts();
     } catch {
       return [];
     }
@@ -43,7 +45,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const showcase = Route.useLoaderData();
+  const items = Route.useLoaderData() as CatalogueItem[];
   return (
     <>
       <FirstScreen />
@@ -51,7 +53,7 @@ function HomePage() {
       <TrustRow />
       <PriceHonesty />
       <Categories />
-      {showcase.length ? <Showcase rows={showcase.slice(0, 2)} /> : null}
+      <CategoryRails items={items} />
       <HowToSend />
     </>
   );
@@ -347,41 +349,74 @@ function Categories() {
   );
 }
 
-function Showcase({ rows }: { rows: ShowcaseRow[] }) {
+/**
+ * One rail per category that actually has stock, so the home page reads as a
+ * multi-category shop rather than whatever keyword was searched most.
+ * Empty categories are hidden and no single category can take over.
+ */
+function CategoryRails({ items }: { items: CatalogueItem[] }) {
   const { t } = useLang();
+
+  const rails = useMemo(() => {
+    const buckets = new Map<CategoryKey, CatalogueItem[]>();
+    for (const p of items) {
+      if (!p.title || isProhibitedTitle(p.title)) continue;
+      const key = categoryOfProduct(p, p.query);
+      if (key === "other") continue;
+      const list = buckets.get(key) ?? [];
+      if (list.length < 8) list.push(p);
+      buckets.set(key, list);
+    }
+    return categories
+      .filter((c) => (buckets.get(c.key)?.length ?? 0) >= 4)
+      .slice(0, 6)
+      .map((c) => ({ category: c, products: buckets.get(c.key)!.slice(0, 8) }));
+  }, [items]);
+
+  if (!rails.length) return null;
+
   return (
     <Section className="py-0">
       <Container>
         <h2 className="font-bn text-[clamp(1.4rem,5vw,2rem)] font-extrabold">
-          {t("উদাহরণ · চীনের দাম", "Examples, China prices")}
+          {t("ক্যাটাগরি ধরে দেখুন", "Browse by category")}
         </h2>
         <p className="font-bn mt-2 max-w-[46ch] text-[15px] font-semibold text-muted-foreground">
           {t(
-            "এগুলো চীনের দোকানের দাম। বাসায় পৌঁছানোর দাম আলাদা, আমরা বলে দেব।",
-            "These are seller prices in China. Delivery to Bangladesh is quoted separately.",
+            "এগুলো চীনের দোকানের দাম। বাংলাদেশে পৌঁছানোর পুরো দাম আলাদা, আমরা বলে দেব।",
+            "These are seller prices in China. The full Bangladesh door price is separate and we quote it for you.",
           )}
         </p>
-        <div className="mt-5 space-y-8">
-          {rows.map((row) => (
-            <div key={row.query}>
+
+        <div className="mt-5 space-y-10">
+          {rails.map(({ category, products }) => (
+            <div key={category.key}>
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-lg font-bold capitalize">{row.query}</h3>
-                <Link to="/sourcing" search={{ q: row.query }} className="font-bn text-sm font-bold text-accent">
-                  {t("সব দেখুন", "See all")}
+                <h3 className="font-bn text-[18px] font-extrabold">
+                  <span aria-hidden className="mr-1.5">{category.emoji}</span>
+                  {t(category.bn, category.en)}
+                </h3>
+                <Link
+                  to="/catalog"
+                  search={{ cat: category.key }}
+                  className="font-bn min-h-[44px] shrink-0 content-center text-[15px] font-bold text-accent"
+                >
+                  {t("আরও দেখুন", "See more")}
                 </Link>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                {row.items.slice(0, 4).map((p) => (
+                {products.map((p) => (
                   <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
                 ))}
               </div>
             </div>
           ))}
         </div>
+
         <Link
           to="/catalog"
           search={{}}
-          className="panel matte font-bn mt-6 flex min-h-[64px] items-center justify-between gap-3 rounded-[18px] px-5 text-[16px] font-bold"
+          className="panel matte font-bn mt-8 flex min-h-[64px] items-center justify-between gap-3 rounded-[18px] px-5 text-[16px] font-bold"
         >
           <span>{t("সব ক্যাটাগরি ও পণ্য দেখুন", "Browse every category and product")}</span>
           <span aria-hidden className="text-accent">→</span>

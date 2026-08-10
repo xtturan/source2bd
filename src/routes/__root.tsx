@@ -15,6 +15,7 @@ import { Header } from "@/components/s2b/header";
 import { Footer } from "@/components/s2b/footer";
 import { MobileDock } from "@/components/s2b/mobile-dock";
 import { LanguageProvider } from "@/lib/i18n";
+import { siteConfig } from "@/config/site";
 
 function NotFoundComponent() {
   return (
@@ -123,11 +124,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "Source2BD",
-          alternateName: "TWT International",
-          url: "https://source2bd.com",
+          alternateName: siteConfig.parent,
+          url: siteConfig.url,
           logo: "https://source2bd.com/apple-touch-icon.png",
-          parentOrganization: { "@type": "Organization", name: "TWT International" },
-          telephone: "+8801752457930",
+          parentOrganization: { "@type": "Organization", name: siteConfig.parent },
+          telephone: siteConfig.phoneTel,
           address: {
             "@type": "PostalAddress",
             streetAddress: "Chawkbazar",
@@ -137,7 +138,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           contactPoint: [
             {
               "@type": "ContactPoint",
-              telephone: "+8801752457930",
+              telephone: siteConfig.phoneTel,
               contactType: "customer service",
               availableLanguage: ["bn", "en"],
             },
@@ -150,11 +151,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
           name: "Source2BD",
-          parentOrganization: { "@type": "Organization", name: "TWT International" },
+          parentOrganization: { "@type": "Organization", name: siteConfig.parent },
           description:
             "Global sourcing agent and Bangladesh cargo: 1688, Alibaba, Amazon and worldwide stores, delivered to Dhaka and Chattogram.",
-          telephone: "+8801752457930",
-          url: "https://source2bd.com",
+          telephone: siteConfig.phoneTel,
+          url: siteConfig.url,
           priceRange: "৳৳",
           address: {
             "@type": "PostalAddress",

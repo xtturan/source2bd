@@ -88,12 +88,37 @@ function CatalogPage() {
   }, [tagged]);
 
   const needle = text.trim().toLowerCase();
-  const shown: { p: CatalogueItem; key: CategoryKey }[] = tagged
+  const matched: { p: CatalogueItem; key: CategoryKey }[] = tagged
     .filter((row: { key: CategoryKey }) => (cat ? row.key === cat : true))
     .filter((row: { p: CatalogueItem }) =>
       needle ? `${row.p.title} ${row.p.query}`.toLowerCase().includes(needle) : true,
-    )
-    .slice(0, 240);
+    );
+
+  // With no category chosen, interleave categories so one popular keyword
+  // cannot turn the whole grid into a single-product-type wall.
+  const shown = useMemo(() => {
+    if (cat) return matched.slice(0, 240);
+    const buckets = new Map<CategoryKey, { p: CatalogueItem; key: CategoryKey }[]>();
+    for (const row of matched) {
+      const list = buckets.get(row.key) ?? [];
+      list.push(row);
+      buckets.set(row.key, list);
+    }
+    const out: { p: CatalogueItem; key: CategoryKey }[] = [];
+    let added = true;
+    while (added && out.length < 240) {
+      added = false;
+      for (const list of buckets.values()) {
+        const next = list.shift();
+        if (!next) continue;
+        out.push(next);
+        added = true;
+        if (out.length >= 240) break;
+      }
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tagged, cat, needle]);
 
   return (
     <Section className="py-6 sm:py-10">
