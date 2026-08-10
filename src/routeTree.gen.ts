@@ -20,9 +20,12 @@ import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as MoreRouteImport } from './routes/more'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as QuoteRouteImport } from './routes/quote'
+import { Route as RefundsRouteImport } from './routes/refunds'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SourcingRouteImport } from './routes/sourcing'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -90,6 +93,16 @@ const QuoteRoute = QuoteRouteImport.update({
   path: '/quote',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RefundsRoute = RefundsRouteImport.update({
+  id: '/refunds',
+  path: '/refunds',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
@@ -103,6 +116,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SourcingRoute = SourcingRouteImport.update({
   id: '/sourcing',
   path: '/sourcing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrackRoute = TrackRouteImport.update({
@@ -177,9 +195,12 @@ export interface FileRoutesByFullPath {
   '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
   '/quote': typeof QuoteRoute
+  '/refunds': typeof RefundsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sourcing': typeof SourcingRoute
+  '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -204,9 +225,12 @@ export interface FileRoutesByTo {
   '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
   '/quote': typeof QuoteRoute
+  '/refunds': typeof RefundsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sourcing': typeof SourcingRoute
+  '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -233,9 +257,12 @@ export interface FileRoutesById {
   '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
   '/quote': typeof QuoteRoute
+  '/refunds': typeof RefundsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sourcing': typeof SourcingRoute
+  '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -262,9 +289,12 @@ export interface FileRouteTypes {
     | '/more'
     | '/privacy'
     | '/quote'
+    | '/refunds'
+    | '/reset-password'
     | '/services'
     | '/sitemap.xml'
     | '/sourcing'
+    | '/terms'
     | '/track'
     | '/account'
     | '/admin'
@@ -289,9 +319,12 @@ export interface FileRouteTypes {
     | '/more'
     | '/privacy'
     | '/quote'
+    | '/refunds'
+    | '/reset-password'
     | '/services'
     | '/sitemap.xml'
     | '/sourcing'
+    | '/terms'
     | '/track'
     | '/account'
     | '/admin'
@@ -317,9 +350,12 @@ export interface FileRouteTypes {
     | '/more'
     | '/privacy'
     | '/quote'
+    | '/refunds'
+    | '/reset-password'
     | '/services'
     | '/sitemap.xml'
     | '/sourcing'
+    | '/terms'
     | '/track'
     | '/_authenticated/account'
     | '/_authenticated/admin'
@@ -346,9 +382,12 @@ export interface RootRouteChildren {
   MoreRoute: typeof MoreRoute
   PrivacyRoute: typeof PrivacyRoute
   QuoteRoute: typeof QuoteRoute
+  RefundsRoute: typeof RefundsRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SourcingRoute: typeof SourcingRoute
+  TermsRoute: typeof TermsRoute
   TrackRoute: typeof TrackRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
   GuidesIndexRoute: typeof GuidesIndexRoute
@@ -440,6 +479,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuoteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/refunds': {
+      id: '/refunds'
+      path: '/refunds'
+      fullPath: '/refunds'
+      preLoaderRoute: typeof RefundsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
@@ -459,6 +512,13 @@ declare module '@tanstack/react-router' {
       path: '/sourcing'
       fullPath: '/sourcing'
       preLoaderRoute: typeof SourcingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/track': {
@@ -573,9 +633,12 @@ const rootRouteChildren: RootRouteChildren = {
   MoreRoute: MoreRoute,
   PrivacyRoute: PrivacyRoute,
   QuoteRoute: QuoteRoute,
+  RefundsRoute: RefundsRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SourcingRoute: SourcingRoute,
+  TermsRoute: TermsRoute,
   TrackRoute: TrackRoute,
   GuidesSlugRoute: GuidesSlugRoute,
   GuidesIndexRoute: GuidesIndexRoute,

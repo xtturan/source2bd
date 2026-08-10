@@ -32,6 +32,8 @@ const pages = [
   { to: "/about", bn: "আমরা কারা", en: "About us" },
   { to: "/contact", bn: "যোগাযোগ", en: "Contact" },
   { to: "/privacy", bn: "প্রাইভেসি", en: "Privacy" },
+  { to: "/terms", bn: "শর্তাবলী", en: "Terms" },
+  { to: "/refunds", bn: "টাকা ফেরত", en: "Refunds" },
 ] as const;
 
 function MorePage() {

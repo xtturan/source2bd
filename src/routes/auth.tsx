@@ -260,7 +260,21 @@ function AuthPage() {
             "One device can create up to 2 accounts. Each account gets 30 live searches per day.",
           )}
         </p>
-        <Link to="/" className="font-bn mt-3 inline-block text-[14px] font-bold text-accent">
+        <Link to="/reset-password" className="font-bn mt-3 inline-block text-[14px] font-bold text-accent">
+          {t("পাসওয়ার্ড ভুলে গেছেন?", "Forgot your password?")}
+        </Link>
+        <p className="font-bn mt-3 text-[12px] leading-relaxed text-muted-foreground">
+          {t("অ্যাকাউন্ট খুললে আপনি", "By creating an account you accept our")}{" "}
+          <Link to="/terms" className="underline">
+            {t("শর্তাবলী", "terms")}
+          </Link>{" "}
+          {t("ও", "and")}{" "}
+          <Link to="/privacy" className="underline">
+            {t("প্রাইভেসি নীতি", "privacy policy")}
+          </Link>
+          {t(" মেনে নিচ্ছেন।", ".")}
+        </p>
+        <Link to="/" className="font-bn mt-3 block text-[14px] font-bold text-accent">
           {t("← হোমে ফিরুন", "← Back home")}
         </Link>
       </div>
