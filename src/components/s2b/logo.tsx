@@ -2,16 +2,23 @@ import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 
 /**
- * Source2BD "bridge seal": navy tile, green ring (the global market) sitting
- * on a single green bar (the Bangladesh delivery line). Flat, two shapes,
- * two brand colours, so it survives down to 16px in a browser tab.
+ * Source2BD mark: navy rounded square, green "S2" monogram. Two flat brand
+ * colours, no gradients, no imagery — identical to public/favicon.svg.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 512 512" className={cn("h-9 w-9 shrink-0", className)} role="img" aria-label="Source2BD">
       <rect width="512" height="512" rx="112" fill="#0A2540" />
-      <circle cx="256" cy="206" r="118" fill="none" stroke="#1FA64A" strokeWidth="52" />
-      <rect x="98" y="382" width="316" height="50" rx="25" fill="#1FA64A" />
+      <g
+        fill="none"
+        stroke="#1FA64A"
+        strokeWidth="42"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M212 198c0-28-26-44-58-44s-56 18-56 44c0 54 114 42 114 100 0 28-26 46-58 46-28 0-50-12-58-32" />
+        <path d="M290 200c0-30 24-46 54-46 32 0 54 20 54 48 0 52-94 84-108 142h112" />
+      </g>
     </svg>
   );
 }
