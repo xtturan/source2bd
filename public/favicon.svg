@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Source2BD">
   <rect width="512" height="512" rx="112" fill="#0A2540"/>
-  <circle cx="256" cy="206" r="118" fill="none" stroke="#1FA64A" stroke-width="52"/>
-  <rect x="98" y="382" width="316" height="50" rx="25" fill="#1FA64A"/>
+  <g fill="none" stroke="#1FA64A" stroke-width="44" stroke-linecap="butt" stroke-linejoin="miter">
+    <path d="M214 172 H118 V256 H214 V340 H118"/>
+    <path d="M298 172 H394 V256 H298 V340 H394"/>
+  </g>
 </svg>
