@@ -158,6 +158,7 @@ function setHeaders(state: QuotaState) {
 export async function consumeQuota(
   action: QuotaAction = "search",
   cost = 1,
+  label?: string,
 ): Promise<QuotaState> {
   const limit = limitFor(action);
   const resetAt = nextDhakaMidnight();
