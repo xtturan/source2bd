@@ -19,10 +19,13 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as MoreRouteImport } from './routes/more'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProhibitedRouteImport } from './routes/prohibited'
 import { Route as QuoteRouteImport } from './routes/quote'
 import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SourcingRouteImport } from './routes/sourcing'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -88,6 +91,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProhibitedRoute = ProhibitedRouteImport.update({
+  id: '/prohibited',
+  path: '/prohibited',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuoteRoute = QuoteRouteImport.update({
   id: '/quote',
   path: '/quote',
@@ -103,9 +111,19 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -194,10 +212,13 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
+  '/prohibited': typeof ProhibitedRoute
   '/quote': typeof QuoteRoute
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/shipping': typeof ShippingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sourcing': typeof SourcingRoute
   '/terms': typeof TermsRoute
@@ -224,10 +245,13 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
+  '/prohibited': typeof ProhibitedRoute
   '/quote': typeof QuoteRoute
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/shipping': typeof ShippingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sourcing': typeof SourcingRoute
   '/terms': typeof TermsRoute
@@ -256,10 +280,13 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
+  '/prohibited': typeof ProhibitedRoute
   '/quote': typeof QuoteRoute
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/shipping': typeof ShippingRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sourcing': typeof SourcingRoute
   '/terms': typeof TermsRoute
@@ -288,10 +315,13 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/more'
     | '/privacy'
+    | '/prohibited'
     | '/quote'
     | '/refunds'
     | '/reset-password'
+    | '/search'
     | '/services'
+    | '/shipping'
     | '/sitemap.xml'
     | '/sourcing'
     | '/terms'
@@ -318,10 +348,13 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/more'
     | '/privacy'
+    | '/prohibited'
     | '/quote'
     | '/refunds'
     | '/reset-password'
+    | '/search'
     | '/services'
+    | '/shipping'
     | '/sitemap.xml'
     | '/sourcing'
     | '/terms'
@@ -349,10 +382,13 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/more'
     | '/privacy'
+    | '/prohibited'
     | '/quote'
     | '/refunds'
     | '/reset-password'
+    | '/search'
     | '/services'
+    | '/shipping'
     | '/sitemap.xml'
     | '/sourcing'
     | '/terms'
@@ -381,10 +417,13 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   MoreRoute: typeof MoreRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProhibitedRoute: typeof ProhibitedRoute
   QuoteRoute: typeof QuoteRoute
   RefundsRoute: typeof RefundsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRoute
+  ShippingRoute: typeof ShippingRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SourcingRoute: typeof SourcingRoute
   TermsRoute: typeof TermsRoute
@@ -472,6 +511,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prohibited': {
+      id: '/prohibited'
+      path: '/prohibited'
+      fullPath: '/prohibited'
+      preLoaderRoute: typeof ProhibitedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quote': {
       id: '/quote'
       path: '/quote'
@@ -493,11 +539,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -632,10 +692,13 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   MoreRoute: MoreRoute,
   PrivacyRoute: PrivacyRoute,
+  ProhibitedRoute: ProhibitedRoute,
   QuoteRoute: QuoteRoute,
   RefundsRoute: RefundsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SearchRoute: SearchRoute,
   ServicesRoute: ServicesRoute,
+  ShippingRoute: ShippingRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SourcingRoute: SourcingRoute,
   TermsRoute: TermsRoute,

@@ -28,11 +28,31 @@ function AboutPage() {
     <Section>
       <Container>
         <SectionHeading
-          eyebrow="About"
+          eyebrow="Source2BD · a TWT International product"
           title="Built for importers who are tired of guessing"
           titleBn="আমাদের সম্পর্কে"
-          intro="Most Bangladeshi buyers work with one agent for sourcing, another for freight, and a third for clearance. Every handover is a place where the price grows and the timeline slips. Source2BD keeps all three on one desk."
+          intro="Source2BD is the customer-facing sourcing and cargo service of TWT International, a trading and freight house based in Chawkbazar, Dhaka. Most Bangladeshi buyers use one agent for sourcing, another for freight and a third for clearance. Every handover is a place where the price grows and the timeline slips. We keep all three on one desk."
         />
+
+        <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          <Card className="p-6">
+            <h2 className="text-lg font-bold">Source2BD</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              The buyer-facing side. Search 1688, Alibaba and Amazon in plain Bangla, send a photo,
+              a name or a link, and get one full Bangladesh door price: product, service fee,
+              freight, and duty explained. You pay only after you accept the quote.
+            </p>
+          </Card>
+          <Card className="p-6">
+            <h2 className="text-lg font-bold">TWT International</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              The parent company. Import and export trading, supplier payment support in China,
+              air, sea, hand carry and courier freight, C&amp;F and customs coordination with
+              licensed agents, warehouse consolidation with QC photos, and door delivery in
+              Bangladesh.
+            </p>
+          </Card>
+        </div>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {trustStats.map((s) => (
@@ -68,6 +88,13 @@ function AboutPage() {
             {siteConfig.officeLine2}. Desk hours {siteConfig.hours}. Walk in with a sample or a
             photo and we will price it while you are there.
           </p>
+          {siteConfig.tradeLicense || siteConfig.binNumber ? (
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              {siteConfig.tradeLicense ? `Trade licence: ${siteConfig.tradeLicense}` : null}
+              {siteConfig.tradeLicense && siteConfig.binNumber ? " · " : null}
+              {siteConfig.binNumber ? `BIN: ${siteConfig.binNumber}` : null}
+            </p>
+          ) : null}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <ButtonAnchor href={generalInquiry()} target="_blank" rel="noopener noreferrer" variant="green" size="lg">
               <WhatsAppIcon /> Message the desk

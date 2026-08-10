@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useLang } from "@/lib/i18n";
+import { WhatsAppIcon } from "./button";
+import { siteConfig } from "@/config/site";
+import { generalInquiry, telLink } from "@/lib/whatsapp";
 
 /**
  * Five jobs, always reachable with a thumb. Bangla labels, obvious selected state.
@@ -16,10 +19,28 @@ export function MobileDock() {
   const { t } = useLang();
   return (
     <>
-      <nav
-        className="glass fixed inset-x-0 bottom-0 z-40 border-x-0 border-b-0 pb-[env(safe-area-inset-bottom)] lg:hidden"
-        aria-label={t("প্রধান মেনু", "Main menu")}
-      >
+      <div className="fixed inset-x-0 bottom-0 z-40 pb-[env(safe-area-inset-bottom)] lg:hidden">
+        {/* Always reachable: one tap to call, one tap to WhatsApp. */}
+        <div className="grid grid-cols-2 gap-px bg-border">
+          <a
+            href={telLink}
+            aria-label={`${t("কল", "Call")} ${siteConfig.phoneDisplay}`}
+            className="font-bn flex min-h-[52px] items-center justify-center gap-2 bg-primary text-[16px] font-extrabold text-primary-foreground"
+          >
+            {t("কল", "Call")}
+          </a>
+          <a
+            href={generalInquiry()}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t("হোয়াটসঅ্যাপ", "WhatsApp")}
+            className="font-bn flex min-h-[52px] items-center justify-center gap-2 bg-wa text-[16px] font-extrabold text-wa-foreground"
+          >
+            <WhatsAppIcon className="h-5 w-5" />
+            {t("হোয়াটসঅ্যাপ", "WhatsApp")}
+          </a>
+        </div>
+        <nav className="glass border-x-0 border-b-0" aria-label={t("প্রধান মেনু", "Main menu")}>
         <div className="grid grid-cols-5">
           {items.map((i) => (
             <Link
@@ -45,8 +66,9 @@ export function MobileDock() {
             </Link>
           ))}
         </div>
-      </nav>
-      <div className="h-20 lg:hidden" aria-hidden />
+        </nav>
+      </div>
+      <div className="h-[124px] lg:hidden" aria-hidden />
     </>
   );
 }

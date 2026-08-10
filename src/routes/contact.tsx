@@ -62,6 +62,23 @@ function ContactPage() {
           <p className="font-bn mt-1 text-[16px] font-semibold text-muted-foreground">{siteConfig.officeLine2}</p>
           <p className="font-bn mt-4 text-[15px] font-bold">{t("সময়", "Hours")}</p>
           <p className="font-bn mt-1 text-[16px] font-semibold text-muted-foreground">{siteConfig.hours}</p>
+          <a
+            href={siteConfig.mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bn mt-4 inline-flex text-[15px] font-bold text-accent underline"
+          >
+            {t("ম্যাপে দেখুন", "Open in Maps")}
+          </a>
+          <div className="mt-4 overflow-hidden rounded-[14px] border border-border">
+            <iframe
+              title={t("চকবাজার, ঢাকা — অফিসের ম্যাপ", "Chawkbazar, Dhaka office map")}
+              src="https://www.google.com/maps?q=Chawkbazar,+Dhaka,+Bangladesh&output=embed"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="h-[240px] w-full border-0"
+            />
+          </div>
         </div>
 
         <div className="panel matte mt-4 rounded-[18px] p-5">

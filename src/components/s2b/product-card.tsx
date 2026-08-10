@@ -4,6 +4,7 @@ import { marketplaceLabels } from "@/lib/products/types";
 import { marketLabel, bdtLabel } from "@/lib/products/pricing";
 import { productQuote } from "@/lib/whatsapp";
 import { productImage } from "@/lib/images";
+import { cleanTitle, isProhibitedTitle } from "@/lib/products/title";
 import { WhatsAppIcon } from "./button";
 import { useLang } from "@/lib/i18n";
 
@@ -17,6 +18,10 @@ export function ProductCard({ product }: { product: ProductSummary }) {
   const { t } = useLang();
   const taka = bdtLabel(product.priceMin, product.priceMax, product.currency, t("দাম জানতে চাপুন", "Ask for price"));
   const market = product.priceMin != null ? marketLabel(product.priceMin, product.priceMax, product.currency) : null;
+  const title = cleanTitle(product.title);
+
+  // Legal goods only: listings that advertise themselves as copies never show.
+  if (isProhibitedTitle(product.title)) return null;
 
   return (
     <article className="panel matte group relative flex flex-col overflow-hidden rounded-[18px] transition-transform duration-150 focus-within:ring-2 focus-within:ring-accent active:scale-[0.995]">
@@ -25,8 +30,11 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           <img
             src={productImage(product.imageUrl)}
             referrerPolicy="no-referrer"
-            alt={product.title}
+            alt={title}
             loading="lazy"
+            decoding="async"
+            width={480}
+            height={480}
             className="h-full w-full object-cover"
           />
         ) : null}
@@ -41,7 +49,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           params={{ marketplace: product.marketplace, id: product.id }}
           className="line-clamp-2 break-words text-[15px] font-semibold leading-snug outline-none after:absolute after:inset-0 after:content-['']"
         >
-          {product.title}
+          {title}
         </Link>
 
         <div>

@@ -6,12 +6,45 @@ import { siteConfig } from "@/config/site";
 import { generalInquiry, telLink } from "@/lib/whatsapp";
 import { useLang } from "@/lib/i18n";
 
-/** Trust block: real office, real phone, honest payment line. */
+const columns = [
+  {
+    bn: "সার্ভিস",
+    en: "Product",
+    links: [
+      { to: "/sourcing", bn: "খুঁজুন", en: "Sourcing" },
+      { to: "/catalog", bn: "ক্যাটালগ", en: "Catalogue" },
+      { to: "/quote", bn: "শিপিংসহ দাম", en: "Get a quote" },
+      { to: "/track", bn: "অর্ডার স্ট্যাটাস", en: "Order status" },
+    ],
+  },
+  {
+    bn: "কোম্পানি",
+    en: "Company",
+    links: [
+      { to: "/about", bn: "আমরা কারা", en: "About TWT and Source2BD" },
+      { to: "/services", bn: "সব সার্ভিস", en: "Services" },
+      { to: "/guides", bn: "গাইড", en: "Guides" },
+      { to: "/contact", bn: "যোগাযোগ", en: "Contact" },
+    ],
+  },
+  {
+    bn: "আইন ও নীতি",
+    en: "Legal",
+    links: [
+      { to: "/privacy", bn: "প্রাইভেসি", en: "Privacy" },
+      { to: "/terms", bn: "শর্তাবলী", en: "Terms" },
+      { to: "/refunds", bn: "টাকা ফেরত", en: "Refunds" },
+      { to: "/prohibited", bn: "নিষিদ্ধ পণ্য", en: "Prohibited goods" },
+    ],
+  },
+] as const;
+
+/** Trust block: real office, real phone, real parent company, honest payment line. */
 export function Footer() {
   const { t } = useLang();
   return (
     <footer className="mt-12 border-t border-border bg-paper/60">
-      <Container className="grid gap-8 py-10 sm:grid-cols-2">
+      <Container className="grid gap-8 py-10 lg:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,0.8fr))]">
         <div>
           <Logo />
           <p className="font-bn mt-3 max-w-[38ch] text-[15px] font-semibold leading-relaxed text-muted-foreground">
@@ -33,59 +66,51 @@ export function Footer() {
             </a>
             <a
               href={telLink}
-              className="font-bn flex min-h-[56px] items-center justify-center rounded-full bg-foreground text-[17px] font-bold text-background"
+              className="font-bn flex min-h-[56px] items-center justify-center rounded-full bg-primary text-[17px] font-bold text-primary-foreground"
             >
               {t("ফোন করুন", "Call")} {siteConfig.phoneDisplay}
             </a>
           </div>
+
+          <ul className="font-bn mt-5 space-y-1.5 text-[15px] font-semibold text-muted-foreground">
+            <li>
+              <a href={siteConfig.mapUrl} target="_blank" rel="noopener noreferrer" className="text-foreground underline">
+                {t(siteConfig.officeBn, siteConfig.office)}
+              </a>
+            </li>
+            <li>{t(siteConfig.hoursBn, siteConfig.hours)}</li>
+            <li className="font-bold text-foreground">{t(siteConfig.policyBn, siteConfig.policy)}</li>
+            <li>{t("দাম দেখে আপনি রাজি হলে তবেই পেমেন্ট।", "You pay only after you see the price and agree.")}</li>
+          </ul>
         </div>
 
-        <ul className="font-bn space-y-2 text-[15px] font-semibold text-muted-foreground">
-          <li>
-            <a href={siteConfig.mapUrl} target="_blank" rel="noopener noreferrer" className="text-foreground underline">
-              {t(siteConfig.officeBn, siteConfig.office)}
-            </a>
-          </li>
-          <li>{t(siteConfig.hoursBn, siteConfig.hours)}</li>
-          <li>{t(siteConfig.policyBn, siteConfig.policy)}</li>
-          <li>
-            {t(
-              "দাম দেখে আপনি রাজি হলে তবেই পেমেন্ট।",
-              "You pay only after you see the price and agree.",
-            )}
-          </li>
-          <li className="pt-2">
-            <Link to="/guides" className="text-foreground underline">
-              {t("গাইড ও পরামর্শ", "Guides")}
-            </Link>
-          </li>
-          <li>
-            <Link to="/more" className="text-foreground underline">
-              {t("সব পেজ দেখুন", "All pages")}
-            </Link>
-          </li>
-        </ul>
+        {columns.map((col) => (
+          <nav key={col.en} aria-label={t(col.bn, col.en)}>
+            <p className="font-bn text-[13px] font-extrabold uppercase tracking-[0.08em] text-foreground">
+              {t(col.bn, col.en)}
+            </p>
+            <ul className="font-bn mt-3 space-y-2 text-[15px] font-semibold text-muted-foreground">
+              {col.links.map((l) => (
+                <li key={l.to}>
+                  <Link to={l.to} className="hover:text-foreground">
+                    {t(l.bn, l.en)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
       </Container>
 
       <div className="border-t border-border">
         <Container className="flex flex-col gap-2 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>
-            {new Date().getFullYear()} {siteConfig.legalName}
+            © {new Date().getFullYear()} {siteConfig.name} · {t("একটি", "a")} {siteConfig.parent}{" "}
+            {t("প্রতিষ্ঠান", "product")}
           </p>
-          <div className="flex gap-4">
-            <Link to="/privacy" className="hover:text-foreground">
-              {t("প্রাইভেসি", "Privacy")}
-            </Link>
-            <Link to="/terms" className="hover:text-foreground">
-              {t("শর্তাবলী", "Terms")}
-            </Link>
-            <Link to="/refunds" className="hover:text-foreground">
-              {t("রিফান্ড", "Refunds")}
-            </Link>
-            <Link to="/faq" className="hover:text-foreground">
-              {t("প্রশ্ন", "Questions")}
-            </Link>
-          </div>
+          <Link to="/more" className="hover:text-foreground">
+            {t("সব পেজ", "All pages")}
+          </Link>
         </Container>
       </div>
     </footer>
