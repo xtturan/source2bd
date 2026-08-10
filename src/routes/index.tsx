@@ -78,14 +78,17 @@ function FirstScreen() {
   return (
     <Container className="pb-8 pt-4 sm:pt-6">
       <h1 className="font-bn max-w-[16ch] text-[clamp(1.7rem,7vw,2.9rem)] font-extrabold leading-[1.2]">
-        {t("নাম লিখুন বা লিংক দিন", "Type the name or paste a link")}
+        {t("ছবি বা লিংক পাঠান", "Send a photo or a link")}
         <br />
         <span className="text-accent">
-          {t("বাংলাদেশ পর্যন্ত পুরো দাম বলে দেব", "We tell you the full Bangladesh price")}
+          {t("বাংলাদেশে পৌঁছানোর পুরো দাম বলব", "we tell you the full Bangladesh door price")}
         </span>
       </h1>
       <p className="font-bn mt-3 text-[clamp(1rem,4vw,1.2rem)] font-semibold text-muted-foreground">
         {t("শিপিং চার্জসহ · কোনো ইংরেজি জানার দরকার নেই", "Shipping included. No English needed.")}
+      </p>
+      <p className="font-bn mt-2 text-[13px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
+        {t(siteConfig.parentLineBn, siteConfig.parentLineEn)}
       </p>
 
       <div className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-3 sm:gap-4">
