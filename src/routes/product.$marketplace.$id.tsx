@@ -25,12 +25,20 @@ export const Route = createFileRoute("/product/$marketplace/$id")({
     }
   },
   head: ({ loaderData, params }) => {
-    const title = loaderData?.item?.title ?? "পণ্যের বিস্তারিত";
+    const item = loaderData?.item ?? null;
+    const title = cleanTitle(item?.title ?? "পণ্যের বিস্তারিত");
     const desc =
       "মার্কেটের দাম দেখুন, তারপর WhatsApp-এ বাংলাদেশ পর্যন্ত পুরো দাম (শিপিং চার্জসহ) জেনে নিন।";
+    const url = `https://source2bd.com/product/${params.marketplace}/${params.id}`;
+    // " | Source2BD" is 12 characters, so the name is capped at 48 for a 60-char title.
+    const shortTitle = title.length > 48 ? `${title.slice(0, 47).trimEnd()}…` : title;
+    const bdtPrice =
+      item?.priceMin != null && (item.currency === "CNY" || item.currency === "USD")
+        ? Math.round(toBdt(item.priceMin, item.currency))
+        : null;
     return {
       meta: [
-        { title: `${title.slice(0, 58)} | Source2BD` },
+        { title: `${shortTitle} | Source2BD` },
         { name: "description", content: desc },
         { property: "og:title", content: title.slice(0, 70) },
         { property: "og:description", content: desc },
@@ -40,9 +48,34 @@ export const Route = createFileRoute("/product/$marketplace/$id")({
       links: [
         {
           rel: "canonical",
-          href: `https://source2bd.com/product/${params.marketplace}/${params.id}`,
+          href: url,
         },
       ],
+      scripts: item
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Product",
+                name: title,
+                url,
+                ...(item.imageUrl ? { image: [item.imageUrl] } : {}),
+                ...(bdtPrice
+                  ? {
+                      offers: {
+                        "@type": "Offer",
+                        price: bdtPrice,
+                        priceCurrency: "BDT",
+                        url,
+                        availability: "https://schema.org/InStock",
+                      },
+                    }
+                  : {}),
+              }),
+            },
+          ]
+        : [],
     };
   },
   component: ProductPage,
