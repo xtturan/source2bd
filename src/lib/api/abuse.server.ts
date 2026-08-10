@@ -113,9 +113,9 @@ export function forgetBlockCache() {
 export interface ActivityEntry {
   kind: ActivityKind;
   userId?: string | null;
-  detail?: string | null;
+  detail?: string | null | undefined;
   allowed?: boolean;
-  reason?: string | null;
+  reason?: string | null | undefined;
 }
 
 /** Write one audit row. Never throws. */
