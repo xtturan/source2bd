@@ -116,7 +116,7 @@ function ServicesPage() {
                 ) : null}
 
                 {isOpen && lang === "en" ? (
-                  <div className={cn("mt-3 text-[15px] leading-relaxed text-muted-foreground", lang === "bn" && "font-bn")}>
+                  <div className={cn("mt-3 text-[15px] leading-relaxed text-muted-foreground")}>
                     <p>{detail?.short}</p>
                   </div>
                 ) : null}
