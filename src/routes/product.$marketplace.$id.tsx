@@ -9,6 +9,7 @@ import { marketLabel, bdtLabel, formatMarket, toBdt, formatBdt } from "@/lib/pro
 import { generalInquiry, productQuote, telLink } from "@/lib/whatsapp";
 import { siteConfig } from "@/config/site";
 import { productImage } from "@/lib/images";
+import { cleanTitle } from "@/lib/products/title";
 import { useLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 

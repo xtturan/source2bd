@@ -23,6 +23,20 @@ export const Route = createFileRoute("/catalog")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://source2bd.com/catalog" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Source2BD catalogue",
+          url: "https://source2bd.com/catalog",
+          description:
+            "Products already sourced from 1688, Taobao and Alibaba, grouped by category for Bangladeshi buyers.",
+          isPartOf: { "@type": "WebSite", name: "Source2BD", url: "https://source2bd.com" },
+        }),
+      },
+    ],
   }),
   validateSearch: (search: Record<string, unknown>): { cat?: string; q?: string } => {
     const out: { cat?: string; q?: string } = {};
