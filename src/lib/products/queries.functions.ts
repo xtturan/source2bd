@@ -32,7 +32,7 @@ export const searchProducts = createServerFn({ method: "GET" })
       const stored = await readSearchCache(data.q, data.marketplace, data.page);
       // Cache hit never burns the daily allowance.
       if (stored) return stored;
-      quota = await consumeQuota("search", 1);
+      quota = await consumeQuota("search", 1, `${data.marketplace}: ${data.q}`);
       try {
         const fresh = await getProductProvider().search(data.q, {
           marketplace: data.marketplace,
