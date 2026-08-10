@@ -2,7 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Container } from "@/components/s2b/primitives";
-import { adminOverview, adminSetUsage, adminDeleteUser } from "@/lib/auth/admin.functions";
+import {
+  adminOverview,
+  adminSetUsage,
+  adminDeleteUser,
+  adminActivity,
+  adminBlocks,
+  adminBlock,
+  adminUnblock,
+} from "@/lib/auth/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -21,13 +29,22 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 function AdminPage() {
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<"users" | "searches" | "errors">("users");
+  const [tab, setTab] = useState<"users" | "activity" | "blocks" | "searches" | "errors">("users");
   const [filter, setFilter] = useState("");
+  const [onlyBlocked, setOnlyBlocked] = useState(false);
+  const [logSearch, setLogSearch] = useState("");
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-overview"],
     queryFn: () => adminOverview(),
     refetchInterval: 60_000,
   });
+
+  const activity = useQuery({
+    queryKey: ["admin-activity", onlyBlocked, logSearch],
+    queryFn: () => adminActivity({ data: { onlyBlocked, search: logSearch, limit: 200 } }),
+    refetchInterval: 30_000,
+  });
+  const blocks = useQuery({ queryKey: ["admin-blocks"], queryFn: () => adminBlocks() });
 
   const reset = useMutation({
     mutationFn: (userId: string) => adminSetUsage({ data: { userId, used: 0 } }),
@@ -37,6 +54,24 @@ function AdminPage() {
     mutationFn: (userId: string) => adminDeleteUser({ data: { userId } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-overview"] }),
   });
+  const block = useMutation({
+    mutationFn: (input: { subjectType: "user" | "ip"; subject: string; reason?: string }) =>
+      adminBlock({ data: { ...input, hours: 0 } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-blocks"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-activity"] });
+    },
+  });
+  const unblock = useMutation({
+    mutationFn: (id: string) => adminUnblock({ data: { id } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-blocks"] }),
+  });
+
+  function askBlock(subjectType: "user" | "ip", subject: string) {
+    const reason = prompt(`Block this ${subjectType}? Optional note:`, "abuse");
+    if (reason === null) return;
+    block.mutate({ subjectType, subject, reason });
+  }
 
   if (error) {
     return (
@@ -71,10 +106,13 @@ function AdminPage() {
         <Stat label="Guest devices" value={data?.totals.guestsToday ?? 0} />
         <Stat label="Cached searches" value={data?.totals.cachedSearches ?? 0} />
         <Stat label="Errors (24h)" value={data?.totals.errors24h ?? 0} />
+        <Stat label="Requests (24h)" value={activity.data?.requests24h ?? 0} />
+        <Stat label="Blocked (24h)" value={activity.data?.blocked24h ?? 0} />
+        <Stat label="Active blocks" value={blocks.data?.length ?? 0} />
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-2">
-        {(["users", "searches", "errors"] as const).map((k) => (
+        {(["users", "activity", "blocks", "searches", "errors"] as const).map((k) => (
           <button
             key={k}
             type="button"
@@ -94,6 +132,26 @@ function AdminPage() {
             placeholder="Search email, phone or name"
             className="ml-auto h-11 w-full max-w-[280px] rounded-full border border-foreground/12 bg-background px-4 text-[14px] outline-none focus:border-accent"
           />
+        ) : null}
+        {tab === "activity" ? (
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setOnlyBlocked((v) => !v)}
+              aria-pressed={onlyBlocked}
+              className={`h-11 rounded-full px-4 text-[14px] font-bold ${
+                onlyBlocked ? "bg-destructive/15 text-destructive" : "bg-foreground/[0.06] text-muted-foreground"
+              }`}
+            >
+              Blocked only
+            </button>
+            <input
+              value={logSearch}
+              onChange={(e) => setLogSearch(e.target.value)}
+              placeholder="Filter by IP, query or user id"
+              className="h-11 w-full max-w-[280px] rounded-full border border-foreground/12 bg-background px-4 text-[14px] outline-none focus:border-accent"
+            />
+          </div>
         ) : null}
       </div>
 
