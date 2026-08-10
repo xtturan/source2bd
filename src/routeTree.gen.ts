@@ -19,6 +19,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as MoreRouteImport } from './routes/more'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProhibitedRouteImport } from './routes/prohibited'
 import { Route as QuoteRouteImport } from './routes/quote'
 import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -86,6 +87,11 @@ const MoreRoute = MoreRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProhibitedRoute = ProhibitedRouteImport.update({
+  id: '/prohibited',
+  path: '/prohibited',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuoteRoute = QuoteRouteImport.update({
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
+  '/prohibited': typeof ProhibitedRoute
   '/quote': typeof QuoteRoute
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
+  '/prohibited': typeof ProhibitedRoute
   '/quote': typeof QuoteRoute
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -256,6 +264,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/more': typeof MoreRoute
   '/privacy': typeof PrivacyRoute
+  '/prohibited': typeof ProhibitedRoute
   '/quote': typeof QuoteRoute
   '/refunds': typeof RefundsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/more'
     | '/privacy'
+    | '/prohibited'
     | '/quote'
     | '/refunds'
     | '/reset-password'
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/more'
     | '/privacy'
+    | '/prohibited'
     | '/quote'
     | '/refunds'
     | '/reset-password'
@@ -349,6 +360,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/more'
     | '/privacy'
+    | '/prohibited'
     | '/quote'
     | '/refunds'
     | '/reset-password'
@@ -381,6 +393,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   MoreRoute: typeof MoreRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProhibitedRoute: typeof ProhibitedRoute
   QuoteRoute: typeof QuoteRoute
   RefundsRoute: typeof RefundsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -470,6 +483,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prohibited': {
+      id: '/prohibited'
+      path: '/prohibited'
+      fullPath: '/prohibited'
+      preLoaderRoute: typeof ProhibitedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quote': {
@@ -632,6 +652,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   MoreRoute: MoreRoute,
   PrivacyRoute: PrivacyRoute,
+  ProhibitedRoute: ProhibitedRoute,
   QuoteRoute: QuoteRoute,
   RefundsRoute: RefundsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
