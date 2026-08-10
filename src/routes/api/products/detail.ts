@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { getProductProvider, providerFallbackMessage } from "@/lib/products/provider.server";
-import { cached, rateLimited, tooMany } from "@/lib/api/guard.server";
+import { cached, rateLimited, tooMany, abuseResponse } from "@/lib/api/guard.server";
+import { consumeQuota } from "@/lib/api/quota.server";
 
 const schema = z.object({
   id: z.string().trim().min(1).max(64),
@@ -22,12 +23,15 @@ export const Route = createFileRoute("/api/products/detail")({
 
         const { id, marketplace } = parsed.data;
         try {
-          const item = await cached(`detail:${marketplace}:${id}`, () =>
-            getProductProvider().getById(id, marketplace),
-          );
+          const item = await cached(`detail:${marketplace}:${id}`, async () => {
+            await consumeQuota("detail", 1, `api ${marketplace}: ${id}`);
+            return getProductProvider().getById(id, marketplace);
+          });
           if (!item) return Response.json({ error: "Product not found" }, { status: 404 });
           return Response.json({ item });
         } catch (err) {
+          const handled = await abuseResponse(err);
+          if (handled) return handled;
           console.error("detail failed", err);
           return Response.json({ error: providerFallbackMessage }, { status: 502 });
         }

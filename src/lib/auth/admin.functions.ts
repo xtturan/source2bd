@@ -141,3 +141,159 @@ export const adminDeleteUser = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export type ActivityRow = {
+  id: string;
+  createdAt: string;
+  kind: string;
+  userId: string | null;
+  ip: string | null;
+  userAgent: string | null;
+  detail: string | null;
+  allowed: boolean;
+  reason: string | null;
+};
+
+export type BlockRow = {
+  id: string;
+  subjectType: "user" | "ip";
+  subject: string;
+  reason: string | null;
+  expiresAt: string | null;
+  createdAt: string;
+};
+
+/** Request trail for troubleshooting attacks: filterable by user, IP or status. */
+export const adminActivity = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        onlyBlocked: z.boolean().default(false),
+        kind: z.string().max(20).optional(),
+        search: z.string().trim().max(120).default(""),
+        limit: z.number().int().min(10).max(500).default(200),
+      })
+      .parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let query = supabaseAdmin
+      .from("activity_log")
+      .select("id, created_at, kind, user_id, ip, user_agent, detail, allowed, reason")
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+
+    if (data.onlyBlocked) query = query.eq("allowed", false);
+    if (data.kind) query = query.eq("kind", data.kind);
+    if (data.search) {
+      const term = data.search.replace(/[%,()]/g, " ").trim();
+      if (term) query = query.or(`ip.ilike.%${term}%,detail.ilike.%${term}%,user_id.eq.${term}`);
+    }
+
+    const { data: rows, error } = await query;
+    if (error) throw new Error(error.message);
+
+    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const events: ActivityRow[] = (rows ?? []).map((r) => ({
+      id: r.id as string,
+      createdAt: r.created_at as string,
+      kind: r.kind as string,
+      userId: (r.user_id as string | null) ?? null,
+      ip: (r.ip as string | null) ?? null,
+      userAgent: (r.user_agent as string | null) ?? null,
+      detail: (r.detail as string | null) ?? null,
+      allowed: Boolean(r.allowed),
+      reason: (r.reason as string | null) ?? null,
+    }));
+
+    const topIps = new Map<string, number>();
+    for (const e of events) {
+      if (!e.ip) continue;
+      topIps.set(e.ip, (topIps.get(e.ip) ?? 0) + 1);
+    }
+
+    return {
+      events,
+      blocked24h: events.filter((e) => !e.allowed && e.createdAt >= since24h).length,
+      requests24h: events.filter((e) => e.createdAt >= since24h).length,
+      topIps: [...topIps.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([ip, count]) => ({ ip, count })),
+    };
+  });
+
+/** Everyone currently blocked. */
+export const adminBlocks = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<BlockRow[]> => {
+    await assertAdmin(context as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("abuse_blocks")
+      .select("id, subject_type, subject, reason, expires_at, created_at")
+      .order("created_at", { ascending: false })
+      .limit(300);
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((r) => ({
+      id: r.id as string,
+      subjectType: r.subject_type as "user" | "ip",
+      subject: r.subject as string,
+      reason: (r.reason as string | null) ?? null,
+      expiresAt: (r.expires_at as string | null) ?? null,
+      createdAt: r.created_at as string,
+    }));
+  });
+
+/** Block an account or an IP address. */
+export const adminBlock = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        subjectType: z.enum(["user", "ip"]),
+        subject: z.string().trim().min(2).max(120),
+        reason: z.string().trim().max(200).optional(),
+        hours: z.number().int().min(0).max(24 * 365).default(0),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    if (data.subjectType === "user" && data.subject === context.userId) {
+      throw new Error("CANNOT_BLOCK_SELF");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { forgetBlockCache } = await import("@/lib/api/abuse.server");
+    const { error } = await supabaseAdmin.from("abuse_blocks").upsert(
+      {
+        subject_type: data.subjectType,
+        subject: data.subject,
+        reason: data.reason ?? null,
+        created_by: context.userId,
+        expires_at:
+          data.hours > 0 ? new Date(Date.now() + data.hours * 3600_000).toISOString() : null,
+      },
+      { onConflict: "subject_type,subject" },
+    );
+    if (error) throw new Error(error.message);
+    forgetBlockCache();
+    return { ok: true };
+  });
+
+/** Lift a block. */
+export const adminUnblock = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { forgetBlockCache } = await import("@/lib/api/abuse.server");
+    const { error } = await supabaseAdmin.from("abuse_blocks").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    forgetBlockCache();
+    return { ok: true };
+  });

@@ -32,7 +32,7 @@ export const searchProducts = createServerFn({ method: "GET" })
       const stored = await readSearchCache(data.q, data.marketplace, data.page);
       // Cache hit never burns the daily allowance.
       if (stored) return stored;
-      quota = await consumeQuota("search", 1);
+      quota = await consumeQuota("search", 1, `${data.marketplace}: ${data.q}`);
       try {
         const fresh = await getProductProvider().search(data.q, {
           marketplace: data.marketplace,
@@ -109,7 +109,7 @@ export const productsByPhoto = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ items: ProductSummary[] } & Partial<QuotaInfo>> => {
     const { searchByPhoto } = await import("./image-search.server");
     const { consumeQuota } = await import("@/lib/api/quota.server");
-    const state = await consumeQuota("search", 1);
+    const state = await consumeQuota("search", 1, `photo: ${data.marketplace}`);
     let res: Awaited<ReturnType<typeof searchByPhoto>>;
     try {
       res = await searchByPhoto(data.image, data.marketplace);
@@ -135,7 +135,7 @@ export const productByUrl = createServerFn({ method: "POST" })
     const { assertSafeUrl } = await import("@/lib/api/url-guard.server");
     const safe = assertSafeUrl(data.url);
     return cached(`fn-url:${safe}`, async () => {
-      await consumeQuota("link", 1);
+      await consumeQuota("link", 1, safe);
       return getProductProvider().getByUrl(safe);
     });
   });
@@ -154,7 +154,7 @@ export const productById = createServerFn({ method: "GET" })
     const { cached } = await import("@/lib/api/guard.server");
     const { consumeQuota } = await import("@/lib/api/quota.server");
     return cached(`fn-detail:${data.marketplace}:${data.id}`, async () => {
-      await consumeQuota("detail", 1);
+      await consumeQuota("detail", 1, `${data.marketplace}: ${data.id}`);
       return getProductProvider().getById(data.id, data.marketplace);
     });
   });

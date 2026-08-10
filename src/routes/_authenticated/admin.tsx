@@ -2,7 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Container } from "@/components/s2b/primitives";
-import { adminOverview, adminSetUsage, adminDeleteUser } from "@/lib/auth/admin.functions";
+import {
+  adminOverview,
+  adminSetUsage,
+  adminDeleteUser,
+  adminActivity,
+  adminBlocks,
+  adminBlock,
+  adminUnblock,
+} from "@/lib/auth/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -21,13 +29,22 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 function AdminPage() {
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<"users" | "searches" | "errors">("users");
+  const [tab, setTab] = useState<"users" | "activity" | "blocks" | "searches" | "errors">("users");
   const [filter, setFilter] = useState("");
+  const [onlyBlocked, setOnlyBlocked] = useState(false);
+  const [logSearch, setLogSearch] = useState("");
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-overview"],
     queryFn: () => adminOverview(),
     refetchInterval: 60_000,
   });
+
+  const activity = useQuery({
+    queryKey: ["admin-activity", onlyBlocked, logSearch],
+    queryFn: () => adminActivity({ data: { onlyBlocked, search: logSearch, limit: 200 } }),
+    refetchInterval: 30_000,
+  });
+  const blocks = useQuery({ queryKey: ["admin-blocks"], queryFn: () => adminBlocks() });
 
   const reset = useMutation({
     mutationFn: (userId: string) => adminSetUsage({ data: { userId, used: 0 } }),
@@ -37,6 +54,28 @@ function AdminPage() {
     mutationFn: (userId: string) => adminDeleteUser({ data: { userId } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-overview"] }),
   });
+  const block = useMutation({
+    mutationFn: (input: {
+      subjectType: "user" | "ip";
+      subject: string;
+      reason?: string | undefined;
+      hours?: number | undefined;
+    }) => adminBlock({ data: { ...input, hours: input.hours ?? 0 } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-blocks"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-activity"] });
+    },
+  });
+  const unblock = useMutation({
+    mutationFn: (id: string) => adminUnblock({ data: { id } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-blocks"] }),
+  });
+
+  function askBlock(subjectType: "user" | "ip", subject: string) {
+    const reason = prompt(`Block this ${subjectType}? Optional note:`, "abuse");
+    if (reason === null) return;
+    block.mutate({ subjectType, subject, reason });
+  }
 
   if (error) {
     return (
@@ -71,10 +110,13 @@ function AdminPage() {
         <Stat label="Guest devices" value={data?.totals.guestsToday ?? 0} />
         <Stat label="Cached searches" value={data?.totals.cachedSearches ?? 0} />
         <Stat label="Errors (24h)" value={data?.totals.errors24h ?? 0} />
+        <Stat label="Requests (24h)" value={activity.data?.requests24h ?? 0} />
+        <Stat label="Blocked (24h)" value={activity.data?.blocked24h ?? 0} />
+        <Stat label="Active blocks" value={blocks.data?.length ?? 0} />
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-2">
-        {(["users", "searches", "errors"] as const).map((k) => (
+        {(["users", "activity", "blocks", "searches", "errors"] as const).map((k) => (
           <button
             key={k}
             type="button"
@@ -94,6 +136,26 @@ function AdminPage() {
             placeholder="Search email, phone or name"
             className="ml-auto h-11 w-full max-w-[280px] rounded-full border border-foreground/12 bg-background px-4 text-[14px] outline-none focus:border-accent"
           />
+        ) : null}
+        {tab === "activity" ? (
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setOnlyBlocked((v) => !v)}
+              aria-pressed={onlyBlocked}
+              className={`h-11 rounded-full px-4 text-[14px] font-bold ${
+                onlyBlocked ? "bg-destructive/15 text-destructive" : "bg-foreground/[0.06] text-muted-foreground"
+              }`}
+            >
+              Blocked only
+            </button>
+            <input
+              value={logSearch}
+              onChange={(e) => setLogSearch(e.target.value)}
+              placeholder="Filter by IP, query or user id"
+              className="h-11 w-full max-w-[280px] rounded-full border border-foreground/12 bg-background px-4 text-[14px] outline-none focus:border-accent"
+            />
+          </div>
         ) : null}
       </div>
 
@@ -144,6 +206,15 @@ function AdminPage() {
                       {!u.isAdmin ? (
                         <button
                           type="button"
+                          onClick={() => askBlock("user", u.id)}
+                          className="h-9 rounded-full bg-foreground/[0.06] px-3 text-[13px] font-bold text-foreground"
+                        >
+                          Block
+                        </button>
+                      ) : null}
+                      {!u.isAdmin ? (
+                        <button
+                          type="button"
                           onClick={() => {
                             if (confirm("Delete this account permanently?")) remove.mutate(u.id);
                           }}
@@ -165,6 +236,134 @@ function AdminPage() {
               ) : null}
             </tbody>
           </table>
+        </div>
+      ) : tab === "activity" ? (
+        <div className="mt-4 overflow-x-auto rounded-3xl border border-foreground/10">
+          {activity.data?.topIps.length ? (
+            <div className="flex flex-wrap gap-2 border-b border-foreground/8 p-3 text-[12px]">
+              <span className="font-bold text-muted-foreground">Busiest IPs:</span>
+              {activity.data.topIps.map((t) => (
+                <button
+                  key={t.ip}
+                  type="button"
+                  onClick={() => setLogSearch(t.ip)}
+                  className="rounded-full bg-foreground/[0.06] px-3 py-1 font-semibold text-foreground"
+                >
+                  {t.ip} · {t.count}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <table className="w-full min-w-[860px] text-left text-[14px]">
+            <thead className="bg-foreground/[0.04] text-[12px] uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3">When</th>
+                <th className="px-4 py-3">Action</th>
+                <th className="px-4 py-3">Who</th>
+                <th className="px-4 py-3">Detail</th>
+                <th className="px-4 py-3">Result</th>
+                <th className="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {(activity.data?.events ?? []).map((e) => (
+                <tr key={e.id} className="border-t border-foreground/8 align-top">
+                  <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                    {e.createdAt.slice(0, 19).replace("T", " ")}
+                  </td>
+                  <td className="px-4 py-3 font-semibold text-foreground">{e.kind}</td>
+                  <td className="px-4 py-3 text-[12px] text-muted-foreground">
+                    <div>{e.userId ? e.userId.slice(0, 8) : "guest"}</div>
+                    <div className="font-mono">{e.ip ?? "—"}</div>
+                  </td>
+                  <td className="max-w-[280px] break-words px-4 py-3 text-muted-foreground">
+                    {e.detail ?? "—"}
+                    {e.userAgent ? (
+                      <div className="mt-1 truncate text-[11px] opacity-70" title={e.userAgent}>
+                        {e.userAgent}
+                      </div>
+                    ) : null}
+                  </td>
+                  <td className="px-4 py-3">
+                    {e.allowed ? (
+                      <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[12px] font-bold text-accent">
+                        allowed
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[12px] font-bold text-destructive">
+                        {e.reason ?? "blocked"}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {e.ip ? (
+                      <button
+                        type="button"
+                        onClick={() => askBlock("ip", e.ip!)}
+                        className="h-9 rounded-full bg-foreground/[0.06] px-3 text-[13px] font-bold text-foreground"
+                      >
+                        Block IP
+                      </button>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+              {!activity.isLoading && (activity.data?.events ?? []).length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                    No requests logged for this filter.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      ) : tab === "blocks" ? (
+        <div className="mt-4 space-y-4">
+          <BlockForm onSubmit={(v) => block.mutate(v)} pending={block.isPending} />
+          <div className="overflow-x-auto rounded-3xl border border-foreground/10">
+            <table className="w-full min-w-[620px] text-left text-[14px]">
+              <thead className="bg-foreground/[0.04] text-[12px] uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Subject</th>
+                  <th className="px-4 py-3">Note</th>
+                  <th className="px-4 py-3">Expires</th>
+                  <th className="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {(blocks.data ?? []).map((b) => (
+                  <tr key={b.id} className="border-t border-foreground/8">
+                    <td className="px-4 py-3 font-semibold text-foreground">{b.subjectType}</td>
+                    <td className="break-all px-4 py-3 font-mono text-[13px] text-muted-foreground">
+                      {b.subject}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">{b.reason ?? "—"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {b.expiresAt ? b.expiresAt.slice(0, 16).replace("T", " ") : "never"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => unblock.mutate(b.id)}
+                        className="h-9 rounded-full bg-foreground/[0.06] px-3 text-[13px] font-bold text-foreground"
+                      >
+                        Unblock
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {(blocks.data ?? []).length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                      Nobody is blocked right now.
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : tab === "searches" ? (
         <div className="mt-4 overflow-x-auto rounded-3xl border border-foreground/10">
@@ -241,5 +440,78 @@ function Stat({ label, value }: { label: string; value: number }) {
       <div className="text-[clamp(1.4rem,3vw,1.9rem)] font-extrabold text-foreground">{value}</div>
       <div className="text-[13px] font-semibold text-muted-foreground">{label}</div>
     </div>
+  );
+}
+
+type BlockInput = {
+  subjectType: "user" | "ip";
+  subject: string;
+  reason?: string | undefined;
+  hours: number;
+};
+
+function BlockForm({
+  onSubmit,
+  pending,
+}: {
+  onSubmit: (value: BlockInput) => void;
+  pending: boolean;
+}) {
+  const [subjectType, setSubjectType] = useState<"user" | "ip">("ip");
+  const [subject, setSubject] = useState("");
+  const [reason, setReason] = useState("");
+  const [hours, setHours] = useState("0");
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!subject.trim()) return;
+        onSubmit({
+          subjectType,
+          subject: subject.trim(),
+          reason: reason.trim() || undefined,
+          hours: Number.parseInt(hours, 10) || 0,
+        });
+        setSubject("");
+        setReason("");
+      }}
+      className="flex flex-wrap items-center gap-2 rounded-3xl border border-foreground/10 p-3"
+    >
+      <select
+        value={subjectType}
+        onChange={(e) => setSubjectType(e.target.value as "user" | "ip")}
+        className="h-11 rounded-full border border-foreground/12 bg-background px-4 text-[14px]"
+      >
+        <option value="ip">IP address</option>
+        <option value="user">User id</option>
+      </select>
+      <input
+        value={subject}
+        onChange={(e) => setSubject(e.target.value)}
+        placeholder={subjectType === "ip" ? "203.0.113.9" : "user uuid"}
+        className="h-11 min-w-[220px] flex-1 rounded-full border border-foreground/12 bg-background px-4 text-[14px] outline-none focus:border-accent"
+      />
+      <input
+        value={reason}
+        onChange={(e) => setReason(e.target.value)}
+        placeholder="Note (optional)"
+        className="h-11 min-w-[160px] flex-1 rounded-full border border-foreground/12 bg-background px-4 text-[14px] outline-none focus:border-accent"
+      />
+      <input
+        value={hours}
+        onChange={(e) => setHours(e.target.value)}
+        inputMode="numeric"
+        title="Hours (0 = permanent)"
+        className="h-11 w-[110px] rounded-full border border-foreground/12 bg-background px-4 text-[14px] outline-none focus:border-accent"
+      />
+      <button
+        type="submit"
+        disabled={pending}
+        className="h-11 rounded-full bg-foreground px-5 text-[14px] font-bold text-background disabled:opacity-50"
+      >
+        Block
+      </button>
+    </form>
   );
 }

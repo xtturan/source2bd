@@ -48,6 +48,7 @@ export const claimAccount = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { ADMIN_EMAIL } = await import("./admin-config");
+    const { logActivity, noteActivity } = await import("@/lib/api/abuse.server");
     const userId = context.userId;
     const email = (context.claims as { email?: string } | undefined)?.email ?? null;
     const hash = await hashDevice(data.deviceId);
@@ -58,9 +59,18 @@ export const claimAccount = createServerFn({ method: "POST" })
       .eq("device_hash", hash);
     const others = new Set((rows ?? []).map((r) => r.user_id));
     if (!others.has(userId) && others.size >= MAX_ACCOUNTS_PER_DEVICE) {
+      await logActivity({
+        kind: "device_limit",
+        userId,
+        allowed: false,
+        reason: "device_account_limit",
+        detail: email ?? hash,
+      });
       await supabaseAdmin.auth.admin.deleteUser(userId);
       throw new Error("DEVICE_ACCOUNT_LIMIT");
     }
+
+    const isNewDevice = !others.has(userId);
 
     await supabaseAdmin.from("device_accounts").upsert(
       { device_hash: hash, user_id: userId },
@@ -83,6 +93,12 @@ export const claimAccount = createServerFn({ method: "POST" })
     await supabaseAdmin
       .from("user_roles")
       .upsert(roles.map((role) => ({ user_id: userId, role })), { onConflict: "user_id,role" });
+
+    noteActivity({
+      kind: isNewDevice ? "signup" : "signin",
+      userId,
+      detail: email ?? data.phone ?? null,
+    });
 
     return { ok: true, isAdmin: roles.includes("admin") };
   });

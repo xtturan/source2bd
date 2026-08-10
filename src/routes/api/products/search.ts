@@ -1,14 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { getProductProvider, providerFallbackMessage } from "@/lib/products/provider.server";
-import { cached, rateLimited, tooMany } from "@/lib/api/guard.server";
-import {
-  consumeQuota,
-  QuotaError,
-  AuthRequiredError,
-  limitFor,
-  nextDhakaMidnight,
-} from "@/lib/api/quota.server";
+import { cached, rateLimited, tooMany, abuseResponse } from "@/lib/api/guard.server";
+import { consumeQuota } from "@/lib/api/quota.server";
 
 const schema = z.object({
   q: z.string().trim().max(100).default(""),
@@ -32,37 +26,13 @@ export const Route = createFileRoute("/api/products/search")({
         const { q, marketplace, page } = parsed.data;
         try {
           const data = await cached(`search:${marketplace}:${q}:${page}`, async () => {
-            await consumeQuota("search", 1);
+            await consumeQuota("search", 1, `api ${marketplace}: ${q}`);
             return getProductProvider().search(q, { marketplace, page });
           });
           return Response.json(data);
         } catch (err) {
-          if (err instanceof AuthRequiredError) {
-            return Response.json(
-              { ok: false, code: err.code, messageBn: err.messageBn },
-              { status: 401 },
-            );
-          }
-          if (err instanceof QuotaError) {
-            return Response.json(
-              {
-                ok: false,
-                code: err.code,
-                limit: err.limit,
-                remaining: 0,
-                resetAt: err.resetAt,
-                messageBn: err.messageBn,
-              },
-              {
-                status: 429,
-                headers: {
-                  "X-RateLimit-Limit": String(err.limit),
-                  "X-RateLimit-Remaining": "0",
-                  "X-RateLimit-Reset": err.resetAt,
-                },
-              },
-            );
-          }
+          const handled = await abuseResponse(err);
+          if (handled) return handled;
           console.error("search failed", err);
           return Response.json(
             { ok: false, code: "UPSTREAM_UNAVAILABLE", messageBn: providerFallbackMessage },
