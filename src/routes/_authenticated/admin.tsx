@@ -438,3 +438,71 @@ function Stat({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
+type BlockInput = { subjectType: "user" | "ip"; subject: string; reason?: string; hours: number };
+
+function BlockForm({
+  onSubmit,
+  pending,
+}: {
+  onSubmit: (value: BlockInput) => void;
+  pending: boolean;
+}) {
+  const [subjectType, setSubjectType] = useState<"user" | "ip">("ip");
+  const [subject, setSubject] = useState("");
+  const [reason, setReason] = useState("");
+  const [hours, setHours] = useState("0");
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!subject.trim()) return;
+        onSubmit({
+          subjectType,
+          subject: subject.trim(),
+          reason: reason.trim() || undefined,
+          hours: Number.parseInt(hours, 10) || 0,
+        });
+        setSubject("");
+        setReason("");
+      }}
+      className="flex flex-wrap items-center gap-2 rounded-3xl border border-foreground/10 p-3"
+    >
+      <select
+        value={subjectType}
+        onChange={(e) => setSubjectType(e.target.value as "user" | "ip")}
+        className="h-11 rounded-full border border-foreground/12 bg-background px-4 text-[14px]"
+      >
+        <option value="ip">IP address</option>
+        <option value="user">User id</option>
+      </select>
+      <input
+        value={subject}
+        onChange={(e) => setSubject(e.target.value)}
+        placeholder={subjectType === "ip" ? "203.0.113.9" : "user uuid"}
+        className="h-11 min-w-[220px] flex-1 rounded-full border border-foreground/12 bg-background px-4 text-[14px] outline-none focus:border-accent"
+      />
+      <input
+        value={reason}
+        onChange={(e) => setReason(e.target.value)}
+        placeholder="Note (optional)"
+        className="h-11 min-w-[160px] flex-1 rounded-full border border-foreground/12 bg-background px-4 text-[14px] outline-none focus:border-accent"
+      />
+      <input
+        value={hours}
+        onChange={(e) => setHours(e.target.value)}
+        inputMode="numeric"
+        title="Hours (0 = permanent)"
+        className="h-11 w-[110px] rounded-full border border-foreground/12 bg-background px-4 text-[14px] outline-none focus:border-accent"
+      />
+      <button
+        type="submit"
+        disabled={pending}
+        className="h-11 rounded-full bg-foreground px-5 text-[14px] font-bold text-background disabled:opacity-50"
+      >
+        Block
+      </button>
+    </form>
+  );
+}
