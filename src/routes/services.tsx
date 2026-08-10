@@ -149,28 +149,26 @@ function ServicesPage() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 flex flex-col gap-2">
-                <a
-                  href="/quote"
-                  className="font-bn flex min-h-[50px] items-center justify-center rounded-full bg-primary text-[16px] font-bold text-primary-foreground"
-                >
-                  {t("দাম চান", "Get a quote")}
-                </a>
-                <a
-                  href={serviceQuote({ mode: lang === "bn" ? s.bn : s.en })}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-bn flex min-h-[50px] items-center justify-center gap-2 rounded-full bg-wa text-[16px] font-bold text-wa-foreground"
-                >
-                  <WhatsAppIcon className="h-5 w-5" />
-                  {t("হোয়াটসঅ্যাপ", "WhatsApp")}
-                </a>
-              </div>
+              <a
+                href="/quote"
+                className="font-bn mt-4 flex min-h-[52px] items-center justify-center rounded-full bg-primary px-4 text-center text-[16px] font-bold text-primary-foreground"
+              >
+                {t("দাম চান", "Get a quote")}
+              </a>
             </div>
           ))}
         </div>
 
         <div className="panel matte mt-6 rounded-[18px] p-5">
+          <p className="font-bn text-[16px] font-bold">
+            {t("চীনে পেমেন্ট কীভাবে হয়", "How payment to China works")}
+          </p>
+          <p className="font-bn mt-2 text-[15px] font-semibold text-muted-foreground">
+            {t(
+              "আগে আমরা পুরো দাম হিসাব করে দেই। আপনি দাম মেনে নেওয়ার পরেই আমরা চীনের সাপ্লায়ারকে আপনার হয়ে পেমেন্ট করি। আমরা কোনো ব্যাংক বা মানি এক্সচেঞ্জ সার্ভিস নই — শুধু আপনার অর্ডারের বিল পরিশোধ করি।",
+              "We quote first. Once you approve the quote, we pay the Chinese supplier on your behalf for that order. We are not a bank or a money exchange service, we only settle the bill for your order.",
+            )}
+          </p>
           <p className="font-bn text-[15px] font-semibold text-muted-foreground">
             {t(siteConfig.policyBn, siteConfig.policy)}
           </p>
