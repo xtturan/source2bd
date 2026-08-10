@@ -93,6 +93,51 @@ function ServicesPage() {
           })}
         </div>
 
+        {/* B2B lane: the full TWT International suite for shop owners and importers. */}
+        <h2 className="font-bn mt-12 text-[clamp(1.3rem,5vw,1.9rem)] font-extrabold">
+          {t("ইমপোর্টার ও দোকানদারদের জন্য পুরো সার্ভিস", "The full suite for importers and shop owners")}
+        </h2>
+        <p className="font-bn mt-2 text-[15px] font-semibold text-muted-foreground">
+          {t(
+            "TWT International-এর সোর্সিং, পেমেন্ট, ফ্রেইট, সি অ্যান্ড এফ ও ডেলিভারি — এক ডেস্ক থেকে।",
+            "Sourcing, payment, freight, C&F and delivery from one TWT International desk.",
+          )}
+        </p>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {b2bServices.map((s) => (
+            <div key={s.key} id={s.key} className="panel matte scroll-mt-24 rounded-[18px] p-5">
+              <h3 className="font-bn text-[18px] font-extrabold">{t(s.bn, s.en)}</h3>
+              <p className="font-bn mt-1 text-[14px] font-bold text-accent">{t(s.timeBn, s.timeEn)}</p>
+              <ul className="mt-3 space-y-2">
+                {(lang === "bn" ? s.pointsBn : s.pointsEn).map((p) => (
+                  <li key={p} className="font-bn flex gap-2 text-[15px] font-semibold text-muted-foreground">
+                    <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
+                    {p}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4 flex flex-col gap-2">
+                <a
+                  href="/quote"
+                  className="font-bn flex min-h-[50px] items-center justify-center rounded-full bg-primary text-[16px] font-bold text-primary-foreground"
+                >
+                  {t("দাম চান", "Get a quote")}
+                </a>
+                <a
+                  href={serviceQuote({ mode: lang === "bn" ? s.bn : s.en })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bn flex min-h-[50px] items-center justify-center gap-2 rounded-full bg-wa text-[16px] font-bold text-wa-foreground"
+                >
+                  <WhatsAppIcon className="h-5 w-5" />
+                  {t("হোয়াটসঅ্যাপ", "WhatsApp")}
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="panel matte mt-6 rounded-[18px] p-5">
           <p className="font-bn text-[15px] font-semibold text-muted-foreground">
             {t(siteConfig.policyBn, siteConfig.policy)}
