@@ -4,6 +4,7 @@ import { Container, Section } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
 import { QuotaBar } from "@/components/s2b/quota-bar";
 import { ProductCard } from "@/components/s2b/product-card";
+import { PriceHonesty } from "@/components/s2b/price-honesty";
 import { showcaseSearches } from "@/lib/products/queries.functions";
 import type { ShowcaseRow } from "@/lib/products/search-cache.server";
 import { quickCategories, siteConfig } from "@/config/site";
@@ -48,6 +49,7 @@ function HomePage() {
       <FirstScreen />
       <ThreeSteps />
       <TrustRow />
+      <PriceHonesty />
       <Categories />
       {showcase.length ? <Showcase rows={showcase.slice(0, 2)} /> : null}
       <HowToSend />
