@@ -169,7 +169,7 @@ function ServicesPage() {
               "We quote first. Once you approve the quote, we pay the Chinese supplier on your behalf for that order. We are not a bank or a money exchange service, we only settle the bill for your order.",
             )}
           </p>
-          <p className="font-bn text-[15px] font-semibold text-muted-foreground">
+          <p className="font-bn mt-5 border-t border-border pt-4 text-[15px] font-semibold text-muted-foreground">
             {t(siteConfig.policyBn, siteConfig.policy)}
           </p>
           <a
