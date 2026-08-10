@@ -439,7 +439,12 @@ function Stat({ label, value }: { label: string; value: number }) {
   );
 }
 
-type BlockInput = { subjectType: "user" | "ip"; subject: string; reason?: string; hours: number };
+type BlockInput = {
+  subjectType: "user" | "ip";
+  subject: string;
+  reason?: string | undefined;
+  hours: number;
+};
 
 function BlockForm({
   onSubmit,
