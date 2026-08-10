@@ -30,6 +30,20 @@ export const siteConfig = {
   mapUrl: "https://maps.google.com/?q=Chawkbazar+Dhaka",
 } as const;
 
+/**
+ * Illustrative landed-cost split shown on the home, quote and product pages.
+ * These are teaching numbers, not a price list. Edit here only.
+ */
+export const costExample = {
+  label: "10 kg LED light order, air freight",
+  parts: [
+    { bn: "পণ্যের দাম", en: "Product cost", taka: 12000 },
+    { bn: "আমাদের সার্ভিস", en: "Our service fee", taka: 1400 },
+    { bn: "ফ্রেইট (এয়ার)", en: "Freight (air)", taka: 6500 },
+    { bn: "ক্লিয়ারেন্স ও ট্যাক্স (আনুমানিক)", en: "Clearance and duty (estimate)", taka: 3100 },
+  ],
+} as const;
+
 export const navLinks = [
   { to: "/sourcing", label: "Sourcing", bn: "খুঁজুন" },
   { to: "/quote", label: "Full price", bn: "শিপিংসহ দাম" },
