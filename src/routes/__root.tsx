@@ -121,10 +121,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "LocalBusiness",
+          "@type": "Organization",
           name: "Source2BD",
-          description:
-            "Global sourcing agent and Bangladesh cargo: 1688, Alibaba, Amazon and worldwide stores, delivered to Dhaka and Chattogram.",
+          alternateName: "TWT International",
+          url: "https://source2bd.com",
+          logo: "https://source2bd.com/apple-touch-icon.png",
+          parentOrganization: { "@type": "Organization", name: "TWT International" },
           telephone: "+8801752457930",
           address: {
             "@type": "PostalAddress",
@@ -132,8 +134,43 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             addressLocality: "Dhaka",
             addressCountry: "BD",
           },
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              telephone: "+8801752457930",
+              contactType: "customer service",
+              availableLanguage: ["bn", "en"],
+            },
+          ],
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          name: "Source2BD",
+          parentOrganization: { "@type": "Organization", name: "TWT International" },
+          description:
+            "Global sourcing agent and Bangladesh cargo: 1688, Alibaba, Amazon and worldwide stores, delivered to Dhaka and Chattogram.",
+          telephone: "+8801752457930",
+          url: "https://source2bd.com",
+          priceRange: "৳৳",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Chawkbazar",
+            addressLocality: "Dhaka",
+            addressCountry: "BD",
+          },
           areaServed: ["Bangladesh", "China", "United States"],
-          openingHours: "Sa-Th 10:00-20:00",
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
+              opens: "10:00",
+              closes: "20:00",
+            },
+          ],
         }),
       },
       {
