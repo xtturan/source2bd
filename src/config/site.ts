@@ -1,6 +1,10 @@
 export const siteConfig = {
   name: "Source2BD",
-  legalName: "Source2BD Sourcing and Cargo",
+  legalName: "Source2BD",
+  /** Parent company. Source2BD is its customer facing sourcing product. */
+  parent: "TWT International",
+  parentLineBn: "TWT International-এর সোর্সিং ও কার্গো সার্ভিস",
+  parentLineEn: "The sourcing and cargo service of TWT International",
   tagline: "Source anything, from anywhere, land it in Bangladesh",
   taglineBn: "যেকোনো দেশ থেকে সোর্সিং · বাংলাদেশে ডেলিভারি",
   url: "https://source2bd.com",
@@ -10,6 +14,12 @@ export const siteConfig = {
   email: "hello@source2bd.com",
   office: "Chawkbazar Office, Dhaka",
   officeLine2: "Chawkbazar, Dhaka, Bangladesh",
+  landmark: "Chawkbazar, Dhaka",
+  landmarkBn: "চকবাজার, ঢাকা",
+  mapEmbedUrl: "https://www.google.com/maps?q=Chawkbazar+Dhaka&output=embed",
+  /** Owner supplied registration numbers. Leave empty until confirmed, never invent. */
+  tradeLicense: "",
+  binNumber: "",
   hours: "Sat to Thu, 10:00 to 20:00 Bangladesh time",
   originCities: ["Guangzhou", "Yiwu", "Shenzhen", "US warehouse"],
   destinationCities: ["Dhaka", "Chattogram"],
