@@ -202,6 +202,15 @@ function AdminPage() {
                       {!u.isAdmin ? (
                         <button
                           type="button"
+                          onClick={() => askBlock("user", u.id)}
+                          className="h-9 rounded-full bg-foreground/[0.06] px-3 text-[13px] font-bold text-foreground"
+                        >
+                          Block
+                        </button>
+                      ) : null}
+                      {!u.isAdmin ? (
+                        <button
+                          type="button"
                           onClick={() => {
                             if (confirm("Delete this account permanently?")) remove.mutate(u.id);
                           }}
@@ -223,6 +232,134 @@ function AdminPage() {
               ) : null}
             </tbody>
           </table>
+        </div>
+      ) : tab === "activity" ? (
+        <div className="mt-4 overflow-x-auto rounded-3xl border border-foreground/10">
+          {activity.data?.topIps.length ? (
+            <div className="flex flex-wrap gap-2 border-b border-foreground/8 p-3 text-[12px]">
+              <span className="font-bold text-muted-foreground">Busiest IPs:</span>
+              {activity.data.topIps.map((t) => (
+                <button
+                  key={t.ip}
+                  type="button"
+                  onClick={() => setLogSearch(t.ip)}
+                  className="rounded-full bg-foreground/[0.06] px-3 py-1 font-semibold text-foreground"
+                >
+                  {t.ip} · {t.count}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <table className="w-full min-w-[860px] text-left text-[14px]">
+            <thead className="bg-foreground/[0.04] text-[12px] uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3">When</th>
+                <th className="px-4 py-3">Action</th>
+                <th className="px-4 py-3">Who</th>
+                <th className="px-4 py-3">Detail</th>
+                <th className="px-4 py-3">Result</th>
+                <th className="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {(activity.data?.events ?? []).map((e) => (
+                <tr key={e.id} className="border-t border-foreground/8 align-top">
+                  <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                    {e.createdAt.slice(0, 19).replace("T", " ")}
+                  </td>
+                  <td className="px-4 py-3 font-semibold text-foreground">{e.kind}</td>
+                  <td className="px-4 py-3 text-[12px] text-muted-foreground">
+                    <div>{e.userId ? e.userId.slice(0, 8) : "guest"}</div>
+                    <div className="font-mono">{e.ip ?? "—"}</div>
+                  </td>
+                  <td className="max-w-[280px] break-words px-4 py-3 text-muted-foreground">
+                    {e.detail ?? "—"}
+                    {e.userAgent ? (
+                      <div className="mt-1 truncate text-[11px] opacity-70" title={e.userAgent}>
+                        {e.userAgent}
+                      </div>
+                    ) : null}
+                  </td>
+                  <td className="px-4 py-3">
+                    {e.allowed ? (
+                      <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[12px] font-bold text-accent">
+                        allowed
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[12px] font-bold text-destructive">
+                        {e.reason ?? "blocked"}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {e.ip ? (
+                      <button
+                        type="button"
+                        onClick={() => askBlock("ip", e.ip!)}
+                        className="h-9 rounded-full bg-foreground/[0.06] px-3 text-[13px] font-bold text-foreground"
+                      >
+                        Block IP
+                      </button>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+              {!activity.isLoading && (activity.data?.events ?? []).length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                    No requests logged for this filter.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      ) : tab === "blocks" ? (
+        <div className="mt-4 space-y-4">
+          <BlockForm onSubmit={(v) => block.mutate(v)} pending={block.isPending} />
+          <div className="overflow-x-auto rounded-3xl border border-foreground/10">
+            <table className="w-full min-w-[620px] text-left text-[14px]">
+              <thead className="bg-foreground/[0.04] text-[12px] uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Subject</th>
+                  <th className="px-4 py-3">Note</th>
+                  <th className="px-4 py-3">Expires</th>
+                  <th className="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {(blocks.data ?? []).map((b) => (
+                  <tr key={b.id} className="border-t border-foreground/8">
+                    <td className="px-4 py-3 font-semibold text-foreground">{b.subjectType}</td>
+                    <td className="break-all px-4 py-3 font-mono text-[13px] text-muted-foreground">
+                      {b.subject}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">{b.reason ?? "—"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {b.expiresAt ? b.expiresAt.slice(0, 16).replace("T", " ") : "never"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => unblock.mutate(b.id)}
+                        className="h-9 rounded-full bg-foreground/[0.06] px-3 text-[13px] font-bold text-foreground"
+                      >
+                        Unblock
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {(blocks.data ?? []).length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                      Nobody is blocked right now.
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : tab === "searches" ? (
         <div className="mt-4 overflow-x-auto rounded-3xl border border-foreground/10">
