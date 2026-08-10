@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Container, Section } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
-import { services, simpleServices, siteConfig } from "@/config/site";
+import { b2bServices, services, simpleServices, siteConfig } from "@/config/site";
 import { serviceQuote, telLink } from "@/lib/whatsapp";
 import { useLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
