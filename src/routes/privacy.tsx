@@ -48,7 +48,7 @@ function PrivacyPage() {
   return (
     <Section>
       <Container>
-        <SectionHeading eyebrow="Privacy" title="Short, because we collect very little" />
+        <SectionHeading as="h1" eyebrow="Privacy" title="Privacy policy: short, because we collect very little" />
         <div className="mt-12 grid max-w-3xl gap-4">
           {sections.map((s) => (
             <Card key={s.t} className="p-6">

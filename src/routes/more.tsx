@@ -41,7 +41,7 @@ function MorePage() {
   return (
     <Section className="py-8">
       <Container>
-        <h1 className="font-bn text-[clamp(1.6rem,6vw,2.2rem)] font-extrabold">{t("আরও", "More")}</h1>
+        <h1 className="font-bn text-[clamp(1.6rem,6vw,2.2rem)] font-extrabold">{t("আরও সার্ভিস ও তথ্য", "More services and information")}</h1>
 
         <div className="mt-5 grid gap-3">
           <a
