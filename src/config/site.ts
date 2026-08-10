@@ -3,7 +3,7 @@ export const siteConfig = {
   legalName: "Source2BD Sourcing and Cargo",
   tagline: "Source anything, from anywhere, land it in Bangladesh",
   taglineBn: "যেকোনো দেশ থেকে সোর্সিং · বাংলাদেশে ডেলিভারি",
-  url: "https://source2bd.lovable.app",
+  url: "https://source2bd.com",
   whatsappNumber: "8801752457930",
   phoneDisplay: "01752-457930",
   phoneTel: "+8801752457930",

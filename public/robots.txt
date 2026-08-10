@@ -5,4 +5,4 @@ Disallow: /auth
 Disallow: /account
 Disallow: /admin
 
-Sitemap: https://source2bd.lovable.app/sitemap.xml
+Sitemap: https://source2bd.com/sitemap.xml

@@ -19,7 +19,7 @@ export const Route = createFileRoute("/how-it-works")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://source2bd.lovable.app/how-it-works" }],
+    links: [{ rel: "canonical", href: "https://source2bd.com/how-it-works" }],
   }),
   component: HowItWorks,
 });

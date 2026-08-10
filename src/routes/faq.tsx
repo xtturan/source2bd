@@ -33,7 +33,7 @@ export const Route = createFileRoute("/faq")({
         }),
       },
     ],
-    links: [{ rel: "canonical", href: "https://source2bd.lovable.app/faq" }],
+    links: [{ rel: "canonical", href: "https://source2bd.com/faq" }],
   }),
   component: FaqPage,
 });
