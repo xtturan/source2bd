@@ -16,7 +16,11 @@ export const siteConfig = {
   officeLine2: "Chawkbazar, Dhaka, Bangladesh",
   landmark: "Chawkbazar, Dhaka",
   landmarkBn: "চকবাজার, ঢাকা",
-  mapEmbedUrl: "https://www.google.com/maps?q=Chawkbazar+Dhaka&output=embed",
+  /** Owner fills this later, e.g. "beside X market, 2nd floor". Empty = hidden. */
+  landmarkDetail: "",
+  landmarkDetailBn: "",
+  /** Set to a real Google Maps place embed URL only when a real pin exists. Empty = no map. */
+  mapEmbedUrl: "",
   /** Owner supplied registration numbers. Leave empty until confirmed, never invent. */
   tradeLicense: "",
   binNumber: "",

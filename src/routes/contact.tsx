@@ -59,26 +59,49 @@ function ContactPage() {
 
         <div className="panel matte mt-4 rounded-[18px] p-5">
           <p className="font-bn text-[15px] font-bold">{t("অফিস", "Office")}</p>
-          <p className="font-bn mt-1 text-[16px] font-semibold text-muted-foreground">{siteConfig.officeLine2}</p>
+          <p className="font-bn mt-1 text-[16px] font-semibold text-muted-foreground">
+            {t(siteConfig.officeBn, siteConfig.officeLine2)}
+          </p>
           <p className="font-bn mt-4 text-[15px] font-bold">{t("সময়", "Hours")}</p>
-          <p className="font-bn mt-1 text-[16px] font-semibold text-muted-foreground">{siteConfig.hours}</p>
-          <a
-            href={siteConfig.mapUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-bn mt-4 inline-flex text-[15px] font-bold text-accent underline"
-          >
-            {t("ম্যাপে দেখুন", "Open in Maps")}
-          </a>
-          <div className="mt-4 overflow-hidden rounded-[14px] border border-border">
-            <iframe
-              title={t("চকবাজার, ঢাকা — অফিসের ম্যাপ", "Chawkbazar, Dhaka office map")}
-              src="https://www.google.com/maps?q=Chawkbazar,+Dhaka,+Bangladesh&output=embed"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="h-[240px] w-full border-0"
-            />
-          </div>
+          <p className="font-bn mt-1 text-[16px] font-semibold text-muted-foreground">
+            {t(siteConfig.hoursBn, siteConfig.hours)}
+          </p>
+          {siteConfig.landmarkDetail ? (
+            <p className="font-bn mt-2 text-[15px] font-semibold text-muted-foreground">
+              {t(siteConfig.landmarkDetailBn || siteConfig.landmarkDetail, siteConfig.landmarkDetail)}
+            </p>
+          ) : null}
+
+          {siteConfig.mapEmbedUrl ? (
+            <div className="mt-4 overflow-hidden rounded-[14px] border border-border">
+              <iframe
+                title={t("অফিসের ম্যাপ", "Office map")}
+                src={siteConfig.mapEmbedUrl}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="h-[240px] w-full border-0"
+              />
+            </div>
+          ) : (
+            <div className="mt-4 rounded-[14px] border border-border p-4">
+              <p className="font-bn text-[16px] font-bold">{t(siteConfig.landmarkBn, siteConfig.landmark)}</p>
+              <p className="font-bn mt-1 text-[14px] font-semibold text-muted-foreground">
+                {t(
+                  "আমাদের ম্যাপে কোনো পিন এখনো দেওয়া নেই, তাই ভুল জায়গায় যাওয়ার ঝুঁকি নেই — হোয়াটসঅ্যাপে বললে আমরা লোকেশন পাঠিয়ে দেব।",
+                  "We have not published a map pin yet, so we will not send you to the wrong place. Ask on WhatsApp and we will share the live location.",
+                )}
+              </p>
+              <a
+                href={generalInquiry()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bn mt-3 flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-wa text-[16px] font-bold text-wa-foreground"
+              >
+                <WhatsAppIcon className="h-5 w-5" />
+                {t("দিকনির্দেশ হোয়াটসঅ্যাপে নিন", "Get directions on WhatsApp")}
+              </a>
+            </div>
+          )}
         </div>
 
         <div className="panel matte mt-4 rounded-[18px] p-5">
