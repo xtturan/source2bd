@@ -28,6 +28,7 @@ function AboutPage() {
     <Section>
       <Container>
         <SectionHeading
+          as="h1"
           eyebrow="Source2BD · a TWT International product"
           title="Built for importers who are tired of guessing"
           titleBn="আমাদের সম্পর্কে"

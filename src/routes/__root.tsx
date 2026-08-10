@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Source2BD sources from 1688, Alibaba, Amazon and any global store, then moves it to Dhaka and Chattogram by air, sea, courier or hand carry. WhatsApp quotes same day.",
+          "Source2BD sources from 1688, Alibaba and Amazon, then ships to Dhaka and Chattogram by air, sea, courier or hand carry. Same-day WhatsApp quotes.",
       },
       { name: "author", content: "Source2BD" },
       { name: "theme-color", content: "#0b1c2c" },

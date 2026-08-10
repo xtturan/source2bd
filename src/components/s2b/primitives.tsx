@@ -38,19 +38,22 @@ export function SectionHeading({
   titleBn,
   intro,
   className,
+  as: Tag = "h2",
 }: {
   eyebrow?: string;
   title: ReactNode;
   titleBn?: string;
   intro?: ReactNode;
   className?: string;
+  /** Use "h1" when this heading is the page's single main heading. */
+  as?: "h1" | "h2";
 }) {
   return (
     <div className={cn("max-w-2xl", className)}>
       {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
-      <h2 className="mt-4 text-[clamp(1.6rem,4.4vw,2.6rem)] font-extrabold leading-[1.08]">
+      <Tag className="mt-4 text-[clamp(1.6rem,4.4vw,2.6rem)] font-extrabold leading-[1.08]">
         {title}
-      </h2>
+      </Tag>
       {titleBn ? <p className="font-bn mt-2 text-base text-muted-foreground">{titleBn}</p> : null}
       {intro ? (
         <p className="mt-4 max-w-[62ch] text-[clamp(0.95rem,1.4vw,1.125rem)] leading-relaxed text-muted-foreground">

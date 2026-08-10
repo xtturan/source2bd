@@ -33,6 +33,7 @@ function GuidesIndex() {
     <Section>
       <Container>
         <SectionHeading
+          as="h1"
           eyebrow="Guides"
           title="গাইড ও পরামর্শ"
           titleBn="নতুন হলে এখান থেকে শুরু করুন"
