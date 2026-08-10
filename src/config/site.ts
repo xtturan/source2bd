@@ -44,6 +44,115 @@ export const costExample = {
   ],
 } as const;
 
+/**
+ * The full TWT International suite, written for shop owners and importers.
+ * Honest scope only: no customs-clearance claims we cannot back.
+ */
+export const b2bServices = [
+  {
+    key: "sourcing-agent",
+    bn: "সোর্সিং এজেন্ট (১৬৮৮ / আলিবাবা / অ্যামাজন)",
+    en: "Sourcing agent (1688 / Alibaba / Amazon)",
+    timeBn: "কোট ২–২৪ ঘণ্টায়",
+    timeEn: "Quote in 2–24 hours",
+    pointsBn: [
+      "নাম, ছবি বা লিংক থেকে সাপ্লায়ার খুঁজে দেই",
+      "একই পণ্যের কয়েকটি দাম তুলনা করে দেখাই",
+      "সাপ্লায়ারের সাথে চীনা ভাষায় দরদাম করি",
+    ],
+    pointsEn: [
+      "We find the supplier from a name, photo or link",
+      "We compare several offers for the same item",
+      "We negotiate with the supplier in Chinese",
+    ],
+  },
+  {
+    key: "payment-support",
+    bn: "চীনে পেমেন্ট সাপোর্ট",
+    en: "China payment support",
+    timeBn: "একই দিনে",
+    timeEn: "Same day",
+    pointsBn: [
+      "আপনার হয়ে সাপ্লায়ারকে বৈধ পথে পরিশোধ করি",
+      "প্রতিটি পেমেন্টের রসিদ আপনাকে দেই",
+      "শুধু বৈধ পণ্যের অর্ডারে প্রযোজ্য",
+    ],
+    pointsEn: [
+      "We settle the supplier invoice on your behalf through legal channels",
+      "You receive a receipt for every payment",
+      "Applies to legal goods only",
+    ],
+  },
+  {
+    key: "freight",
+    bn: "ফ্রেইট — এয়ার, সি, হ্যান্ড ক্যারি, কুরিয়ার",
+    en: "Freight — air, sea, hand carry, courier",
+    timeBn: "৪–৪৫ দিন, লাইন অনুযায়ী",
+    timeEn: "4–45 days depending on the lane",
+    pointsBn: [
+      "ওজন ও ভলিউম দেখে সবচেয়ে সস্তা লাইন বেছে দেই",
+      "প্রতি কেজি বা প্রতি সিবিএম রেট আগেই জানাই",
+      "জরুরি হলে হ্যান্ড ক্যারি",
+    ],
+    pointsEn: [
+      "We pick the cheapest lane for your weight and volume",
+      "Per kg or per CBM rate is quoted upfront",
+      "Hand carry when it is urgent",
+    ],
+  },
+  {
+    key: "cnf",
+    bn: "সি অ্যান্ড এফ ও কাস্টমস সমন্বয়",
+    en: "C&F and customs coordination",
+    timeBn: "পোর্টে ২–৭ দিন",
+    timeEn: "2–7 days at port",
+    pointsBn: [
+      "লাইসেন্সধারী সি অ্যান্ড এফ এজেন্টের সাথে কাজ করি",
+      "কাগজপত্র ও এইচএস কোড গুছিয়ে দেই",
+      "ডিউটি সরকারি হারে, আমরা কিছু যোগ করি না",
+    ],
+    pointsEn: [
+      "We work with licensed C&F agents",
+      "Documents and HS codes prepared for you",
+      "Duty at government rates, we add nothing on top",
+    ],
+  },
+  {
+    key: "warehouse-qc",
+    bn: "গুদামে একত্র করা ও কিউসি ছবি",
+    en: "Warehouse consolidation and QC photos",
+    timeBn: "ফ্রি স্টোরেজ ১৫ দিন",
+    timeEn: "15 days free storage",
+    pointsBn: [
+      "কয়েক সাপ্লায়ারের মাল এক কার্টনে",
+      "পাঠানোর আগে ছবি ও ভিডিও",
+      "ভাঙা বা ভুল মাল আগেই ধরা পড়ে",
+    ],
+    pointsEn: [
+      "Several suppliers packed into one carton",
+      "Photos and video before dispatch",
+      "Damaged or wrong items caught before shipping",
+    ],
+  },
+  {
+    key: "door-delivery",
+    bn: "বাংলাদেশে ডোর ডেলিভারি",
+    en: "Door delivery in Bangladesh",
+    timeBn: "ক্লিয়ারেন্সের পর ১–৩ দিন",
+    timeEn: "1–3 days after clearance",
+    pointsBn: [
+      "ঢাকা, চট্টগ্রামসহ সারা দেশে",
+      "কুরিয়ার বা ট্রাক, পরিমাণ অনুযায়ী",
+      "ডেলিভারির আগে ফোনে জানানো হয়",
+    ],
+    pointsEn: [
+      "Dhaka, Chattogram and nationwide",
+      "Courier or truck depending on volume",
+      "We call before delivery",
+    ],
+  },
+] as const;
+
 export const navLinks = [
   { to: "/sourcing", label: "Sourcing", bn: "খুঁজুন" },
   { to: "/quote", label: "Full price", bn: "শিপিংসহ দাম" },
