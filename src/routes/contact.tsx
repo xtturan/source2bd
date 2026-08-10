@@ -59,9 +59,13 @@ function ContactPage() {
 
         <div className="panel matte mt-4 rounded-[18px] p-5">
           <p className="font-bn text-[15px] font-bold">{t("অফিস", "Office")}</p>
-          <p className="font-bn mt-1 text-[16px] font-semibold text-muted-foreground">{siteConfig.officeLine2}</p>
+          <p className="font-bn mt-1 text-[16px] font-semibold text-muted-foreground">
+            {t(siteConfig.officeBn, siteConfig.officeLine2)}
+          </p>
           <p className="font-bn mt-4 text-[15px] font-bold">{t("সময়", "Hours")}</p>
-          <p className="font-bn mt-1 text-[16px] font-semibold text-muted-foreground">{siteConfig.hours}</p>
+          <p className="font-bn mt-1 text-[16px] font-semibold text-muted-foreground">
+            {t(siteConfig.hoursBn, siteConfig.hours)}
+          </p>
           {siteConfig.landmarkDetail ? (
             <p className="font-bn mt-2 text-[15px] font-semibold text-muted-foreground">
               {t(siteConfig.landmarkDetailBn || siteConfig.landmarkDetail, siteConfig.landmarkDetail)}
