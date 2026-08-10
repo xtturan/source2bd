@@ -119,9 +119,19 @@ export function EmptyState({
 }
 
 export function Stat({ value, label, sub }: { value: string; label: string; sub?: string }) {
+  // Values are sometimes a short fact rather than a number; keep both readable.
+  const long = value.length > 12;
   return (
     <div className="panel matte rounded-[18px] px-4 py-5 sm:px-5 sm:py-6">
-      <div className="tnum text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-tight">{value}</div>
+      <div
+        className={
+          long
+            ? "text-[clamp(0.95rem,1.6vw,1.15rem)] font-extrabold leading-snug tracking-tight"
+            : "tnum text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-tight"
+        }
+      >
+        {value}
+      </div>
       <div className="mt-1 text-sm font-semibold leading-snug">{label}</div>
       {sub ? <div className="mt-1 text-xs text-muted-foreground">{sub}</div> : null}
     </div>

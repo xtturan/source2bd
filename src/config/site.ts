@@ -434,9 +434,13 @@ export const services: ServiceDef[] = [
   },
 ];
 
+/**
+ * Honest claims only. These describe what we offer, not measured metrics.
+ * Never add order counts, review counts or SLA numbers we do not track.
+ */
 export const trustStats = [
-  { value: "4", label: "origin lanes live", sub: "China, US, EU, regional" },
-  { value: "1 day", label: "median quote time", sub: "on working days" },
-  { value: "0", label: "restricted goods handled", sub: "legal cargo only" },
-  { value: "2", label: "BD delivery hubs", sub: "Dhaka and Chattogram" },
+  { value: "1688 · Alibaba · Amazon", label: "markets we buy from", sub: "and any global store on request" },
+  { value: "Air · Sea · Courier · Hand carry", label: "freight options", sub: "we pick the cheapest for your load" },
+  { value: "Legal goods only", label: "what we will carry", sub: "no counterfeit, no restricted items" },
+  { value: "Dhaka · Chattogram", label: "delivery hubs", sub: "nationwide door delivery from there" },
 ];
