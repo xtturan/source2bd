@@ -43,3 +43,46 @@ export function tooMany() {
     { status: 429 },
   );
 }
+
+/**
+ * Turns the shared abuse/quota errors into the right HTTP response.
+ * Returns null when the error is something else and should bubble up.
+ */
+export async function abuseResponse(err: unknown): Promise<Response | null> {
+  const { BlockedError } = await import("./abuse.server");
+  const { QuotaError, AuthRequiredError } = await import("./quota.server");
+
+  if (err instanceof BlockedError) {
+    return Response.json(
+      { ok: false, code: err.code, messageBn: err.messageBn },
+      { status: 403 },
+    );
+  }
+  if (err instanceof AuthRequiredError) {
+    return Response.json(
+      { ok: false, code: err.code, messageBn: err.messageBn },
+      { status: 401 },
+    );
+  }
+  if (err instanceof QuotaError) {
+    return Response.json(
+      {
+        ok: false,
+        code: err.code,
+        limit: err.limit,
+        remaining: 0,
+        resetAt: err.resetAt,
+        messageBn: err.messageBn,
+      },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": String(err.limit),
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": err.resetAt,
+        },
+      },
+    );
+  }
+  return null;
+}
