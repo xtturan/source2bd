@@ -20,7 +20,7 @@ export const siteConfig = {
   landmarkDetail: "",
   landmarkDetailBn: "",
   /** Set to a real Google Maps place embed URL only when a real pin exists. Empty = no map. */
-  mapEmbedUrl: "https://www.google.com/maps?q=Chawkbazar+Dhaka&output=embed",
+  mapEmbedUrl: "",
   /** Owner supplied registration numbers. Leave empty until confirmed, never invent. */
   tradeLicense: "",
   binNumber: "",
