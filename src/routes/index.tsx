@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://source2bd.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://source2bd.com/" }],
   }),
   component: HomePage,
   loader: async (): Promise<ShowcaseRow[]> => {
@@ -375,7 +375,7 @@ function Showcase({ rows }: { rows: ShowcaseRow[] }) {
         </div>
         <Link
           to="/catalog"
-          search={{ cat: "", q: "" }}
+          search={{}}
           className="panel matte font-bn mt-6 flex min-h-[64px] items-center justify-between gap-3 rounded-[18px] px-5 text-[16px] font-bold"
         >
           <span>{t("সব ক্যাটাগরি ও পণ্য দেখুন", "Browse every category and product")}</span>

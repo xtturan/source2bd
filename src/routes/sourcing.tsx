@@ -27,7 +27,7 @@ export const Route = createFileRoute("/sourcing")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://source2bd.lovable.app/sourcing" }],
+    links: [{ rel: "canonical", href: "https://source2bd.com/sourcing" }],
   }),
   component: SourcingPage,
   validateSearch: (s: Record<string, unknown>): { q?: string; mode?: Mode } => {
@@ -90,7 +90,7 @@ function SourcingPage() {
 
         <Link
           to="/catalog"
-          search={{ cat: "", q: "" }}
+          search={{}}
           className="panel matte font-bn mt-3 flex min-h-[56px] items-center justify-between gap-3 rounded-[16px] px-4 text-[15px] font-bold"
         >
           <span>{t("বুঝতে পারছেন না কী আনবেন? ক্যাটালগ দেখুন", "Not sure what to import? Browse the catalogue")}</span>

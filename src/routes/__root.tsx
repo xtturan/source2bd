@@ -98,8 +98,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "Source2BD, source from anywhere and land it in Bangladesh" },
       { property: "og:description", content: "Source2BD sources from 1688, Alibaba, Amazon and any global store, then moves it to Dhaka and Chattogram by air, sea, courier or hand carry. WhatsApp quotes same day." },
       { name: "twitter:description", content: "Source2BD sources from 1688, Alibaba, Amazon and any global store, then moves it to Dhaka and Chattogram by air, sea, courier or hand carry. WhatsApp quotes same day." },
-      { property: "og:image", content: "https://source2bd.lovable.app/og-cover.jpg" },
-      { name: "twitter:image", content: "https://source2bd.lovable.app/og-cover.jpg" },
+      { property: "og:image", content: "https://source2bd.com/og-cover.jpg" },
+      { name: "twitter:image", content: "https://source2bd.com/og-cover.jpg" },
     ],
     links: [
       {
@@ -142,13 +142,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "Source2BD",
-          url: "https://source2bd.lovable.app",
+          url: "https://source2bd.com",
           inLanguage: "bn-BD",
           potentialAction: {
             "@type": "SearchAction",
             target: {
               "@type": "EntryPoint",
-              urlTemplate: "https://source2bd.lovable.app/sourcing?q={search_term_string}",
+              urlTemplate: "https://source2bd.com/sourcing?q={search_term_string}",
             },
             "query-input": "required name=search_term_string",
           },

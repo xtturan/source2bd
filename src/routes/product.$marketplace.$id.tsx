@@ -40,7 +40,7 @@ export const Route = createFileRoute("/product/$marketplace/$id")({
       links: [
         {
           rel: "canonical",
-          href: `https://source2bd.lovable.app/product/${params.marketplace}/${params.id}`,
+          href: `https://source2bd.com/product/${params.marketplace}/${params.id}`,
         },
       ],
     };

@@ -21,7 +21,7 @@ export const Route = createFileRoute("/services")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://source2bd.lovable.app/services" }],
+    links: [{ rel: "canonical", href: "https://source2bd.com/services" }],
   }),
   component: ServicesPage,
 });

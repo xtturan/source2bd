@@ -22,12 +22,14 @@ export const Route = createFileRoute("/catalog")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://source2bd.lovable.app/catalog" }],
+    links: [{ rel: "canonical", href: "https://source2bd.com/catalog" }],
   }),
-  validateSearch: (search: Record<string, unknown>): { cat: string; q: string } => ({
-    cat: typeof search["cat"] === "string" ? search["cat"] : "",
-    q: typeof search["q"] === "string" ? search["q"] : "",
-  }),
+  validateSearch: (search: Record<string, unknown>): { cat?: string; q?: string } => {
+    const out: { cat?: string; q?: string } = {};
+    if (typeof search["cat"] === "string" && search["cat"]) out.cat = search["cat"];
+    if (typeof search["q"] === "string" && search["q"]) out.q = search["q"];
+    return out;
+  },
   loader: async (): Promise<CatalogueItem[]> => {
     try {
       return await catalogueProducts();
@@ -56,7 +58,7 @@ export const Route = createFileRoute("/catalog")({
 
 function CatalogPage() {
   const items = Route.useLoaderData() as CatalogueItem[];
-  const { cat, q } = Route.useSearch();
+  const { cat = "", q = "" } = Route.useSearch();
   const { t } = useLang();
   const [text, setText] = useState(q);
 
@@ -105,7 +107,7 @@ function CatalogPage() {
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
             to="/catalog"
-            search={{ cat: "", q: "" }}
+            search={{}}
             className={cn(
               "font-bn flex min-h-[48px] items-center gap-2 rounded-full px-4 text-[14px] font-bold",
               cat ? "panel matte text-muted-foreground" : "bg-foreground text-background",
@@ -119,7 +121,7 @@ function CatalogPage() {
               <Link
                 key={c.key}
                 to="/catalog"
-                search={{ cat: c.key, q: "" }}
+                search={{ cat: c.key }}
                 className={cn(
                   "font-bn flex min-h-[48px] items-center gap-2 rounded-full px-4 text-[14px] font-bold",
                   cat === c.key ? "bg-foreground text-background" : "panel matte text-muted-foreground",
