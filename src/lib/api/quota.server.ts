@@ -170,8 +170,20 @@ export async function consumeQuota(
     action === "search" && (process.env["REQUIRE_LOGIN_FOR_SEARCH"] ?? "true") !== "false";
   const userId = await currentUserId();
 
+  const { assertNotBlocked, noteActivity } = await import("./abuse.server");
+  try {
+    await assertNotBlocked(userId);
+  } catch (err) {
+    noteActivity({ kind: action, userId, allowed: false, reason: "blocked", detail: label });
+    throw err;
+  }
+
   if (!userId) {
-    if (requireLogin) throw new AuthRequiredError();
+    if (requireLogin) {
+      noteActivity({ kind: action, userId: null, allowed: false, reason: "login_required", detail: label });
+      throw new AuthRequiredError();
+    }
+    noteActivity({ kind: action, userId: null, allowed: true, detail: label });
     return { limit, remaining: limit, resetAt };
   }
 
@@ -188,6 +200,13 @@ export async function consumeQuota(
     if (error) throw error;
     const row = Array.isArray(data) ? data[0] : data;
     if (row && row.allowed === false) {
+      noteActivity({
+        kind: action,
+        userId,
+        allowed: false,
+        reason: row.reason === "burst" ? "burst_limit" : "daily_limit",
+        detail: label,
+      });
       throw new QuotaError({
         code: row.reason === "burst" ? "BURST_LIMIT" : "DAILY_SEARCH_LIMIT",
         limit,
@@ -200,12 +219,14 @@ export async function consumeQuota(
       resetAt,
     };
     setHeaders(state);
+    noteActivity({ kind: action, userId, allowed: true, detail: label });
     console.info(
       `quota ${action} allowed user=${userId.slice(0, 8)} remaining=${state.remaining}`,
     );
     return state;
   } catch (err) {
     if (err instanceof QuotaError) throw err;
+    if (err instanceof Error && err.name === "BlockedError") throw err;
     // Counter store unreachable: let a real customer through rather than block.
     console.error("quota check failed", err);
     return { limit, remaining: limit, resetAt };
