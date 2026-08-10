@@ -30,6 +30,34 @@ function ServicesPage() {
   const { t, lang } = useLang();
   const [open, setOpen] = useState<string | null>(null);
 
+  /** Three plain bullets per lane. Facts only: what it covers, what it costs you in time, what we need. */
+  const bullets: Record<string, { bn: string[]; en: string[] }> = {
+    "hand-carry": {
+      bn: ["ছোট ও হালকা পণ্য, হাতে করে আনা", "সবচেয়ে দ্রুত, তবে কেজি প্রতি খরচ বেশি", "ছবি বা লিংক আর কয়টা লাগবে জানালেই দাম"],
+      en: ["Small, light items carried by hand", "Fastest lane, highest cost per kg", "Send a photo or link plus quantity for a price"],
+    },
+    "air-freight": {
+      bn: ["মাঝারি ওজনের মাল দ্রুত আনার জন্য", "ওজন ও আয়তন — যেটা বেশি সেটার হিসাবে দাম", "গুদামে মাল একত্র করে এক চালানে পাঠানো যায়"],
+      en: ["Medium weight loads that cannot wait", "Charged on weight or volume, whichever is higher", "We can consolidate several sellers into one shipment"],
+    },
+    "sea-freight": {
+      bn: ["ভারী বা অনেক বেশি পরিমাণ মালের জন্য", "কেজি প্রতি সবচেয়ে কম খরচ, সময় বেশি লাগে", "সম্পূর্ণ কনটেইনার বা শেয়ার্ড দুটোই হয়"],
+      en: ["Heavy or high volume orders", "Cheapest per kg, slowest to arrive", "Full container or shared space, both work"],
+    },
+    courier: {
+      bn: ["এক দুই কার্টন বা ট্রায়াল অর্ডার", "ডোর টু ডোর, ট্র্যাকিং নম্বর দিয়ে দেই", "নমুনা আনার সবচেয়ে সহজ উপায়"],
+      en: ["One or two cartons, or a trial order", "Door to door with a tracking number", "The simplest way to bring in samples"],
+    },
+    warehouse: {
+      bn: ["কয়েক দোকানের মাল আমাদের গুদামে জমা হয়", "পাঠানোর আগে ছবি দেখে নিতে পারবেন", "একসাথে পাঠালে ফ্রেইট খরচ কমে"],
+      en: ["Goods from several sellers land in our warehouse", "You see photos before anything ships", "Combining orders cuts the freight bill"],
+    },
+  };
+  const fallbackBullets = {
+    bn: ["ছবি, লিংক বা নাম পাঠান", "কয়টা লাগবে আর কোন শহরে যাবে বলুন", "পুরো খরচ হিসাব করে জানাব"],
+    en: ["Send a photo, link or name", "Tell us quantity and delivery city", "We come back with the full landed cost"],
+  };
+
   return (
     <Section className="py-8">
       <Container>
@@ -50,42 +78,46 @@ function ServicesPage() {
                   <BoxGlyph />
                 </span>
                 <h2 className="font-bn mt-3 text-[20px] font-extrabold">{t(s.bn, s.en)}</h2>
-                <p className="font-bn mt-1 text-[15px] font-semibold text-muted-foreground">
+                <p className="font-bn mt-1 text-[15px] font-bold text-accent">{t(s.timeBn, s.timeEn)}</p>
+                <ul className="mt-3 space-y-2">
+                  {(lang === "bn"
+                    ? (bullets[s.key]?.bn ?? fallbackBullets.bn)
+                    : (bullets[s.key]?.en ?? fallbackBullets.en)
+                  ).map((p) => (
+                    <li key={p} className="font-bn flex gap-2 text-[15px] font-semibold text-muted-foreground">
+                      <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-bn mt-3 text-[15px] font-semibold">
+                  <span className="text-muted-foreground">{t("কার জন্য:", "Who it is for:")} </span>
                   {t(s.forBn, s.forEn)}
                 </p>
-                <p className="font-bn mt-1 text-[15px] font-bold text-accent">{t(s.timeBn, s.timeEn)}</p>
 
                 <a
                   href={serviceQuote({ mode: lang === "bn" ? s.bn : s.en })}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-bn mt-4 flex min-h-[56px] items-center justify-center gap-2 rounded-full bg-wa text-[17px] font-bold text-wa-foreground"
+                  className="font-bn mt-4 flex min-h-[56px] items-center justify-center gap-2 rounded-full bg-wa px-4 text-center text-[17px] font-bold text-wa-foreground"
                 >
                   <WhatsAppIcon className="h-5 w-5" />
                   {t("বাংলাদেশ পর্যন্ত পুরো দাম জানুন", "Get the full Bangladesh price")}
                 </a>
+                {detail?.short && lang === "en" ? (
+                  <button
+                    type="button"
+                    onClick={() => setOpen(isOpen ? null : s.key)}
+                    aria-expanded={isOpen}
+                    className="font-bn mt-3 text-[15px] font-bold text-muted-foreground underline"
+                  >
+                    {isOpen ? "Close" : "Read more"}
+                  </button>
+                ) : null}
 
-                <button
-                  type="button"
-                  onClick={() => setOpen(isOpen ? null : s.key)}
-                  aria-expanded={isOpen}
-                  className="font-bn mt-3 text-[15px] font-bold text-muted-foreground underline"
-                >
-                  {isOpen ? t("বন্ধ করুন", "Close") : t("আরও জানুন", "Read more")}
-                </button>
-
-                {isOpen ? (
+                {isOpen && lang === "en" ? (
                   <div className={cn("mt-3 text-[15px] leading-relaxed text-muted-foreground", lang === "bn" && "font-bn")}>
-                    {lang === "bn" ? (
-                      <p>
-                        {t(
-                          "আপনার পণ্যের ছবি বা লিংক দিন, কয়টা লাগবে আর কোন শহরে যাবে বলুন। আমরা পুরো খরচ হিসাব করে জানাব।",
-                          "",
-                        )}
-                      </p>
-                    ) : (
-                      <p>{detail?.short}</p>
-                    )}
+                    <p>{detail?.short}</p>
                   </div>
                 ) : null}
               </div>
