@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      abuse_blocks: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          reason: string | null
+          subject: string
+          subject_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          subject: string
+          subject_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          subject?: string
+          subject_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      activity_log: {
+        Row: {
+          allowed: boolean
+          created_at: string
+          detail: string | null
+          id: string
+          ip: string | null
+          kind: string
+          reason: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          allowed?: boolean
+          created_at?: string
+          detail?: string | null
+          id?: string
+          ip?: string | null
+          kind: string
+          reason?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          allowed?: boolean
+          created_at?: string
+          detail?: string | null
+          id?: string
+          ip?: string | null
+          kind?: string
+          reason?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       daily_usage: {
         Row: {
           created_at: string
@@ -269,6 +338,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_blocked: { Args: { _ip: string; _user_id: string }; Returns: boolean }
       read_user_usage: {
         Args: { _day: string; _user_id: string }
         Returns: {
