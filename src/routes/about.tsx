@@ -88,9 +88,13 @@ function AboutPage() {
             {siteConfig.officeLine2}. Desk hours {siteConfig.hours}. Walk in with a sample or a
             photo and we will price it while you are there.
           </p>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Trade licence: {siteConfig.tradeLicense} · BIN: {siteConfig.bin}
-          </p>
+          {siteConfig.tradeLicense || siteConfig.binNumber ? (
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              {siteConfig.tradeLicense ? `Trade licence: ${siteConfig.tradeLicense}` : null}
+              {siteConfig.tradeLicense && siteConfig.binNumber ? " · " : null}
+              {siteConfig.binNumber ? `BIN: ${siteConfig.binNumber}` : null}
+            </p>
+          ) : null}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <ButtonAnchor href={generalInquiry()} target="_blank" rel="noopener noreferrer" variant="green" size="lg">
               <WhatsAppIcon /> Message the desk
