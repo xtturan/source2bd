@@ -61,6 +61,16 @@ export class AuthRequiredError extends Error {
   }
 }
 
+/** Automated crawler tried to trigger a paid lookup. */
+export class CrawlerError extends Error {
+  readonly code = "BOT_BLOCKED";
+  readonly messageBn = "স্বয়ংক্রিয় রিকোয়েস্ট অনুমোদিত নয়।";
+  constructor() {
+    super("BOT_BLOCKED");
+    this.name = "CrawlerError";
+  }
+}
+
 /** Calendar day in Asia/Dhaka (UTC+6), as YYYY-MM-DD. */
 export function dhakaDay(now = new Date()) {
   return new Date(now.getTime() + 6 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -165,13 +175,21 @@ export async function consumeQuota(
 
   if (hasBypass()) return { limit, remaining: limit, resetAt };
 
+  const { assertNotBlocked, noteActivity, isCrawler } = await import("./abuse.server");
+
+  // Crawlers never spend provider credit: 400 bot hits on product pages can
+  // drain a whole day's API budget in minutes.
+  if (isCrawler()) {
+    noteActivity({ kind: action, userId: null, allowed: false, reason: "bot", detail: label });
+    throw new CrawlerError();
+  }
+
   // Only live keyword/photo search is gated behind login; opening a product
   // detail page or resolving a pasted link stays public and crawlable.
   const requireLogin =
     action === "search" && (process.env["REQUIRE_LOGIN_FOR_SEARCH"] ?? "true") !== "false";
   const userId = await currentUserId();
 
-  const { assertNotBlocked, noteActivity } = await import("./abuse.server");
   try {
     await assertNotBlocked(userId);
   } catch (err) {
@@ -227,6 +245,7 @@ export async function consumeQuota(
     return state;
   } catch (err) {
     if (err instanceof QuotaError) throw err;
+    if (err instanceof CrawlerError) throw err;
     if (err instanceof Error && err.name === "BlockedError") throw err;
     // Counter store unreachable: let a real customer through rather than block.
     console.error("quota check failed", err);

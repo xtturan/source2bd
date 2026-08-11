@@ -55,6 +55,23 @@ export function clientMeta(): ClientMeta {
   }
 }
 
+/**
+ * Automated crawlers (search engines, AI scrapers, link previewers).
+ *
+ * These hit product pages in bulk and every uncached hit costs a paid
+ * marketplace lookup, so they are never allowed to trigger a live provider
+ * call. Product pages are not in the sitemap, so nothing indexable is lost.
+ */
+const CRAWLER_UA =
+  /(bot\b|bot\/|crawler|spider|slurp|claudebot|gptbot|oai-searchbot|chatgpt-user|ccbot|perplexity|anthropic|bytespider|amazonbot|applebot|semrush|ahrefs|mj12|dotbot|dataforseo|petalbot|yandex|baiduspider|facebookexternalhit|meta-externalagent|twitterbot|slackbot|discordbot|whatsapp|headlesschrome|python-requests|curl\/|wget|scrapy|http-client|go-http)/i;
+
+/** True when the current request looks like an automated crawler. */
+export function isCrawler(): boolean {
+  const { userAgent } = clientMeta();
+  if (!userAgent) return true; // no UA at all is never a real browser
+  return CRAWLER_UA.test(userAgent);
+}
+
 /** Short-lived cache so a burst of requests does not hammer the block table. */
 const blockCache = new Map<string, { reason: string | null; blocked: boolean; expires: number }>();
 const BLOCK_TTL = 30_000;
