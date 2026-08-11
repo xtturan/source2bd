@@ -131,6 +131,39 @@ export type Database = {
         }
         Relationships: []
       }
+      product_cache: {
+        Row: {
+          created_at: string
+          hits: number
+          id: string
+          marketplace: string
+          payload: Json
+          product_id: string
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hits?: number
+          id?: string
+          marketplace: string
+          payload: Json
+          product_id: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hits?: number
+          id?: string
+          marketplace?: string
+          payload?: Json
+          product_id?: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
