@@ -133,10 +133,16 @@ export const productByUrl = createServerFn({ method: "POST" })
     const { cached } = await import("@/lib/api/guard.server");
     const { consumeQuota } = await import("@/lib/api/quota.server");
     const { assertSafeUrl } = await import("@/lib/api/url-guard.server");
+    const { readProductCacheByUrl, writeProductCache } = await import("./product-cache.server");
     const safe = assertSafeUrl(data.url);
     return cached(`fn-url:${safe}`, async () => {
+      // Served from our own database: no provider call, no daily allowance spent.
+      const stored = await readProductCacheByUrl(safe);
+      if (stored) return stored;
       await consumeQuota("link", 1, safe);
-      return getProductProvider().getByUrl(safe);
+      const fresh = await getProductProvider().getByUrl(safe);
+      await writeProductCache(fresh, safe);
+      return fresh;
     });
   });
 
@@ -153,8 +159,13 @@ export const productById = createServerFn({ method: "GET" })
     const { getProductProvider } = await import("./provider.server");
     const { cached } = await import("@/lib/api/guard.server");
     const { consumeQuota } = await import("@/lib/api/quota.server");
+    const { readProductCache, writeProductCache } = await import("./product-cache.server");
     return cached(`fn-detail:${data.marketplace}:${data.id}`, async () => {
+      const stored = await readProductCache(data.marketplace, data.id);
+      if (stored) return stored;
       await consumeQuota("detail", 1, `${data.marketplace}: ${data.id}`);
-      return getProductProvider().getById(data.id, data.marketplace);
+      const fresh = await getProductProvider().getById(data.id, data.marketplace);
+      await writeProductCache(fresh);
+      return fresh;
     });
   });
