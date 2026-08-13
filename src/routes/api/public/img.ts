@@ -20,7 +20,8 @@ export const Route = createFileRoute("/api/public/img")({
       GET: async ({ request }) => {
         // Free-to-call bandwidth path: keep one IP from turning it into a
         // proxy or a bandwidth sink.
-        if (rateLimited(request)) return tooMany();
+        // Generous: a single results page pulls dozens of thumbnails.
+        if (rateLimited(request, 600, "img")) return tooMany();
         const raw = new URL(request.url).searchParams.get("u");
         if (!raw) return new Response("Missing url", { status: 400 });
 
