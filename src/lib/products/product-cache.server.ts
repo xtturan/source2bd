@@ -8,10 +8,13 @@ import type { Marketplace, ProductDetail, ProductSummary } from "./types";
  * server instance — unlike the in-memory cache, which dies with the worker.
  */
 
-/** Prices/stock drift, so a saved product is re-fetched after this. */
-const FRESH_MS = 7 * 24 * 60 * 60 * 1000;
-/** Anything untouched for this long is deleted. */
-const EVICT_MS = 60 * 24 * 60 * 60 * 1000;
+/**
+ * Product pages never auto-refresh from a paid provider. Marketplace data can
+ * drift, but serving a labelled cached snapshot is safer than letting crawlers
+ * turn age into paid cache misses. Fresh data is obtained through a deliberate
+ * signed-in search/link lookup instead.
+ */
+const EVICT_MS = 180 * 24 * 60 * 60 * 1000;
 
 let lastPrune = 0;
 
@@ -33,7 +36,6 @@ export async function readProductCache(
       .eq("product_id", id)
       .maybeSingle();
     if (error || !data) return null;
-    if (Date.now() - new Date(data.updated_at as string).getTime() > FRESH_MS) return null;
     void db
       .from("product_cache")
       .update({ hits: ((data.hits as number) ?? 0) + 1 })
@@ -57,7 +59,6 @@ export async function readProductCacheByUrl(url: string): Promise<ProductDetail 
       .limit(1)
       .maybeSingle();
     if (error || !data) return null;
-    if (Date.now() - new Date(data.updated_at as string).getTime() > FRESH_MS) return null;
     return data.payload as unknown as ProductDetail;
   } catch (err) {
     console.error("product cache url read failed", err);
@@ -105,6 +106,7 @@ export async function writeProductSummariesCache(items: ProductSummary[]) {
     const db = await admin();
     await db.from("product_cache").upsert(rows, {
       onConflict: "marketplace,product_id",
+      // Never replace a richer detail record with a search-result summary.
       ignoreDuplicates: true,
     });
     void pruneProductCache();

@@ -54,7 +54,6 @@ async function call(
   scraperId: string,
   endpoint: string,
   params: Record<string, string | number | undefined>,
-  timeoutMs = 60_000,
 ): Promise<unknown> {
   const key = env("PARSE_API_KEY");
   if (!key) {
@@ -62,6 +61,8 @@ async function call(
       "Live marketplace search is not switched on yet. Send the link or photo on WhatsApp and we will quote it manually.",
     );
   }
+  const { reservePaidProviderCredit } = await import("@/lib/api/quota.server");
+  await reservePaidProviderCredit(1);
 
   const qs = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
@@ -70,7 +71,6 @@ async function call(
 
   const res = await fetch(`${BASE}/${scraperId}/${endpoint}?${qs.toString()}`, {
     headers: { "X-API-Key": key },
-    signal: AbortSignal.timeout(timeoutMs),
   });
 
   if (!res.ok) {

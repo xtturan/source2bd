@@ -35,7 +35,7 @@ function env(key: string) {
   return process.env[key]?.trim() || "";
 }
 
-async function call(path: string, body: Raw, timeoutMs = 45_000): Promise<Raw> {
+async function call(path: string, body: Raw): Promise<Raw> {
   const key = env("ELIM_API_KEY");
   if (!key) {
     throw new ProviderUnavailableError(
@@ -43,11 +43,15 @@ async function call(path: string, body: Raw, timeoutMs = 45_000): Promise<Raw> {
     );
   }
 
+  // Last line of defence: every actual paid HTTP request atomically reserves
+  // one unit from the site-wide budget before it reaches Elim.
+  const { reservePaidProviderCredit } = await import("@/lib/api/quota.server");
+  await reservePaidProviderCredit(1);
+
   const res = await fetch(`${BASE}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": key },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(timeoutMs),
   });
 
   if (!res.ok) {
@@ -279,6 +283,8 @@ async function detailElim(market: Marketplace, id: string): Promise<ProductDetai
 export async function uploadPhotoToElim(bytes: Uint8Array, mime: string): Promise<string> {
   const key = env("ELIM_API_KEY");
   if (!key) throw new ProviderUnavailableError("Photo search is not switched on yet.");
+  const { reservePaidProviderCredit } = await import("@/lib/api/quota.server");
+  await reservePaidProviderCredit(1);
   const form = new FormData();
   const ext = mime === "image/png" ? "png" : mime === "image/webp" ? "webp" : "jpg";
   form.append("file", new Blob([bytes as unknown as BlobPart], { type: mime }), `photo.${ext}`);
@@ -286,7 +292,6 @@ export async function uploadPhotoToElim(bytes: Uint8Array, mime: string): Promis
     method: "POST",
     headers: { "x-api-key": key },
     body: form,
-    signal: AbortSignal.timeout(45_000),
   });
   const json = (await res.json().catch(() => ({}))) as Raw;
   const id = str(obj(json["data"])["image_id"]) ?? str(json["image_id"]);
