@@ -37,8 +37,8 @@ export function clientIp(request: Request) {
 }
 
 /** Returns true when the caller is over the limit. */
-export function rateLimited(request: Request, limit = LIMIT) {
-  const ip = clientIp(request);
+export function rateLimited(request: Request, limit = LIMIT, bucket = "api") {
+  const ip = `${bucket}:${clientIp(request)}`;
   const now = Date.now();
   const list = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW);
   list.push(now);
