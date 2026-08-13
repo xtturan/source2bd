@@ -54,7 +54,7 @@ export class QuotaError extends Error {
 
 export class AuthRequiredError extends Error {
   readonly code = "LOGIN_REQUIRED";
-  readonly messageBn = "খুঁজতে লগইন করুন — দিনে ৩০ বার (লেখা+ছবি)।";
+  readonly messageBn = "লাইভ তথ্য দেখতে লগইন করুন। আগে থেকে সংরক্ষিত পণ্য লগইন ছাড়াই দেখা যাবে।";
   constructor() {
     super("LOGIN_REQUIRED");
     this.name = "AuthRequiredError";
@@ -184,10 +184,11 @@ export async function consumeQuota(
     throw new CrawlerError();
   }
 
-  // Only live keyword/photo search is gated behind login; opening a product
-  // detail page or resolving a pasted link stays public and crawlable.
-  const requireLogin =
-    action === "search" && (process.env["REQUIRE_LOGIN_FOR_SEARCH"] ?? "true") !== "false";
+  // Every paid provider lookup requires a verified account. Cache reads happen
+  // before this function, so saved products remain public without API cost.
+  // This is deliberately fail-closed: crawlers spoofing a browser UA still
+  // cannot turn a product URL into a paid marketplace request.
+  const requireLogin = (process.env["REQUIRE_LOGIN_FOR_LIVE_LOOKUPS"] ?? "true") !== "false";
   const userId = await currentUserId();
 
   try {

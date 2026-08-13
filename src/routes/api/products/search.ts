@@ -3,6 +3,8 @@ import { z } from "zod";
 import { getProductProvider, providerFallbackMessage } from "@/lib/products/provider.server";
 import { cached, rateLimited, tooMany, abuseResponse } from "@/lib/api/guard.server";
 import { consumeQuota } from "@/lib/api/quota.server";
+import { readSearchCache, writeSearchCache } from "@/lib/products/search-cache.server";
+import { writeProductSummariesCache } from "@/lib/products/product-cache.server";
 
 const schema = z.object({
   q: z.string().trim().max(100).default(""),
@@ -26,8 +28,15 @@ export const Route = createFileRoute("/api/products/search")({
         const { q, marketplace, page } = parsed.data;
         try {
           const data = await cached(`search:${marketplace}:${q}:${page}`, async () => {
+            const stored = await readSearchCache(q, marketplace, page);
+            if (stored) return stored;
             await consumeQuota("search", 1, `api ${marketplace}: ${q}`);
-            return getProductProvider().search(q, { marketplace, page });
+            const fresh = await getProductProvider().search(q, { marketplace, page });
+            await Promise.all([
+              writeSearchCache(q, marketplace, page, fresh),
+              writeProductSummariesCache(fresh.items),
+            ]);
+            return fresh;
           });
           return Response.json(data);
         } catch (err) {

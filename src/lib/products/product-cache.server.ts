@@ -1,4 +1,4 @@
-import type { Marketplace, ProductDetail } from "./types";
+import type { Marketplace, ProductDetail, ProductSummary } from "./types";
 
 /**
  * Durable product-detail cache.
@@ -82,6 +82,31 @@ export async function writeProductCache(detail: ProductDetail | null, sourceUrl?
     void pruneProductCache();
   } catch (err) {
     console.error("product cache write failed", err);
+  }
+}
+
+/**
+ * Prime product pages from search results. A summary is enough to render a
+ * useful, quoteable page and prevents every catalogue click from becoming a
+ * second paid detail request. A full detail fetch can overwrite it later.
+ */
+export async function writeProductSummariesCache(items: ProductSummary[]) {
+  const rows = items
+    .filter((item) => item?.id && item.marketplace)
+    .map((item) => ({
+      marketplace: item.marketplace,
+      product_id: item.id,
+      source_url: item.productUrl || null,
+      payload: { ...item, images: item.imageUrl ? [item.imageUrl] : [] } as unknown as never,
+      updated_at: new Date().toISOString(),
+    }));
+  if (!rows.length) return;
+  try {
+    const db = await admin();
+    await db.from("product_cache").upsert(rows, { onConflict: "marketplace,product_id" });
+    void pruneProductCache();
+  } catch (err) {
+    console.error("product summary cache write failed", err);
   }
 }
 

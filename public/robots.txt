@@ -43,5 +43,11 @@ User-agent: DotBot
 Disallow: /
 User-agent: PetalBot
 Disallow: /
+User-agent: serpstatbot
+Disallow: /
+User-agent: SiteLockSpider
+Disallow: /
+User-agent: facebookexternalhit
+Disallow: /
 
 Sitemap: https://source2bd.com/sitemap.xml
