@@ -59,7 +59,7 @@ export function tooMany() {
  */
 export async function abuseResponse(err: unknown): Promise<Response | null> {
   const { BlockedError } = await import("./abuse.server");
-  const { QuotaError, AuthRequiredError, CrawlerError } = await import("./quota.server");
+  const { QuotaError, AuthRequiredError, CrawlerError, LiveBudgetError } = await import("./quota.server");
 
   if (err instanceof CrawlerError) {
     return Response.json({ ok: false, code: err.code }, { status: 403 });
@@ -74,6 +74,12 @@ export async function abuseResponse(err: unknown): Promise<Response | null> {
     return Response.json(
       { ok: false, code: err.code, messageBn: err.messageBn },
       { status: 401 },
+    );
+  }
+  if (err instanceof LiveBudgetError) {
+    return Response.json(
+      { ok: false, code: err.code, messageBn: err.messageBn },
+      { status: 503, headers: { "Retry-After": "3600" } },
     );
   }
   if (err instanceof QuotaError) {

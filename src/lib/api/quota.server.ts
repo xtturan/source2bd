@@ -71,6 +71,15 @@ export class CrawlerError extends Error {
   }
 }
 
+export class LiveBudgetError extends Error {
+  readonly code = "LIVE_BUDGET_EXHAUSTED";
+  readonly messageBn = "আজকের লাইভ মার্কেটপ্লেস সীমা শেষ। সংরক্ষিত পণ্য দেখা যাবে; নতুন তথ্যের জন্য WhatsApp-এ যোগাযোগ করুন।";
+  constructor() {
+    super("LIVE_BUDGET_EXHAUSTED");
+    this.name = "LiveBudgetError";
+  }
+}
+
 /** Calendar day in Asia/Dhaka (UTC+6), as YYYY-MM-DD. */
 export function dhakaDay(now = new Date()) {
   return new Date(now.getTime() + 6 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -135,6 +144,32 @@ export async function assertLiveLookupAuthorized(): Promise<void> {
   const userId = await currentUserId();
   if (!userId) throw new AuthRequiredError();
   await assertNotBlocked(userId);
+}
+
+/**
+ * Atomic, site-wide fuse for actual paid HTTP calls. This is intentionally
+ * separate from per-user quotas: many accounts together still cannot drain
+ * more than the configured daily provider budget.
+ */
+export async function reservePaidProviderCredit(cost = 1): Promise<void> {
+  await assertLiveLookupAuthorized();
+  const globalLimit = envInt("DAILY_PROVIDER_CREDIT_LIMIT", 100);
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("consume_daily_usage", {
+      _visitor_key: "global:paid-provider",
+      _day: dhakaDay(),
+      _limit: globalLimit,
+      _cost: Math.max(1, Math.floor(cost)),
+    });
+    if (error) throw error;
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row || row.allowed !== true) throw new LiveBudgetError();
+  } catch (err) {
+    if (err instanceof LiveBudgetError) throw err;
+    console.error("global provider budget check failed", err);
+    throw new Error("LIVE_LOOKUP_GUARD_UNAVAILABLE");
+  }
 }
 
 /** Read-only view of today's allowance for the signed-in user. */
