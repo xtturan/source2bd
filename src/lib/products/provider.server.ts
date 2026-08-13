@@ -15,6 +15,7 @@ export function getProductProvider(): ProductProvider {
   };
 
   return {
+    name: provider.name,
     async search(query, opts) {
       await authorize();
       return provider.search(query, opts);
