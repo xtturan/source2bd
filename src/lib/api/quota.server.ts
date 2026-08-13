@@ -124,6 +124,19 @@ export interface QuotaState {
   resetAt: string;
 }
 
+/**
+ * Final provider-boundary check. Paid clients call this too, so a future route
+ * cannot accidentally bypass the normal cache -> quota -> provider sequence.
+ */
+export async function assertLiveLookupAuthorized(): Promise<void> {
+  if (hasBypass()) return;
+  const { assertNotBlocked, isCrawler } = await import("./abuse.server");
+  if (isCrawler()) throw new CrawlerError();
+  const userId = await currentUserId();
+  if (!userId) throw new AuthRequiredError();
+  await assertNotBlocked(userId);
+}
+
 /** Read-only view of today's allowance for the signed-in user. */
 export async function readQuota(action: QuotaAction = "search"): Promise<QuotaState | null> {
   const limit = limitFor(action);
@@ -248,8 +261,9 @@ export async function consumeQuota(
     if (err instanceof QuotaError) throw err;
     if (err instanceof CrawlerError) throw err;
     if (err instanceof Error && err.name === "BlockedError") throw err;
-    // Counter store unreachable: let a real customer through rather than block.
+    // Paid lookups must fail closed. A database outage must never become an
+    // unlimited-credit bypass.
     console.error("quota check failed", err);
-    return { limit, remaining: limit, resetAt };
+    throw new Error("LIVE_LOOKUP_GUARD_UNAVAILABLE");
   }
 }

@@ -35,7 +35,7 @@ function env(key: string) {
   return process.env[key]?.trim() || "";
 }
 
-async function call(path: string, body: Raw, timeoutMs = 45_000): Promise<Raw> {
+async function call(path: string, body: Raw): Promise<Raw> {
   const key = env("ELIM_API_KEY");
   if (!key) {
     throw new ProviderUnavailableError(
@@ -47,7 +47,6 @@ async function call(path: string, body: Raw, timeoutMs = 45_000): Promise<Raw> {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": key },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(timeoutMs),
   });
 
   if (!res.ok) {
@@ -286,7 +285,6 @@ export async function uploadPhotoToElim(bytes: Uint8Array, mime: string): Promis
     method: "POST",
     headers: { "x-api-key": key },
     body: form,
-    signal: AbortSignal.timeout(45_000),
   });
   const json = (await res.json().catch(() => ({}))) as Raw;
   const id = str(obj(json["data"])["image_id"]) ?? str(json["image_id"]);

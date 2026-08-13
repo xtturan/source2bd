@@ -1,18 +1,27 @@
 type Entry<T> = { value: T; expires: number };
 
 const cache = new Map<string, Entry<unknown>>();
+const pending = new Map<string, Promise<unknown>>();
 const CACHE_TTL = 15 * 60 * 1000;
 
 export async function cached<T>(key: string, fn: () => Promise<T>): Promise<T> {
   const now = Date.now();
   const hit = cache.get(key);
   if (hit && hit.expires > now) return hit.value as T;
-  const value = await fn();
-  cache.set(key, { value, expires: now + CACHE_TTL });
-  if (cache.size > 500) {
-    for (const [k, v] of cache) if (v.expires <= now) cache.delete(k);
-  }
-  return value;
+  const inFlight = pending.get(key);
+  if (inFlight) return inFlight as Promise<T>;
+
+  const request = fn()
+    .then((value) => {
+      cache.set(key, { value, expires: Date.now() + CACHE_TTL });
+      if (cache.size > 500) {
+        for (const [k, v] of cache) if (v.expires <= Date.now()) cache.delete(k);
+      }
+      return value;
+    })
+    .finally(() => pending.delete(key));
+  pending.set(key, request);
+  return request;
 }
 
 const WINDOW = 10 * 60 * 1000;
