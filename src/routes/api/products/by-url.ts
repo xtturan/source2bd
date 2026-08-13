@@ -4,6 +4,7 @@ import { getProductProvider, providerFallbackMessage } from "@/lib/products/prov
 import { cached, rateLimited, tooMany, abuseResponse } from "@/lib/api/guard.server";
 import { consumeQuota } from "@/lib/api/quota.server";
 import { assertSafeUrl, UnsafeUrlError } from "@/lib/api/url-guard.server";
+import { readProductCacheByUrl, writeProductCache } from "@/lib/products/product-cache.server";
 
 const schema = z.object({ url: z.string().trim().url().max(2048) });
 
@@ -23,8 +24,12 @@ export const Route = createFileRoute("/api/products/by-url")({
         try {
           const safe = assertSafeUrl(parsed.data.url);
           const item = await cached(`by-url:${safe}`, async () => {
+            const stored = await readProductCacheByUrl(safe);
+            if (stored) return stored;
             await consumeQuota("link", 1, `api ${safe}`);
-            return getProductProvider().getByUrl(safe);
+            const fresh = await getProductProvider().getByUrl(safe);
+            await writeProductCache(fresh, safe);
+            return fresh;
           });
           if (!item) return Response.json({ error: "Could not read that link" }, { status: 404 });
           return Response.json({ item });

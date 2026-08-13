@@ -24,6 +24,7 @@ export const searchProducts = createServerFn({ method: "GET" })
     const { getProductProvider } = await import("./provider.server");
     const { cached } = await import("@/lib/api/guard.server");
     const { readSearchCache, writeSearchCache } = await import("./search-cache.server");
+    const { writeProductSummariesCache } = await import("./product-cache.server");
     const { consumeQuota, readQuota } = await import("@/lib/api/quota.server");
 
     let quota: { limit: number; remaining: number; resetAt: string } | null = null;
@@ -38,7 +39,10 @@ export const searchProducts = createServerFn({ method: "GET" })
           marketplace: data.marketplace,
           page: data.page,
         });
-        await writeSearchCache(data.q, data.marketplace, data.page, fresh);
+        await Promise.all([
+          writeSearchCache(data.q, data.marketplace, data.page, fresh),
+          writeProductSummariesCache(fresh.items),
+        ]);
         return fresh;
       } catch (err) {
         const { noteIncident } = await import("@/lib/api/error-log.server");
