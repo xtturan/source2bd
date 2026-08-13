@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { rateLimited, tooMany } from "@/lib/api/guard.server";
 
 /**
  * Image proxy for marketplace CDNs that block hotlinking from other origins.
@@ -17,6 +18,10 @@ export const Route = createFileRoute("/api/public/img")({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        // Free-to-call bandwidth path: keep one IP from turning it into a
+        // proxy or a bandwidth sink.
+        // Generous: a single results page pulls dozens of thumbnails.
+        if (rateLimited(request, 600, "img")) return tooMany();
         const raw = new URL(request.url).searchParams.get("u");
         if (!raw) return new Response("Missing url", { status: 400 });
 
@@ -26,7 +31,7 @@ export const Route = createFileRoute("/api/public/img")({
         } catch {
           return new Response("Bad url", { status: 400 });
         }
-        if (target.protocol !== "https:" && target.protocol !== "http:")
+        if (target.protocol !== "https:")
           return new Response("Bad url", { status: 400 });
         const host = target.hostname.toLowerCase();
         if (!ALLOWED.some((d) => host === d || host.endsWith(`.${d}`)))
@@ -42,10 +47,15 @@ export const Route = createFileRoute("/api/public/img")({
         const type = upstream.headers.get("content-type") ?? "image/jpeg";
         if (!type.startsWith("image/")) return new Response("Not an image", { status: 415 });
 
+        const declared = Number(upstream.headers.get("content-length") ?? 0);
+        if (declared > 8 * 1024 * 1024) return new Response("Image too large", { status: 413 });
+
         return new Response(upstream.body, {
           headers: {
             "Content-Type": type,
             "Cache-Control": "public, max-age=86400, immutable",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "default-src 'none'; sandbox",
           },
         });
       },

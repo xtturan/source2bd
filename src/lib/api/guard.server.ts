@@ -37,13 +37,16 @@ export function clientIp(request: Request) {
 }
 
 /** Returns true when the caller is over the limit. */
-export function rateLimited(request: Request) {
-  const ip = clientIp(request);
+export function rateLimited(request: Request, limit = LIMIT, bucket = "api") {
+  const ip = `${bucket}:${clientIp(request)}`;
   const now = Date.now();
   const list = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW);
   list.push(now);
   hits.set(ip, list);
-  return list.length > LIMIT;
+  if (hits.size > 5000) {
+    for (const [k, v] of hits) if (!v.some((t) => now - t < WINDOW)) hits.delete(k);
+  }
+  return list.length > limit;
 }
 
 export function tooMany() {
