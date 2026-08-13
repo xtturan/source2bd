@@ -164,7 +164,15 @@ export async function reservePaidProviderCredit(cost = 1): Promise<void> {
     });
     if (error) throw error;
     const row = Array.isArray(data) ? data[0] : data;
-    if (!row || row.allowed !== true) throw new LiveBudgetError();
+    if (!row || row.allowed !== true) {
+      const { noteIncident } = await import("./error-log.server");
+      noteIncident(
+        "provider.budget",
+        `Daily provider credit fuse tripped at ${globalLimit} paid calls`,
+        `day=${dhakaDay()}`,
+      );
+      throw new LiveBudgetError();
+    }
   } catch (err) {
     if (err instanceof LiveBudgetError) throw err;
     console.error("global provider budget check failed", err);
