@@ -106,7 +106,8 @@ export async function writeProductSummariesCache(items: ProductSummary[]) {
     const db = await admin();
     await db.from("product_cache").upsert(rows, {
       onConflict: "marketplace,product_id",
-      ignoreDuplicates: false,
+      // Never replace a richer detail record with a search-result summary.
+      ignoreDuplicates: true,
     });
     void pruneProductCache();
   } catch (err) {
