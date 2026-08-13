@@ -103,7 +103,10 @@ export async function writeProductSummariesCache(items: ProductSummary[]) {
   if (!rows.length) return;
   try {
     const db = await admin();
-    await db.from("product_cache").upsert(rows, { onConflict: "marketplace,product_id" });
+    await db.from("product_cache").upsert(rows, {
+      onConflict: "marketplace,product_id",
+      ignoreDuplicates: true,
+    });
     void pruneProductCache();
   } catch (err) {
     console.error("product summary cache write failed", err);
