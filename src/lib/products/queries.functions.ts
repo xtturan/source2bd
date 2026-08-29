@@ -90,6 +90,15 @@ export const myQuota = createServerFn({ method: "GET" }).handler(
  * Instant, free keyword lookup over already-cached products.
  * No login, no quota, no provider call: this is what guests see first.
  */
+/** Free autocomplete: popular cached queries matching the typed prefix. */
+export const searchSuggestions = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ q: z.string().trim().max(100) }).parse(d))
+  .handler(async ({ data }): Promise<string[]> => {
+    if (data.q.length < 2) return [];
+    const { readSuggestedQueries } = await import("./search-cache.server");
+    return readSuggestedQueries(canonicalQuery(data.q), 6);
+  });
+
 export const cachedSearch = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ q: z.string().trim().max(100) }).parse(d))
   .handler(async ({ data }): Promise<CatalogueItem[]> => {

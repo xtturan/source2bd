@@ -12,6 +12,7 @@ import {
   productByUrl,
   productsByPhoto,
   cachedSearch,
+  searchSuggestions,
 } from "@/lib/products/queries.functions";
 import type { Marketplace, ProductSummary } from "@/lib/products/types";
 import { generalInquiry, linkInquiry, photoInquiry, telLink, voiceInquiry } from "@/lib/whatsapp";
@@ -617,6 +618,16 @@ function SearchPanel() {
   const [submitted, setSubmitted] = useState(initialQ ?? "");
   const search = useServerFn(searchProducts);
   const cachedFn = useServerFn(cachedSearch);
+  const suggestFn = useServerFn(searchSuggestions);
+
+  // Free autocomplete over already-cached queries. Debounced by react-query's
+  // staleTime so typing stays snappy and no provider is ever called.
+  const suggestions = useQuery({
+    queryKey: ["search-suggestions", q],
+    queryFn: () => suggestFn({ data: { q } }),
+    enabled: q.trim().length > 1,
+    staleTime: 60_000,
+  });
 
   // Free, login-free results from what we have already paid for. These paint
   // in well under a second so nobody stares at an empty screen.
@@ -677,17 +688,25 @@ function SearchPanel() {
         }}
       >
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
-          <input
-            id="q"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            enterKeyHint="search"
-            placeholder={t(
-              "কী লাগবে? যেমন: লেড লাইট, ফোন কভার",
-              "What do you need? e.g. led light, phone cover",
-            )}
-            className="font-bn h-16 min-w-0 flex-1 rounded-[16px] border border-input bg-paper px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          />
+          <>
+            <input
+              id="q"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              enterKeyHint="search"
+              list="q-suggestions"
+              placeholder={t(
+                "কী লাগবে? যেমন: লেড লাইট, ফোন কভার",
+                "What do you need? e.g. led light, phone cover",
+              )}
+              className="font-bn h-16 min-w-0 flex-1 rounded-[16px] border border-input bg-paper px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            />
+            <datalist id="q-suggestions">
+              {(suggestions.data ?? []).map((s: string) => (
+                <option key={s} value={s} />
+              ))}
+            </datalist>
+          </>
           <VoiceButton
             onFinal={(text) => {
               setQ(text);

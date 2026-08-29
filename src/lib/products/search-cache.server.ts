@@ -116,9 +116,7 @@ export async function pruneSearchCache() {
     const cutoff = new Date(Date.now() - EVICT_MS).toISOString();
     await db.from("search_cache").delete().lt("updated_at", cutoff);
 
-    const { count } = await db
-      .from("search_cache")
-      .select("id", { count: "exact", head: true });
+    const { count } = await db.from("search_cache").select("id", { count: "exact", head: true });
     if (!count || count <= MAX_ROWS) return;
 
     const { data } = await db
@@ -209,10 +207,7 @@ export async function readShowcase(limit = 4): Promise<ShowcaseRow[]> {
  * Free, login-free keyword lookup over what we have already paid for.
  * Guests and first-time visitors see products instantly instead of a wall.
  */
-export async function readCachedMatches(
-  q: string,
-  limit = 24,
-): Promise<CatalogueItem[]> {
+export async function readCachedMatches(q: string, limit = 24): Promise<CatalogueItem[]> {
   const needle = q.trim().toLowerCase();
   if (!needle) return [];
   const words = needle.split(/\s+/).filter((w) => w.length > 1);
@@ -256,6 +251,41 @@ export async function readCachedMatches(
       .map((s) => s.item);
   } catch (err) {
     console.error("cached match read failed", err);
+    return [];
+  }
+}
+
+/**
+ * Autocomplete suggestions: the most-searched cached queries matching what
+ * the shopper has typed so far. Free (cache-only), prefix OR substring
+ * matched, capped small so the datalist stays scannable.
+ */
+export async function readSuggestedQueries(q: string, limit = 6): Promise<string[]> {
+  const needle = q.trim().toLowerCase();
+  if (needle.length < 2) return [];
+  try {
+    const db = await admin();
+    const { data, error } = await db
+      .from("search_cache")
+      .select("query, hits")
+      .gt("item_count", 0)
+      .order("hits", { ascending: false })
+      .limit(120);
+    if (error || !data) return [];
+    const seen = new Set<string>();
+    const out: { q: string; hits: number }[] = [];
+    for (const row of data) {
+      const query = ((row.query as string) ?? "").toLowerCase();
+      if (!query || seen.has(query)) continue;
+      if (query === needle) continue; // already exactly what they typed
+      if (!query.includes(needle)) continue;
+      seen.add(query);
+      out.push({ q: row.query as string, hits: (row.hits as number) ?? 0 });
+      if (out.length >= limit) break;
+    }
+    return out.map((s) => s.q);
+  } catch (err) {
+    console.error("suggestion read failed", err);
     return [];
   }
 }
