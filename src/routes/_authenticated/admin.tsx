@@ -11,13 +11,17 @@ import {
   adminBlock,
   adminUnblock,
 } from "@/lib/auth/admin.functions";
+import { seedCatalog, type SeedReport } from "@/lib/products/seed.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
       { name: "robots", content: "noindex, nofollow" },
       { title: "Admin panel | Source2BD" },
-      { name: "description", content: "Source2BD owner dashboard: accounts, daily lookups and cached searches." },
+      {
+        name: "description",
+        content: "Source2BD owner dashboard: accounts, daily lookups and cached searches.",
+      },
       { property: "og:title", content: "Source2BD admin panel" },
       { property: "og:description", content: "Accounts, daily lookups and cached searches." },
       { property: "og:type", content: "website" },
@@ -69,6 +73,15 @@ function AdminPage() {
   const unblock = useMutation({
     mutationFn: (id: string) => adminUnblock({ data: { id } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-blocks"] }),
+  });
+
+  const [seedReport, setSeedReport] = useState<SeedReport | null>(null);
+  const seed = useMutation({
+    mutationFn: (dryRun: boolean) => seedCatalog({ data: { dryRun } }),
+    onSuccess: (report: SeedReport) => {
+      setSeedReport(report);
+      queryClient.invalidateQueries({ queryKey: ["admin-overview"] });
+    },
   });
 
   function askBlock(subjectType: "user" | "ip", subject: string) {
@@ -123,7 +136,9 @@ function AdminPage() {
             onClick={() => setTab(k)}
             aria-pressed={tab === k}
             className={`h-11 rounded-full px-5 text-[14px] font-bold capitalize transition-colors ${
-              tab === k ? "bg-foreground text-background" : "bg-foreground/[0.06] text-muted-foreground"
+              tab === k
+                ? "bg-foreground text-background"
+                : "bg-foreground/[0.06] text-muted-foreground"
             }`}
           >
             {k}
@@ -144,7 +159,9 @@ function AdminPage() {
               onClick={() => setOnlyBlocked((v) => !v)}
               aria-pressed={onlyBlocked}
               className={`h-11 rounded-full px-4 text-[14px] font-bold ${
-                onlyBlocked ? "bg-destructive/15 text-destructive" : "bg-foreground/[0.06] text-muted-foreground"
+                onlyBlocked
+                  ? "bg-destructive/15 text-destructive"
+                  : "bg-foreground/[0.06] text-muted-foreground"
               }`}
             >
               Blocked only
@@ -366,29 +383,71 @@ function AdminPage() {
           </div>
         </div>
       ) : tab === "searches" ? (
-        <div className="mt-4 overflow-x-auto rounded-3xl border border-foreground/10">
-          <table className="w-full min-w-[620px] text-left text-[14px]">
-            <thead className="bg-foreground/[0.04] text-[12px] uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3">Query</th>
-                <th className="px-4 py-3">Market</th>
-                <th className="px-4 py-3">Items</th>
-                <th className="px-4 py-3">Hits</th>
-                <th className="px-4 py-3">Updated</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(data?.searches ?? []).map((s) => (
-                <tr key={`${s.marketplace}-${s.query}`} className="border-t border-foreground/8">
-                  <td className="px-4 py-3 font-semibold text-foreground">{s.query}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{s.marketplace}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{s.items}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{s.hits}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{s.updatedAt.slice(0, 16).replace("T", " ")}</td>
+        <div className="mt-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => seed.mutate(true)}
+              disabled={seed.isPending}
+              className="h-11 rounded-full bg-foreground/[0.06] px-4 text-[14px] font-bold text-muted-foreground disabled:opacity-50"
+            >
+              {seed.isPending ? "Working…" : "Check seed status"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (
+                  confirm(
+                    "Run live searches for the curated seed list? This spends provider credit.",
+                  )
+                )
+                  seed.mutate(false);
+              }}
+              disabled={seed.isPending}
+              className="h-11 rounded-full bg-accent px-4 text-[14px] font-bold text-background disabled:opacity-50"
+            >
+              Seed catalogue
+            </button>
+          </div>
+          {seedReport ? (
+            <p className="mt-2 text-[13px] text-muted-foreground">
+              Seeded {seedReport.done.length} ({seedReport.items} products) · skipped{" "}
+              {seedReport.skipped.length}
+              {seedReport.failed.length ? (
+                <span className="text-destructive">
+                  {" "}
+                  · failed {seedReport.failed.length}:{" "}
+                  {seedReport.failed.map((f) => f.query).join(", ")}
+                </span>
+              ) : null}
+            </p>
+          ) : null}
+          <div className="mt-3 overflow-x-auto rounded-3xl border border-foreground/10">
+            <table className="w-full min-w-[620px] text-left text-[14px]">
+              <thead className="bg-foreground/[0.04] text-[12px] uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3">Query</th>
+                  <th className="px-4 py-3">Market</th>
+                  <th className="px-4 py-3">Items</th>
+                  <th className="px-4 py-3">Hits</th>
+                  <th className="px-4 py-3">Updated</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {(data?.searches ?? []).map((s) => (
+                  <tr key={`${s.marketplace}-${s.query}`} className="border-t border-foreground/8">
+                    <td className="px-4 py-3 font-semibold text-foreground">{s.query}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{s.marketplace}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{s.items}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{s.hits}</td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {s.updatedAt.slice(0, 16).replace("T", " ")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
         <div className="mt-4 overflow-x-auto rounded-3xl border border-foreground/10">
@@ -414,7 +473,9 @@ function AdminPage() {
                   <td className="px-4 py-3">
                     <div className="font-semibold text-foreground">{e.message}</div>
                     {e.detail ? (
-                      <div className="mt-1 break-all text-[12px] text-muted-foreground">{e.detail}</div>
+                      <div className="mt-1 break-all text-[12px] text-muted-foreground">
+                        {e.detail}
+                      </div>
                     ) : null}
                   </td>
                 </tr>
