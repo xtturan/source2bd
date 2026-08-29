@@ -41,7 +41,6 @@ export const seedCatalog = createServerFn({ method: "POST" })
   .handler(async ({ context, data }): Promise<SeedReport> => {
     await assertAdmin(context as unknown as { supabase: SupabaseLike; userId: string });
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { canonicalQuery } = await import("./bn-keywords");
     const { readSearchCache, writeSearchCache } = await import("./search-cache.server");
     const { writeProductSummariesCache } = await import("./product-cache.server");
