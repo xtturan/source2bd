@@ -743,7 +743,15 @@ function SearchPanel() {
         className="mt-3 flex flex-wrap gap-2"
         aria-label={t("জনপ্রিয় খোঁজ", "Popular searches")}
       >
-        {["led light", "phone cover", "shoes", "watch", "bag"].map((term) => (
+        {(
+          [
+            ["led light", "💡 লেড লাইট"],
+            ["phone cover", "📱 ফোন কভার"],
+            ["shoes", "👟 জুতা"],
+            ["watch", "⌚ ঘড়ি"],
+            ["bag", "👜 ব্যাগ"],
+          ] as const
+        ).map(([term, bn]) => (
           <button
             key={term}
             type="button"
@@ -753,7 +761,7 @@ function SearchPanel() {
             }}
             className="font-bn min-h-[44px] rounded-full border border-border bg-paper px-4 text-[14px] font-bold"
           >
-            {term}
+            {t(bn, term)}
           </button>
         ))}
       </div>

@@ -142,6 +142,9 @@ export function VoiceButton({
   }
 
   if (inline) {
+    // No speech recognition in this browser: render nothing rather than a
+    // dead button (the field works fine on its own).
+    if (state === "unsupported") return null;
     return (
       <button
         type="button"
