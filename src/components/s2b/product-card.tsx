@@ -6,6 +6,7 @@ import { productQuote } from "@/lib/whatsapp";
 import { productImage } from "@/lib/images";
 import { cleanTitle, isProhibitedTitle } from "@/lib/products/title";
 import { WhatsAppIcon } from "./button";
+import { CheckGlyph } from "./glyphs";
 import { useLang } from "@/lib/i18n";
 
 /**
@@ -53,7 +54,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         </Link>
 
         <div>
-          <div className="tnum text-lg font-extrabold leading-tight tracking-tight">
+          <div className="tnum text-[22px] font-black text-accent leading-tight tracking-tight">
             {product.priceMin != null ? <span className="font-bn text-[13px] font-bold text-muted-foreground">{t("আনুমানিক", "approx.")} </span> : null}
             {taka}
           </div>
@@ -82,7 +83,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           })}
           target="_blank"
           rel="noopener noreferrer"
-          className="relative z-10 mt-auto flex min-h-[56px] flex-col items-center justify-center rounded-[14px] bg-wa px-2 text-wa-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.24)] transition-transform duration-150 active:scale-[0.98]"
+          className="relative z-10 mt-auto flex min-h-[64px] flex-col items-center justify-center rounded-[14px] bg-[#25D366] hover:bg-[#20ba5a] px-2 text-wa-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.24)] transition-transform duration-150 active:scale-[0.98]"
         >
           <span className="font-bn flex items-center gap-2 text-[14px] font-bold leading-tight">
             <WhatsAppIcon className="h-5 w-5" />
@@ -96,3 +97,6 @@ export function ProductCard({ product }: { product: ProductSummary }) {
     </article>
   );
 }
+
+
+

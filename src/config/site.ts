@@ -188,10 +188,10 @@ export const bdCities = [
 
 /** Picture buttons on the home page. Each opens the search with a keyword. */
 export const quickCategories = [
-  { bn: "লাইট", en: "Lights", q: "led light" },
-  { bn: "ফোন কভার", en: "Phone cases", q: "phone case" },
-  { bn: "জুতো", en: "Shoes", q: "shoes" },
-  { bn: "মেশিন", en: "Machines", q: "small machine" },
+  { bn: "💡 লাইট", en: "Lights", q: "led light" },
+  { bn: "📱 ফোন কভার", en: "Phone cases", q: "phone case" },
+  { bn: "👟 জুতো", en: "Shoes", q: "shoes" },
+  { bn: "⚙️ মেশিন", en: "Machines", q: "small machine" },
 ] as const;
 
 /** Short Bangla service tiles. Long English copy lives in EN mode only. */

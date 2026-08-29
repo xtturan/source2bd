@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Container, Section, Skeleton } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
+import { SearchGlyph, LinkGlyph, CameraGlyph, MicGlyph, BoxGlyph } from "@/components/s2b/glyphs";
+import { VoiceButton } from "@/components/s2b/voice-button";
 import { ProductCard } from "@/components/s2b/product-card";
 import { searchProducts, productByUrl, productsByPhoto, cachedSearch } from "@/lib/products/queries.functions";
 import type { Marketplace, ProductSummary } from "@/lib/products/types";
@@ -120,24 +122,29 @@ function Searching() {
   }, []);
   const pct = Math.min(95, Math.round(95 * (1 - Math.exp(-sec / 12))));
   return (
-    <div className="panel matte rounded-[16px] p-4" role="status" aria-live="polite">
-      <div className="flex items-center gap-3">
-        <span className="h-3 w-3 animate-pulse rounded-full bg-accent" aria-hidden />
-        <span className="font-bn text-[17px] font-bold">{t("খুঁজছি…", "Searching…")}</span>
-        <span className="tnum ml-auto text-sm text-muted-foreground">{sec}s</span>
+    <div className="panel matte relative overflow-hidden rounded-[20px] p-6 text-center" role="status" aria-live="polite">
+      <div className="absolute inset-x-0 top-0 h-1 bg-accent/20">
+        <div 
+          className="h-full bg-accent transition-all duration-500" 
+          style={{ width: `${pct}%` }}
+        />
       </div>
-      <div
-        className="mt-3 h-2 w-full overflow-hidden rounded-full bg-foreground/10"
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={pct}
-      >
-        <div className="h-full rounded-full bg-accent transition-[width] duration-700 ease-out" style={{ width: `${pct}%` }} />
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative">
+          <div className="h-16 w-16 animate-spin rounded-full border-4 border-accent/20 border-t-accent" />
+          <SearchGlyph className="absolute inset-0 m-auto h-6 w-6 text-accent" />
+        </div>
+        <div>
+          <h3 className="font-bn text-xl font-black">{t("খুঁজছি… একটু অপেক্ষা করুন", "Searching... please wait")}</h3>
+          <p className="font-bn mt-1 text-[15px] font-bold text-muted-foreground">
+            {t("সরাসরি চীন থেকে দাম দেখছি", "Checking prices directly from China")}
+          </p>
+        </div>
+        <span className="tnum rounded-full bg-accent/10 px-3 py-1 text-sm font-bold text-accent">{sec}s</span>
       </div>
-      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="aspect-[3/4]" />
+          <div key={i} className="aspect-[3/4] animate-pulse rounded-[12px] bg-foreground/5" />
         ))}
       </div>
     </div>
@@ -536,20 +543,12 @@ function SearchPanel() {
   const qc = useQueryClient();
   const mutation = useMutation({
     mutationFn: (vars: { q: string; marketplace: Marketplace }) =>
-      search({ data: { q: vars.q, marketplace: vars.marketplace, page: 1 } }),
+      search({ data: { q: vars.q, marketplace: vars.marketplace, page: 1, live: true } }),
     onSuccess: (res) => {
       setItems(res.items);
       void qc.invalidateQueries({ queryKey: ["my-quota"] });
     },
   });
-
-  const run = mutation.mutate;
-  useEffect(() => {
-    if (initialQ) {
-      setSubmitted(initialQ);
-      run({ q: initialQ, marketplace: "1688" });
-    }
-  }, [initialQ, run]);
 
   function submit(value: string, market = marketplace) {
     const text = value.trim();
@@ -558,7 +557,13 @@ function SearchPanel() {
     void navigate({ search: { q: text, mode: "search" }, replace: true });
     setItems(null);
     setSubmitted(text);
-    mutation.mutate({ q: text, marketplace: market });
+    mutation.reset();
+  }
+
+  function requestLive() {
+    const text = submitted.trim();
+    if (!text || mutation.isPending) return;
+    mutation.mutate({ q: text, marketplace });
   }
 
   return (
@@ -592,13 +597,29 @@ function SearchPanel() {
         </div>
         <button
           type="submit"
-          disabled={mutation.isPending}
+          disabled={!q.trim()}
           className="font-bn flex min-h-[64px] items-center justify-center gap-2 rounded-full bg-accent text-xl font-bold text-accent-foreground disabled:opacity-60"
         >
           <SearchGlyph className="h-6 w-6" />
-          {mutation.isPending ? t("খুঁজছি…", "Searching…") : t("খুঁজুন", "Search")}
+          {t("সংরক্ষিত পণ্য খুঁজুন", "Search saved products")}
         </button>
       </form>
+
+      <div className="mt-3 flex flex-wrap gap-2" aria-label={t("জনপ্রিয় খোঁজ", "Popular searches")}>
+        {["led light", "phone cover", "shoes", "watch", "bag"].map((term) => (
+          <button
+            key={term}
+            type="button"
+            onClick={() => {
+              setQ(term);
+              submit(term);
+            }}
+            className="font-bn min-h-[44px] rounded-full border border-border bg-paper px-4 text-[14px] font-bold"
+          >
+            {term}
+          </button>
+        ))}
+      </div>
 
       <button
         type="button"
@@ -640,6 +661,30 @@ function SearchPanel() {
             <div className="mt-3">
               <Results items={cachedItems} />
             </div>
+          </div>
+        ) : null}
+
+        {submitted && !mutation.isPending && !items ? (
+          <div className="panel matte mb-5 rounded-[18px] p-4">
+            <p className="font-bn text-[16px] font-bold">
+              {cachedItems.length
+                ? t("আরও নতুন পণ্য দরকার?", "Need newer products?")
+                : t("সংরক্ষিত পণ্যে মেলেনি", "No matching saved products")}
+            </p>
+            <p className="font-bn mt-1 text-[14px] font-semibold text-muted-foreground">
+              {t(
+                "শুধু নিচের বাটনে চাপলেই লাইভ মার্কেট থেকে নতুন ফলাফল আনা হবে।",
+                "A live marketplace search only runs when you press the button below.",
+              )}
+            </p>
+            <button
+              type="button"
+              onClick={requestLive}
+              className="font-bn mt-3 flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-[17px] font-bold text-background"
+            >
+              <SearchGlyph className="h-5 w-5" />
+              {t("নতুন পণ্য খুঁজুন", "Search live marketplace")}
+            </button>
           </div>
         ) : null}
 
@@ -691,7 +736,7 @@ type VoiceState = "idle" | "listening" | "processing" | "error" | "unsupported";
  * Mic sits beside the search box and fills the very same input.
  * Every state is spoken out loud in Bangla: idle, listening, heard, failed.
  */
-function VoiceButton({
+function VoiceSearch({
   onFinal,
   onInterim,
 }: {
@@ -918,43 +963,3 @@ async function shrinkImage(file: File): Promise<string> {
   return canvas.toDataURL("image/jpeg", 0.82);
 }
 
-const stroke = {
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 1.8,
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-} as const;
-
-function CameraGlyph({ className = "h-8 w-8" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...stroke} aria-hidden>
-      <path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.2l1.2-2h8.2l1.2 2h2.2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z" />
-      <circle cx="12" cy="13" r="3.6" />
-    </svg>
-  );
-}
-function LinkGlyph({ className = "h-8 w-8" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...stroke} aria-hidden>
-      <path d="M10 14a4 4 0 0 0 5.7 0l2.8-2.8a4 4 0 0 0-5.7-5.7L11.5 7" />
-      <path d="M14 10a4 4 0 0 0-5.7 0L5.5 12.8a4 4 0 0 0 5.7 5.7L12.5 17" />
-    </svg>
-  );
-}
-function SearchGlyph({ className = "h-8 w-8" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...stroke} aria-hidden>
-      <circle cx="11" cy="11" r="6.5" />
-      <path d="M20 20l-4.2-4.2" />
-    </svg>
-  );
-}
-function MicGlyph({ className = "h-8 w-8" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} {...stroke} aria-hidden>
-      <rect x="9" y="3" width="6" height="11" rx="3" />
-      <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
-    </svg>
-  );
-}

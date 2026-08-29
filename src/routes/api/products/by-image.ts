@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { getProductProvider, providerFallbackMessage } from "@/lib/products/provider.server";
-import { cached, rateLimited, tooMany, abuseResponse } from "@/lib/api/guard.server";
-import { consumeQuota } from "@/lib/api/quota.server";
+import { rateLimited, tooMany } from "@/lib/api/guard.server";
 
 const schema = z.object({
   imageUrl: z.string().trim().min(4).max(2000),
@@ -24,23 +22,10 @@ export const Route = createFileRoute("/api/products/by-image")({
         if (!parsed.success)
           return Response.json({ error: "Upload a photo first" }, { status: 400 });
 
-        const provider = getProductProvider();
-        if (!provider.searchByImage)
-          return Response.json({ error: providerFallbackMessage }, { status: 501 });
-
-        try {
-          const { imageUrl, marketplace } = parsed.data;
-          const data = await cached(`image:${marketplace}:${imageUrl.slice(0, 200)}`, async () => {
-            await consumeQuota("search", 1, `api photo: ${marketplace}`);
-            return provider.searchByImage!(imageUrl, { marketplace });
-          });
-          return Response.json(data);
-        } catch (err) {
-          const handled = await abuseResponse(err);
-          if (handled) return handled;
-          console.error("image search failed", err);
-          return Response.json({ error: providerFallbackMessage }, { status: 502 });
-        }
+        return Response.json(
+          { ok: false, code: "USE_SIGNED_IN_PHOTO_SEARCH" },
+          { status: 410 },
+        );
       },
     },
   },
