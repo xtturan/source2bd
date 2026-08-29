@@ -224,7 +224,7 @@ export function toEnglishKeywords(rawQuery: string): string {
         break;
       }
     }
-    return BN_WORDS[stem] ?? "";
+    return BN_WORDS[stem] ?? BN_PHRASES[stem] ?? "";
   });
 
   const result = mapped
