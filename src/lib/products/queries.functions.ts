@@ -78,6 +78,18 @@ export const myQuota = createServerFn({ method: "GET" }).handler(
   },
 );
 
+/**
+ * Instant, free keyword lookup over already-cached products.
+ * No login, no quota, no provider call: this is what guests see first.
+ */
+export const cachedSearch = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ q: z.string().trim().max(100) }).parse(d))
+  .handler(async ({ data }): Promise<CatalogueItem[]> => {
+    if (!data.q) return [];
+    const { readCachedMatches } = await import("./search-cache.server");
+    return readCachedMatches(data.q, 24);
+  });
+
 /** Popular saved searches, used to fill the homepage with real listings. */
 export const showcaseSearches = createServerFn({ method: "GET" }).handler(
   async (): Promise<ShowcaseRow[]> => {

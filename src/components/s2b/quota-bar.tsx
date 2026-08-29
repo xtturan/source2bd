@@ -44,8 +44,8 @@ export function QuotaBar({ className }: { className?: string }) {
       >
         <p className="font-bn text-[16px] font-bold leading-snug">
           {t(
-            "খুঁজতে লগইন করুন — দিনে ৩০ বার (লেখা+ছবি)",
-            "Sign in to search — 30 times a day (text and photo together)",
+            "সংরক্ষিত পণ্য লগইন ছাড়াই দেখুন · নতুন খোঁজার জন্য লগইন (দিনে ৩০ বার ফ্রি)",
+            "Browse saved products without an account. Log in for fresh searches, 30 free a day.",
           )}
         </p>
         <Link
