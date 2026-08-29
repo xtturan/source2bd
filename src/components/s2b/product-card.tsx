@@ -17,8 +17,16 @@ import { useLang } from "@/lib/i18n";
  */
 export function ProductCard({ product }: { product: ProductSummary }) {
   const { t } = useLang();
-  const taka = bdtLabel(product.priceMin, product.priceMax, product.currency, t("দাম জানতে চাপুন", "Ask for price"));
-  const market = product.priceMin != null ? marketLabel(product.priceMin, product.priceMax, product.currency) : null;
+  const taka = bdtLabel(
+    product.priceMin,
+    product.priceMax,
+    product.currency,
+    t("দাম জানতে চাপুন", "Ask for price"),
+  );
+  const market =
+    product.priceMin != null
+      ? marketLabel(product.priceMin, product.priceMax, product.currency)
+      : null;
   const title = cleanTitle(product.title);
 
   // Legal goods only: listings that advertise themselves as copies never show.
@@ -55,7 +63,11 @@ export function ProductCard({ product }: { product: ProductSummary }) {
 
         <div>
           <div className="tnum text-[22px] font-black text-accent leading-tight tracking-tight">
-            {product.priceMin != null ? <span className="font-bn text-[13px] font-bold text-muted-foreground">{t("আনুমানিক", "approx.")} </span> : null}
+            {product.priceMin != null ? (
+              <span className="font-bn text-[13px] font-bold text-muted-foreground">
+                {t("আনুমানিক", "approx.")}{" "}
+              </span>
+            ) : null}
             {taka}
           </div>
           {market ? (
@@ -63,17 +75,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
               {t("মার্কেট দাম", "Market price")} {market}
             </p>
           ) : null}
-          <p className="font-bn mt-0.5 text-[12px] font-semibold leading-snug text-foreground/70">
-            {t(
-              "বাংলাদেশে পৌঁছানোর পুরো দাম আলাদা — শিপিংসহ জানতে চাপুন",
-              "Bangladesh total is separate — tap for the shipping-inclusive price",
-            )}
-          </p>
         </div>
-
-        <span className="font-bn text-[13px] font-bold text-accent underline underline-offset-2">
-          {t("বিস্তারিত দেখুন", "See details")}
-        </span>
 
         <a
           href={productQuote({
@@ -83,20 +85,14 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           })}
           target="_blank"
           rel="noopener noreferrer"
-          className="relative z-10 mt-auto flex min-h-[64px] flex-col items-center justify-center rounded-[14px] bg-[#25D366] hover:bg-[#20ba5a] px-2 text-wa-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.24)] transition-transform duration-150 active:scale-[0.98]"
+          className="relative z-10 mt-auto flex min-h-[52px] items-center justify-center gap-2 rounded-[14px] bg-[#25D366] hover:bg-[#20ba5a] px-2 text-wa-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.24)] transition-transform duration-150 active:scale-[0.98]"
         >
           <span className="font-bn flex items-center gap-2 text-[14px] font-bold leading-tight">
             <WhatsAppIcon className="h-5 w-5" />
-            {t("বাংলাদেশ পর্যন্ত পুরো দাম জানুন", "Get the full Bangladesh price")}
-          </span>
-          <span className="font-bn text-[11px] font-semibold opacity-90">
-            {t("শিপিং চার্জসহ · WhatsApp-এ", "Shipping included · on WhatsApp")}
+            {t("শিপিংসহ দাম জানুন", "Get the full price")}
           </span>
         </a>
       </div>
     </article>
   );
 }
-
-
-

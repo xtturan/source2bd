@@ -10,7 +10,14 @@ import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auth/session";
 import { QuotaChip } from "./quota-bar";
 
-/** Minimal header: logo, language, WhatsApp, phone. Nothing else competes. */
+/** Minimal header: logo, nav, language, WhatsApp, phone. Nothing else competes. */
+const navLinks = [
+  { to: "/sourcing", bn: "খুঁজুন", en: "Find" },
+  { to: "/catalog", bn: "ক্যাটালগ", en: "Catalogue" },
+  { to: "/guides", bn: "গাইড", en: "Guides" },
+  { to: "/track", bn: "অর্ডার স্ট্যাটাস", en: "Order status" },
+] as const;
+
 export function Header() {
   const { lang, setLang, t } = useLang();
   const [scrolled, setScrolled] = useState(false);
@@ -38,6 +45,21 @@ export function Header() {
         >
           <Logo />
         </Link>
+
+        <nav aria-label={t("প্রধান মেনু", "Main menu")} className="mr-auto hidden lg:block">
+          <ul className="flex items-center gap-1">
+            {navLinks.map((l) => (
+              <li key={l.to}>
+                <Link
+                  to={l.to}
+                  className="font-bn flex min-h-[44px] items-center rounded-full px-4 text-[15px] font-bold text-muted-foreground transition-colors hover:bg-foreground/[0.06] hover:text-foreground [&.active]:text-accent"
+                >
+                  {t(l.bn, l.en)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         <div
           className="flex h-11 items-center rounded-full bg-foreground/[0.06] p-1 text-sm font-bold"
@@ -69,7 +91,16 @@ export function Header() {
           className="font-bn grid h-12 min-w-12 place-items-center rounded-full border border-foreground/12 px-3 text-[14px] font-bold text-foreground"
         >
           {user ? (
-            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <svg
+              viewBox="0 0 24 24"
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.9"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
               <circle cx="12" cy="8" r="3.5" />
               <path d="M5 20a7 7 0 0 1 14 0" />
             </svg>
@@ -93,7 +124,16 @@ export function Header() {
           aria-label={`${t("ফোন করুন", "Call")} ${siteConfig.phoneDisplay}`}
           className="grid h-12 w-12 place-items-center rounded-full bg-foreground text-background shadow-[var(--shadow-1)]"
         >
-          <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <svg
+            viewBox="0 0 24 24"
+            className="h-6 w-6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
             <path d="M6.5 3.5h3l1.4 3.6-2 1.4a12 12 0 0 0 5.6 5.6l1.4-2 3.6 1.4v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2z" />
           </svg>
         </a>

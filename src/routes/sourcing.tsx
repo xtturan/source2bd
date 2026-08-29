@@ -7,7 +7,12 @@ import { WhatsAppIcon } from "@/components/s2b/button";
 import { SearchGlyph, LinkGlyph, CameraGlyph, MicGlyph, BoxGlyph } from "@/components/s2b/glyphs";
 import { VoiceButton } from "@/components/s2b/voice-button";
 import { ProductCard } from "@/components/s2b/product-card";
-import { searchProducts, productByUrl, productsByPhoto, cachedSearch } from "@/lib/products/queries.functions";
+import {
+  searchProducts,
+  productByUrl,
+  productsByPhoto,
+  cachedSearch,
+} from "@/lib/products/queries.functions";
 import type { Marketplace, ProductSummary } from "@/lib/products/types";
 import { generalInquiry, linkInquiry, photoInquiry, telLink, voiceInquiry } from "@/lib/whatsapp";
 import { siteConfig } from "@/config/site";
@@ -25,7 +30,10 @@ export const Route = createFileRoute("/sourcing")({
           "পণ্যের ছবি তুলুন বা ১৬৮৮, আলিবাবা, অ্যামাজনের লিংক দিন। মিল থাকা পণ্য দেখুন, তারপর WhatsApp-এ বাংলাদেশ পর্যন্ত পুরো দাম (শিপিংসহ) জেনে নিন।",
       },
       { property: "og:title", content: "পণ্য খুঁজুন · Source2BD" },
-      { property: "og:description", content: "নাম লিখুন, লিংক বা ছবি দিন, বাংলাদেশ পর্যন্ত পুরো দাম জেনে নিন।" },
+      {
+        property: "og:description",
+        content: "নাম লিখুন, লিংক বা ছবি দিন, বাংলাদেশ পর্যন্ত পুরো দাম জেনে নিন।",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -35,7 +43,12 @@ export const Route = createFileRoute("/sourcing")({
   validateSearch: (s: Record<string, unknown>): { q?: string; mode?: Mode } => {
     const out: { q?: string; mode?: Mode } = {};
     if (typeof s["q"] === "string" && s["q"].trim()) out.q = s["q"].slice(0, 120);
-    if (s["mode"] === "photo" || s["mode"] === "link" || s["mode"] === "search" || s["mode"] === "voice")
+    if (
+      s["mode"] === "photo" ||
+      s["mode"] === "link" ||
+      s["mode"] === "search" ||
+      s["mode"] === "voice"
+    )
       out.mode = s["mode"];
     return out;
   },
@@ -48,13 +61,34 @@ function SourcingPage() {
   const { t } = useLang();
   // Typing a name is the real first job. Voice lives inside that panel.
   const [mode, setMode] = useState<Mode>(
-    initialMode && initialMode !== "voice" ? initialMode : q ? "search" : (initialMode === "voice" ? "search" : "search"),
+    initialMode && initialMode !== "voice"
+      ? initialMode
+      : q
+        ? "search"
+        : initialMode === "voice"
+          ? "search"
+          : "search",
   );
 
   const tabs: { key: Mode; bn: string; en: string; icon: ReactNode }[] = [
-    { key: "search", bn: "নাম লিখে খুঁজুন", en: "Search by name", icon: <SearchGlyph className="h-7 w-7" /> },
-    { key: "link", bn: "লিংক দিয়ে খুঁজুন", en: "Search by link", icon: <LinkGlyph className="h-7 w-7" /> },
-    { key: "photo", bn: "ছবি দিয়ে খুঁজুন", en: "Search by photo", icon: <CameraGlyph className="h-7 w-7" /> },
+    {
+      key: "search",
+      bn: "নাম লিখে খুঁজুন",
+      en: "Search by name",
+      icon: <SearchGlyph className="h-7 w-7" />,
+    },
+    {
+      key: "link",
+      bn: "লিংক দিয়ে খুঁজুন",
+      en: "Search by link",
+      icon: <LinkGlyph className="h-7 w-7" />,
+    },
+    {
+      key: "photo",
+      bn: "ছবি দিয়ে খুঁজুন",
+      en: "Search by photo",
+      icon: <CameraGlyph className="h-7 w-7" />,
+    },
   ];
 
   return (
@@ -70,7 +104,11 @@ function SourcingPage() {
           )}
         </p>
 
-        <div role="tablist" aria-label={t("খোঁজার উপায়", "Search method")} className="mt-5 grid grid-cols-3 gap-2">
+        <div
+          role="tablist"
+          aria-label={t("খোঁজার উপায়", "Search method")}
+          className="mt-5 grid grid-cols-3 gap-2"
+        >
           {tabs.map((tab) => (
             <button
               key={tab.key}
@@ -85,7 +123,9 @@ function SourcingPage() {
               )}
             >
               {tab.icon}
-              <span className="font-bn text-[12.5px] font-bold leading-tight">{t(tab.bn, tab.en)}</span>
+              <span className="font-bn text-[12.5px] font-bold leading-tight">
+                {t(tab.bn, tab.en)}
+              </span>
             </button>
           ))}
         </div>
@@ -95,8 +135,15 @@ function SourcingPage() {
           search={{}}
           className="panel matte font-bn mt-3 flex min-h-[56px] items-center justify-between gap-3 rounded-[16px] px-4 text-[15px] font-bold"
         >
-          <span>{t("বুঝতে পারছেন না কী আনবেন? ক্যাটালগ দেখুন", "Not sure what to import? Browse the catalogue")}</span>
-          <span aria-hidden className="text-accent">→</span>
+          <span>
+            {t(
+              "বুঝতে পারছেন না কী আনবেন? ক্যাটালগ দেখুন",
+              "Not sure what to import? Browse the catalogue",
+            )}
+          </span>
+          <span aria-hidden className="text-accent">
+            →
+          </span>
         </Link>
 
         <QuotaBar className="mt-4" />
@@ -122,10 +169,14 @@ function Searching() {
   }, []);
   const pct = Math.min(95, Math.round(95 * (1 - Math.exp(-sec / 12))));
   return (
-    <div className="panel matte relative overflow-hidden rounded-[20px] p-6 text-center" role="status" aria-live="polite">
+    <div
+      className="panel matte relative overflow-hidden rounded-[20px] p-6 text-center"
+      role="status"
+      aria-live="polite"
+    >
       <div className="absolute inset-x-0 top-0 h-1 bg-accent/20">
-        <div 
-          className="h-full bg-accent transition-all duration-500" 
+        <div
+          className="h-full bg-accent transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -135,12 +186,16 @@ function Searching() {
           <SearchGlyph className="absolute inset-0 m-auto h-6 w-6 text-accent" />
         </div>
         <div>
-          <h3 className="font-bn text-xl font-black">{t("খুঁজছি… একটু অপেক্ষা করুন", "Searching... please wait")}</h3>
+          <h3 className="font-bn text-xl font-black">
+            {t("খুঁজছি… একটু অপেক্ষা করুন", "Searching... please wait")}
+          </h3>
           <p className="font-bn mt-1 text-[15px] font-bold text-muted-foreground">
             {t("সরাসরি চীন থেকে দাম দেখছি", "Checking prices directly from China")}
           </p>
         </div>
-        <span className="tnum rounded-full bg-accent/10 px-3 py-1 text-sm font-bold text-accent">{sec}s</span>
+        <span className="tnum rounded-full bg-accent/10 px-3 py-1 text-sm font-bold text-accent">
+          {sec}s
+        </span>
       </div>
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -170,7 +225,10 @@ function LoginWall() {
         {t("খুঁজতে আগে লগইন করুন", "Please log in to search")}
       </p>
       <p className="font-bn mt-2 text-[16px] font-semibold text-muted-foreground">
-        {t("ফোন নম্বর বা ইমেইল দিয়ে ১ মিনিটে অ্যাকাউন্ট খুলুন · দিনে ৩০ বার ফ্রি", "Open an account in a minute with a phone number or email. 30 free searches a day.")}
+        {t(
+          "ফোন নম্বর বা ইমেইল দিয়ে ১ মিনিটে অ্যাকাউন্ট খুলুন · দিনে ৩০ বার ফ্রি",
+          "Open an account in a minute with a phone number or email. 30 free searches a day.",
+        )}
       </p>
       <Link
         to="/auth"
@@ -197,7 +255,6 @@ function SoftLoginNote({ quota }: { quota?: boolean }) {
               "ফ্রি খোঁজা শেষ — লগইন করলে দিনে ৩০ বার ফ্রি লাইভ খোঁজা।",
               "Free trial searches used. Log in for 30 free live searches a day.",
             )}
-
       </p>
       {quota ? null : (
         <Link
@@ -312,13 +369,17 @@ function PhotoPanel() {
       setPreview(dataUrl);
       mutation.mutate(dataUrl);
     } catch {
-      setFileError(t("ছবিটা পড়া গেল না। আরেকটা দিন।", "We could not read that photo. Try another one."));
+      setFileError(
+        t("ছবিটা পড়া গেল না। আরেকটা দিন।", "We could not read that photo. Try another one."),
+      );
     }
   }
 
   useEffect(() => {
     function onPaste(e: ClipboardEvent) {
-      const file = Array.from(e.clipboardData?.files ?? []).find((f) => f.type.startsWith("image/"));
+      const file = Array.from(e.clipboardData?.files ?? []).find((f) =>
+        f.type.startsWith("image/"),
+      );
       if (!file) return;
       e.preventDefault();
       void pickFile(file);
@@ -359,18 +420,27 @@ function PhotoPanel() {
           }}
         />
         {preview ? (
-          <img src={preview} alt={t("আপনার ছবি", "Your photo")} className="max-h-44 w-auto rounded-[14px] object-contain" />
+          <img
+            src={preview}
+            alt={t("আপনার ছবি", "Your photo")}
+            className="max-h-44 w-auto rounded-[14px] object-contain"
+          />
         ) : (
           <CameraGlyph className="h-16 w-16 text-accent" />
         )}
         <span className="font-bn max-w-[24ch] text-[18px] font-bold leading-snug">
           {preview
             ? t("অন্য ছবি দিন", "Use another photo")
-            : t("পণ্যের ছবি তুলুন বা গ্যালারি থেকে বাছুন", "Take a photo or pick one from your gallery")}
+            : t(
+                "পণ্যের ছবি তুলুন বা গ্যালারি থেকে বাছুন",
+                "Take a photo or pick one from your gallery",
+              )}
         </span>
       </label>
 
-      {fileError ? <p className="font-bn mt-3 text-[16px] font-bold text-accent">{fileError}</p> : null}
+      {fileError ? (
+        <p className="font-bn mt-3 text-[16px] font-bold text-accent">{fileError}</p>
+      ) : null}
 
       <a
         href={photoInquiry()}
@@ -387,7 +457,10 @@ function PhotoPanel() {
         </span>
       </a>
       <p className="font-bn mt-2 text-center text-[14px] font-semibold text-foreground/70">
-        {t("হোয়াটসঅ্যাপ খুলবে, সেখানে ছবিটা পাঠিয়ে দিন।", "WhatsApp opens, then attach your photo there.")}
+        {t(
+          "হোয়াটসঅ্যাপ খুলবে, সেখানে ছবিটা পাঠিয়ে দিন।",
+          "WhatsApp opens, then attach your photo there.",
+        )}
       </p>
 
       <div className="mt-6">
@@ -399,7 +472,10 @@ function PhotoPanel() {
             <LimitReached />
           ) : (
             <HelpBox
-              title={t("এখন খুঁজে পাওয়া গেল না · ছবিটা WhatsApp-এ পাঠান", "The search did not come back. Send the photo on WhatsApp.")}
+              title={t(
+                "এখন খুঁজে পাওয়া গেল না · ছবিটা WhatsApp-এ পাঠান",
+                "The search did not come back. Send the photo on WhatsApp.",
+              )}
               waHref={photoInquiry()}
             />
           )
@@ -409,7 +485,10 @@ function PhotoPanel() {
             <Results items={items} />
           ) : (
             <HelpBox
-              title={t("কিছু পাইনি · ছবিটা WhatsApp-এ পাঠান বা ফোন করুন", "Nothing found. Send the photo on WhatsApp or call us.")}
+              title={t(
+                "কিছু পাইনি · ছবিটা WhatsApp-এ পাঠান বা ফোন করুন",
+                "Nothing found. Send the photo on WhatsApp or call us.",
+              )}
               waHref={photoInquiry()}
             />
           )
@@ -438,7 +517,12 @@ function LinkPanel() {
     }
     if (!/^https?:\/\/|\w+\.\w+/.test(value)) {
       // Still let them reach the desk, just warn once.
-      setError(t("এটা লিংকের মতো লাগছে না, তবু পাঠাতে পারেন।", "That does not look like a link, but you can still send it."));
+      setError(
+        t(
+          "এটা লিংকের মতো লাগছে না, তবু পাঠাতে পারেন।",
+          "That does not look like a link, but you can still send it.",
+        ),
+      );
     } else {
       setError(null);
     }
@@ -458,7 +542,10 @@ function LinkPanel() {
           setError(null);
         }}
         inputMode="url"
-        placeholder={t("পণ্যের লিংক পেস্ট করুন (১৬৮৮ / অ্যামাজন / অন্য)", "Paste the product link (1688 / Amazon / other)")}
+        placeholder={t(
+          "পণ্যের লিংক পেস্ট করুন (১৬৮৮ / অ্যামাজন / অন্য)",
+          "Paste the product link (1688 / Amazon / other)",
+        )}
         className="mt-2 h-16 w-full rounded-[16px] border border-input bg-paper px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
       />
 
@@ -484,7 +571,9 @@ function LinkPanel() {
         disabled={url.trim().length < 8 || mutation.isPending}
         className="font-bn mt-3 flex min-h-[56px] w-full items-center justify-center rounded-full border border-foreground/15 bg-paper text-[17px] font-bold disabled:opacity-50"
       >
-        {mutation.isPending ? t("দেখছি…", "Loading…") : t("আগে পণ্যটা দেখে নিন", "Preview the product first")}
+        {mutation.isPending
+          ? t("দেখছি…", "Loading…")
+          : t("আগে পণ্যটা দেখে নিন", "Preview the product first")}
       </button>
 
       <div className="mt-6">
@@ -502,9 +591,7 @@ function LinkPanel() {
             waHref={linkInquiry(url)}
           />
         ) : null}
-        {item && !mutation.isPending ? (
-          <Results items={[item]} />
-        ) : null}
+        {item && !mutation.isPending ? <Results items={[item]} /> : null}
       </div>
     </div>
   );
@@ -561,11 +648,21 @@ function SearchPanel() {
     mutation.reset();
   }
 
-  function requestLive() {
+  // One search, one tap. Saved results paint instantly; the live marketplace
+  // search then runs automatically without asking for a second button press.
+  // autoLiveRef makes the effect fire exactly once per submitted query, so an
+  // error or a re-render never re-burns the user's daily quota.
+  const autoLiveRef = useRef("");
+  useEffect(() => {
     const text = submitted.trim();
-    if (!text || mutation.isPending) return;
+    if (!text) return;
+    if (autoLiveRef.current === text) return;
+    if (cachedQuery.isPending || cachedQuery.isFetching) return;
+    if (mutation.isPending || items) return;
+    autoLiveRef.current = text;
     mutation.mutate({ q: text, marketplace });
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submitted, cachedQuery.isPending, cachedQuery.isFetching, cachedItems.length]);
 
   return (
     <div>
@@ -585,7 +682,10 @@ function SearchPanel() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             enterKeyHint="search"
-            placeholder={t("কী লাগবে? যেমন: লেড লাইট, ফোন কভার", "What do you need? e.g. led light, phone cover")}
+            placeholder={t(
+              "কী লাগবে? যেমন: লেড লাইট, ফোন কভার",
+              "What do you need? e.g. led light, phone cover",
+            )}
             className="font-bn h-16 min-w-0 flex-1 rounded-[16px] border border-input bg-paper px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
           />
           <VoiceButton
@@ -602,11 +702,14 @@ function SearchPanel() {
           className="font-bn flex min-h-[64px] items-center justify-center gap-2 rounded-full bg-accent text-xl font-bold text-accent-foreground disabled:opacity-60"
         >
           <SearchGlyph className="h-6 w-6" />
-          {t("সংরক্ষিত পণ্য খুঁজুন", "Search saved products")}
+          {mutation.isPending ? t("খুঁজছি…", "Searching…") : t("খুঁজুন", "Search")}
         </button>
       </form>
 
-      <div className="mt-3 flex flex-wrap gap-2" aria-label={t("জনপ্রিয় খোঁজ", "Popular searches")}>
+      <div
+        className="mt-3 flex flex-wrap gap-2"
+        aria-label={t("জনপ্রিয় খোঁজ", "Popular searches")}
+      >
         {["led light", "phone cover", "shoes", "watch", "bag"].map((term) => (
           <button
             key={term}
@@ -643,7 +746,9 @@ function SearchPanel() {
               }}
               className={cn(
                 "min-h-[48px] rounded-full px-5 text-[15px] font-bold transition-colors",
-                marketplace === m.key ? "bg-foreground text-background" : "border border-border text-foreground/70",
+                marketplace === m.key
+                  ? "bg-foreground text-background"
+                  : "border border-border text-foreground/70",
               )}
             >
               {m.label}
@@ -665,30 +770,6 @@ function SearchPanel() {
           </div>
         ) : null}
 
-        {submitted && !mutation.isPending && !items ? (
-          <div className="panel matte mb-5 rounded-[18px] p-4">
-            <p className="font-bn text-[16px] font-bold">
-              {cachedItems.length
-                ? t("আরও নতুন পণ্য দরকার?", "Need newer products?")
-                : t("সংরক্ষিত পণ্যে মেলেনি", "No matching saved products")}
-            </p>
-            <p className="font-bn mt-1 text-[14px] font-semibold text-muted-foreground">
-              {t(
-                "শুধু নিচের বাটনে চাপলেই লাইভ মার্কেট থেকে নতুন ফলাফল আনা হবে।",
-                "A live marketplace search only runs when you press the button below.",
-              )}
-            </p>
-            <button
-              type="button"
-              onClick={requestLive}
-              className="font-bn mt-3 flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-[17px] font-bold text-background"
-            >
-              <SearchGlyph className="h-5 w-5" />
-              {t("নতুন পণ্য খুঁজুন", "Search live marketplace")}
-            </button>
-          </div>
-        ) : null}
-
         {mutation.isPending ? <Searching /> : null}
         {mutation.isError ? (
           isLoginRequired(mutation.error) ? (
@@ -698,7 +779,11 @@ function SearchPanel() {
               <LoginWall />
             )
           ) : isQuota(mutation.error) ? (
-            cachedItems.length ? <SoftLoginNote quota /> : <LimitReached />
+            cachedItems.length ? (
+              <SoftLoginNote quota />
+            ) : (
+              <LimitReached />
+            )
           ) : cachedItems.length ? null : (
             <HelpBox
               title={t("এখন খুঁজে পাওয়া গেল না", "Search did not come back")}
@@ -751,8 +836,7 @@ function VoiceSearch({
   const recRef = useRef<any>(null);
 
   useEffect(() => {
-    const Ctor =
-      (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    const Ctor = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
     if (!Ctor) setState("unsupported");
     return () => {
       try {
@@ -830,8 +914,14 @@ function VoiceSearch({
       setState("error");
       setError(
         code === "not-allowed" || code === "service-not-allowed"
-          ? t("মাইক বন্ধ আছে · সেটিংস থেকে মাইক অন করুন অথবা টাইপ করুন", "The mic is blocked. Turn it on in settings, or type instead.")
-          : t("বুঝতে পারিনি · আবার বলুন বা টাইপ করুন", "We did not catch that. Say it again or type it."),
+          ? t(
+              "মাইক বন্ধ আছে · সেটিংস থেকে মাইক অন করুন অথবা টাইপ করুন",
+              "The mic is blocked. Turn it on in settings, or type instead.",
+            )
+          : t(
+              "বুঝতে পারিনি · আবার বলুন বা টাইপ করুন",
+              "We did not catch that. Say it again or type it.",
+            ),
       );
     };
     rec.onend = () => {
@@ -845,7 +935,14 @@ function VoiceSearch({
         setTimeout(() => setState("idle"), 600);
       } else {
         setState((s) => (s === "error" ? s : "error"));
-        setError((prev) => prev ?? t("বুঝতে পারিনি · আবার বলুন বা টাইপ করুন", "We did not catch that. Say it again or type it."));
+        setError(
+          (prev) =>
+            prev ??
+            t(
+              "বুঝতে পারিনি · আবার বলুন বা টাইপ করুন",
+              "We did not catch that. Say it again or type it.",
+            ),
+        );
       }
     };
     setState("listening");
@@ -853,7 +950,9 @@ function VoiceSearch({
       rec.start();
     } catch {
       setState("error");
-      setError(t("মাইক চালু করা গেল না · টাইপ করুন", "The mic could not start. Please type instead."));
+      setError(
+        t("মাইক চালু করা গেল না · টাইপ করুন", "The mic could not start. Please type instead."),
+      );
     }
   }
 
@@ -863,7 +962,9 @@ function VoiceSearch({
         type="button"
         onClick={() => (state === "listening" ? stop() : void start())}
         aria-pressed={state === "listening"}
-        aria-label={state === "listening" ? t("শোনা বন্ধ করুন", "Stop listening") : t("মাইকে বলুন", "Speak")}
+        aria-label={
+          state === "listening" ? t("শোনা বন্ধ করুন", "Stop listening") : t("মাইকে বলুন", "Speak")
+        }
         className={cn(
           "grid h-16 w-16 shrink-0 place-items-center rounded-[16px] transition-colors",
           state === "listening"
@@ -877,14 +978,20 @@ function VoiceSearch({
       <div className="col-span-full w-full" aria-live="polite">
         {state === "idle" && !heard ? (
           <p className="font-bn mt-1 text-[14px] font-semibold text-foreground/70">
-            {t("মাইক চাপলে ফোন অনুমতি চাইবে · তারপর স্পষ্ট করে বলুন", "Tapping the mic asks for permission, then speak clearly.")}
+            {t(
+              "মাইক চাপলে ফোন অনুমতি চাইবে · তারপর স্পষ্ট করে বলুন",
+              "Tapping the mic asks for permission, then speak clearly.",
+            )}
           </p>
         ) : null}
         {state === "listening" ? (
           <div className="mt-2 rounded-[16px] border-2 border-accent bg-accent/10 p-4">
             <p className="font-bn text-[18px] font-extrabold">{t("শুনছি…", "Listening…")}</p>
             <p className="font-bn mt-1 text-[15px] font-semibold">
-              {t("বলুন · শেষ হলে আবার মাইকে চাপুন", "Speak, then tap the mic again when you finish.")}
+              {t(
+                "বলুন · শেষ হলে আবার মাইকে চাপুন",
+                "Speak, then tap the mic again when you finish.",
+              )}
             </p>
             {heard ? (
               <p className="font-bn mt-3 text-[17px] font-bold">
@@ -902,7 +1009,8 @@ function VoiceSearch({
         ) : null}
         {state === "processing" && heard ? (
           <p className="font-bn mt-2 text-[15px] font-bold">
-            {t("আপনি বলেছেন:", "You said:")} {heard} · {t("লিখেছি · এখন ‘খুঁজুন’ চাপুন", "Filled in. Now press Search.")}
+            {t("আপনি বলেছেন:", "You said:")} {heard} ·{" "}
+            {t("লিখেছি · এখন ‘খুঁজুন’ চাপুন", "Filled in. Now press Search.")}
           </p>
         ) : null}
         {state === "error" && error ? (
@@ -941,7 +1049,10 @@ function VoiceSearch({
         ) : null}
         {state === "unsupported" ? (
           <p className="font-bn mt-1 text-[14px] font-semibold text-foreground/70">
-            {t("এই ফোনে ভয়েস চলছে না · নাম টাইপ করুন বা WhatsApp-এ বলুন", "Voice is not available on this phone. Type the name or tell us on WhatsApp.")}
+            {t(
+              "এই ফোনে ভয়েস চলছে না · নাম টাইপ করুন বা WhatsApp-এ বলুন",
+              "Voice is not available on this phone. Type the name or tell us on WhatsApp.",
+            )}
           </p>
         ) : null}
       </div>
@@ -963,4 +1074,3 @@ async function shrinkImage(file: File): Promise<string> {
   bitmap.close();
   return canvas.toDataURL("image/jpeg", 0.82);
 }
-

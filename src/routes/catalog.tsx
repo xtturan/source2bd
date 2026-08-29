@@ -163,7 +163,9 @@ function CatalogPage() {
                 search={{ cat: c.key }}
                 className={cn(
                   "font-bn flex min-h-[48px] items-center gap-2 rounded-full px-4 text-[14px] font-bold",
-                  cat === c.key ? "bg-foreground text-background" : "panel matte text-muted-foreground",
+                  cat === c.key
+                    ? "bg-foreground text-background"
+                    : "panel matte text-muted-foreground",
                 )}
               >
                 <span aria-hidden>{c.emoji}</span>
@@ -181,11 +183,33 @@ function CatalogPage() {
         ) : (
           <div className="panel matte mt-6 rounded-[18px] p-5">
             <p className="font-bn text-[16px] font-bold">
-              {t("এখানে এখনো কিছু নেই।", "Nothing here yet.")}
+              {needle || cat
+                ? t(
+                    "এই খোঁজে কিছু নেই। অন্য শব্দ চেষ্টা করুন।",
+                    "Nothing matches that. Try another word.",
+                  )
+                : t(
+                    "ক্যাটালগে এখনো জিনিস ওঠেনি। সরাসরি খুঁজে দেখুন:",
+                    "Nothing in the catalogue yet. Search directly:",
+                  )}
             </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {["led light", "phone cover", "shoes", "watch", "bag", "kitchen items"].map(
+                (term) => (
+                  <Link
+                    key={term}
+                    to="/sourcing"
+                    search={{ q: term, mode: "search" } as never}
+                    className="font-bn flex min-h-[48px] items-center rounded-full border border-border bg-paper px-4 text-[14px] font-bold"
+                  >
+                    {term}
+                  </Link>
+                ),
+              )}
+            </div>
             <Link
               to="/sourcing"
-              className="font-bn mt-3 inline-flex min-h-[56px] items-center rounded-[14px] bg-foreground px-5 text-[15px] font-bold text-background"
+              className="font-bn mt-4 inline-flex min-h-[56px] items-center rounded-[14px] bg-foreground px-5 text-[15px] font-bold text-background"
             >
               {t("নাম লিখে খুঁজুন", "Search by name")}
             </Link>
