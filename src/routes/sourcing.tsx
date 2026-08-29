@@ -603,13 +603,29 @@ function SearchPanel() {
       ) : null}
 
       <div className="mt-6">
+        {/* Saved products appear immediately; the live search fills in after. */}
+        {cachedItems.length && !items ? (
+          <div className="mb-5">
+            <p className="font-bn text-[15px] font-bold text-muted-foreground">
+              {t("সংরক্ষিত পণ্য · এখনই দেখুন", "Saved products, available right now")}
+            </p>
+            <div className="mt-3">
+              <Results items={cachedItems} />
+            </div>
+          </div>
+        ) : null}
+
         {mutation.isPending ? <Searching /> : null}
         {mutation.isError ? (
           isLoginRequired(mutation.error) ? (
-            <LoginWall />
+            cachedItems.length ? (
+              <SoftLoginNote />
+            ) : (
+              <LoginWall />
+            )
           ) : isQuota(mutation.error) ? (
-            <LimitReached />
-          ) : (
+            cachedItems.length ? <SoftLoginNote quota /> : <LimitReached />
+          ) : cachedItems.length ? null : (
             <HelpBox
               title={t("এখন খুঁজে পাওয়া গেল না", "Search did not come back")}
               waHref={generalInquiry(q)}
@@ -619,7 +635,7 @@ function SearchPanel() {
         {items && !mutation.isPending ? (
           items.length ? (
             <Results items={items} />
-          ) : (
+          ) : cachedItems.length ? null : (
             <HelpBox
               title={t(
                 "কিছু পাইনি · অন্য নাম লিখুন, লিংক দিন, বা WhatsApp করুন",
