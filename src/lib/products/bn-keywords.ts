@@ -231,7 +231,7 @@ export function toEnglishKeywords(rawQuery: string): string {
     .filter(Boolean)
     // Collapse consecutive duplicates: "লাইট লাইট" would map to
     // "light light" and marketplaces treat that as two separate intents.
-    .filter((w, i, arr) => i === 0 || w.toLowerCase() !== arr[i - 1].toLowerCase())
+    .filter((w, i, arr) => i === 0 || w.toLowerCase() !== arr[i - 1]?.toLowerCase())
     .join(" ")
     .trim();
   // Never return blank: fall back to the original so the desk still sees intent.

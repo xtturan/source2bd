@@ -205,7 +205,11 @@ function CatalogPage() {
             <Link
               key={value || "popular"}
               to="/catalog"
-              search={{ cat: cat || undefined, q: q || undefined, sort: value || undefined }}
+              search={{
+                ...(cat ? { cat } : {}),
+                ...(q ? { q } : {}),
+                ...(value ? { sort: value } : {}),
+              }}
               className={cn(
                 "font-bn flex min-h-[44px] items-center rounded-full px-4 text-[14px] font-bold",
                 sort === value
