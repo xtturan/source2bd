@@ -737,6 +737,9 @@ type VoiceState = "idle" | "listening" | "processing" | "error" | "unsupported";
  * Every state is spoken out loud in Bangla: idle, listening, heard, failed.
  */
 function VoiceSearch({
+  onFinal,
+  onInterim,
+}: {
   onFinal: (text: string) => void;
   onInterim: (text: string) => void;
 }) {

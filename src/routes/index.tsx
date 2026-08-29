@@ -250,7 +250,7 @@ function HeroSearch() {
             key={chip.q}
             to="/sourcing"
             search={{ q: chip.q, mode: "search" }}
-            className="font-bn rounded-full border border-foreground/12 bg-paper px-4 py-2 text-[15px] font-semibold"
+            className="font-bn rounded-full border border-foreground/12 bg-paper px-5 py-2.5 text-[16px] font-semibold"
           >
             {t(chip.bn, chip.q)}
           </Link>
@@ -547,5 +547,6 @@ function HowToSend() {
     </Section>
   );
 }
+
 
 

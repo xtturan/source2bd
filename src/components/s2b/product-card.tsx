@@ -56,7 +56,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         <div>
           <div className="tnum text-[22px] font-black text-accent leading-tight tracking-tight">
             {product.priceMin != null ? <span className="font-bn text-[13px] font-bold text-muted-foreground">{t("আনুমানিক", "approx.")} </span> : null}
-            "৳" + {taka}
+            {taka}
           </div>
           {market ? (
             <p className="font-bn tnum text-[12px] font-semibold text-muted-foreground">
@@ -97,4 +97,5 @@ export function ProductCard({ product }: { product: ProductSummary }) {
     </article>
   );
 }
+
 
