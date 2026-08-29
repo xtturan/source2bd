@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Container, Section, Skeleton } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
-import { SearchGlyph, LinkGlyph, CameraGlyph, MicGlyph } from "@/components/s2b/glyphs";
+import { SearchGlyph, LinkGlyph, CameraGlyph, MicGlyph, BoxGlyph } from "@/components/s2b/glyphs";
 import { VoiceButton } from "@/components/s2b/voice-button";
 import { ProductCard } from "@/components/s2b/product-card";
 import { searchProducts, productByUrl, productsByPhoto, cachedSearch } from "@/lib/products/queries.functions";
