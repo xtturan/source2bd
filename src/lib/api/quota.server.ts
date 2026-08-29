@@ -153,7 +153,9 @@ export async function assertLiveLookupAuthorized(): Promise<void> {
  */
 export async function reservePaidProviderCredit(cost = 1): Promise<void> {
   await assertLiveLookupAuthorized();
-  const globalLimit = envInt("DAILY_PROVIDER_CREDIT_LIMIT", 100);
+  // Hard ceiling protects the account even if an environment value is set too
+  // high by mistake. Raising this requires a code change and review.
+  const globalLimit = Math.min(envInt("DAILY_PROVIDER_CREDIT_LIMIT", 30), 50);
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin.rpc("consume_daily_usage", {

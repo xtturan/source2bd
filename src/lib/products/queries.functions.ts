@@ -10,13 +10,14 @@ export interface QuotaInfo {
   resetAt: string;
 }
 
-export const searchProducts = createServerFn({ method: "GET" })
+export const searchProducts = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z
       .object({
         q: z.string().trim().max(100).default(""),
         marketplace: z.enum(["1688", "taobao", "alibaba", "aliexpress", "amazon", "global"]).default("1688"),
         page: z.number().int().min(1).max(50).default(1),
+        live: z.literal(true),
       })
       .parse(d),
   )
@@ -172,16 +173,8 @@ export const productById = createServerFn({ method: "GET" })
       .parse(d),
   )
   .handler(async ({ data }): Promise<ProductDetail | null> => {
-    const { getProductProvider } = await import("./provider.server");
-    const { cached } = await import("@/lib/api/guard.server");
-    const { consumeQuota } = await import("@/lib/api/quota.server");
-    const { readProductCache, writeProductCache } = await import("./product-cache.server");
-    return cached(`fn-detail:${data.marketplace}:${data.id}`, async () => {
-      const stored = await readProductCache(data.marketplace, data.id);
-      if (stored) return stored;
-      await consumeQuota("detail", 1, `${data.marketplace}: ${data.id}`);
-      const fresh = await getProductProvider().getById(data.id, data.marketplace);
-      await writeProductCache(fresh);
-      return fresh;
-    });
+    // Product pages are crawlable navigation targets, so they are permanently
+    // cache-only. A page view must never become a paid marketplace request.
+    const { readProductCache } = await import("./product-cache.server");
+    return readProductCache(data.marketplace, data.id);
   });
