@@ -125,6 +125,37 @@ export interface QuotaState {
   resetAt: string;
 }
 
+/** Free live searches a signed-out visitor gets per device per day. */
+export function guestTrialLimit() {
+  return Math.min(envInt("GUEST_TRIAL_SEARCHES", 3), 5);
+}
+
+/** Visitor key for signed-out trial counting: IP + coarse UA. */
+async function guestKey(): Promise<string | null> {
+  const { clientMeta } = await import("./abuse.server");
+  const { ip, userAgent } = clientMeta();
+  if (!ip || !userAgent) return null;
+  return `guest:${ip}:${userAgent.slice(0, 40)}`;
+}
+
+/**
+ * Short-lived proof that a guest already paid for this request out of their
+ * free trial, so the provider boundary can allow the call without a session.
+ */
+const guestPasses = new Map<string, number>();
+function grantGuestPass(key: string) {
+  guestPasses.set(key, Date.now() + 60_000);
+}
+function hasGuestPass(key: string) {
+  const until = guestPasses.get(key);
+  if (!until) return false;
+  if (until < Date.now()) {
+    guestPasses.delete(key);
+    return false;
+  }
+  return true;
+}
+
 /**
  * Final provider-boundary check. Paid clients call this too, so a future route
  * cannot accidentally bypass the normal cache -> quota -> provider sequence.
@@ -133,9 +164,15 @@ export async function assertLiveLookupAuthorized(): Promise<void> {
   const { assertNotBlocked, isCrawler } = await import("./abuse.server");
   if (isCrawler()) throw new CrawlerError();
   const userId = await currentUserId();
-  if (!userId) throw new AuthRequiredError();
+  if (!userId) {
+    const key = await guestKey();
+    if (!key || !hasGuestPass(key)) throw new AuthRequiredError();
+    await assertNotBlocked(null);
+    return;
+  }
   await assertNotBlocked(userId);
 }
+
 
 /**
  * Atomic, site-wide fuse for actual paid HTTP calls. This is intentionally
