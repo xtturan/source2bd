@@ -194,9 +194,10 @@ function SoftLoginNote({ quota }: { quota?: boolean }) {
               "Today's live search limit is used up. The saved products above are still available.",
             )
           : t(
-              "আরও নতুন পণ্য দেখতে লগইন করুন · দিনে ৩০ বার ফ্রি",
-              "Log in to pull fresh listings. 30 free live searches a day.",
+              "ফ্রি খোঁজা শেষ — লগইন করলে দিনে ৩০ বার ফ্রি লাইভ খোঁজা।",
+              "Free trial searches used. Log in for 30 free live searches a day.",
             )}
+
       </p>
       {quota ? null : (
         <Link

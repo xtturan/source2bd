@@ -54,7 +54,7 @@ export class QuotaError extends Error {
 
 export class AuthRequiredError extends Error {
   readonly code = "LOGIN_REQUIRED";
-  readonly messageBn = "লাইভ তথ্য দেখতে লগইন করুন। আগে থেকে সংরক্ষিত পণ্য লগইন ছাড়াই দেখা যাবে।";
+  readonly messageBn = "ফ্রি খোঁজার সুযোগ শেষ। লগইন করলে দিনে ৩০ বার ফ্রি লাইভ খোঁজা যাবে। সংরক্ষিত পণ্য লগইন ছাড়াই দেখা যাবে।";
   constructor() {
     super("LOGIN_REQUIRED");
     this.name = "AuthRequiredError";
@@ -125,6 +125,37 @@ export interface QuotaState {
   resetAt: string;
 }
 
+/** Free live searches a signed-out visitor gets per device per day. */
+export function guestTrialLimit() {
+  return Math.min(envInt("GUEST_TRIAL_SEARCHES", 3), 5);
+}
+
+/** Visitor key for signed-out trial counting: IP + coarse UA. */
+async function guestKey(): Promise<string | null> {
+  const { clientMeta } = await import("./abuse.server");
+  const { ip, userAgent } = clientMeta();
+  if (!ip || !userAgent) return null;
+  return `guest:${ip}:${userAgent.slice(0, 40)}`;
+}
+
+/**
+ * Short-lived proof that a guest already paid for this request out of their
+ * free trial, so the provider boundary can allow the call without a session.
+ */
+const guestPasses = new Map<string, number>();
+function grantGuestPass(key: string) {
+  guestPasses.set(key, Date.now() + 60_000);
+}
+function hasGuestPass(key: string) {
+  const until = guestPasses.get(key);
+  if (!until) return false;
+  if (until < Date.now()) {
+    guestPasses.delete(key);
+    return false;
+  }
+  return true;
+}
+
 /**
  * Final provider-boundary check. Paid clients call this too, so a future route
  * cannot accidentally bypass the normal cache -> quota -> provider sequence.
@@ -133,9 +164,15 @@ export async function assertLiveLookupAuthorized(): Promise<void> {
   const { assertNotBlocked, isCrawler } = await import("./abuse.server");
   if (isCrawler()) throw new CrawlerError();
   const userId = await currentUserId();
-  if (!userId) throw new AuthRequiredError();
+  if (!userId) {
+    const key = await guestKey();
+    if (!key || !hasGuestPass(key)) throw new AuthRequiredError();
+    await assertNotBlocked(null);
+    return;
+  }
   await assertNotBlocked(userId);
 }
+
 
 /**
  * Atomic, site-wide fuse for actual paid HTTP calls. This is intentionally
@@ -247,6 +284,37 @@ export async function consumeQuota(
   }
 
   if (!userId) {
+    // Signed-out visitors get a small free trial per device per day so the
+    // first search never hits a login wall. Bots are already rejected above,
+    // and the site-wide credit fuse still applies to every paid call.
+    const trial = guestTrialLimit();
+    const key = trial > 0 ? await guestKey() : null;
+    if (key) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data, error } = await supabaseAdmin.rpc("consume_daily_usage", {
+          _visitor_key: key,
+          _day: dhakaDay(),
+          _limit: trial,
+          _cost: Math.max(1, Math.floor(cost)),
+        });
+        if (error) throw error;
+        const row = Array.isArray(data) ? data[0] : data;
+        if (row && row.allowed === true) {
+          grantGuestPass(key);
+          const state = {
+            limit: trial,
+            remaining: Math.max(0, trial - (row.used ?? 0)),
+            resetAt,
+          };
+          setHeaders(state);
+          noteActivity({ kind: action, userId: null, allowed: true, reason: "guest_trial", detail: label });
+          return state;
+        }
+      } catch (err) {
+        console.error("guest trial check failed", err);
+      }
+    }
     if (requireLogin) {
       noteActivity({ kind: action, userId: null, allowed: false, reason: "login_required", detail: label });
       throw new AuthRequiredError();
@@ -254,6 +322,7 @@ export async function consumeQuota(
     noteActivity({ kind: action, userId: null, allowed: true, detail: label });
     return { limit, remaining: limit, resetAt };
   }
+
 
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
