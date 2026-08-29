@@ -100,14 +100,6 @@ function bearerToken(): string | null {
   return token && token.split(".").length === 3 ? token : null;
 }
 
-/** Owner escape hatch. The key never leaves the server. */
-function hasBypass(): boolean {
-  const expected = process.env["RATE_LIMIT_BYPASS_KEY"];
-  if (!expected) return false;
-  const request = getRequest();
-  return request?.headers?.get("x-s2bd-bypass") === expected;
-}
-
 /** The verified user id from the session bearer token, or null. */
 export async function currentUserId(): Promise<string | null> {
   try {
@@ -138,7 +130,6 @@ export interface QuotaState {
  * cannot accidentally bypass the normal cache -> quota -> provider sequence.
  */
 export async function assertLiveLookupAuthorized(): Promise<void> {
-  if (hasBypass()) return;
   const { assertNotBlocked, isCrawler } = await import("./abuse.server");
   if (isCrawler()) throw new CrawlerError();
   const userId = await currentUserId();
@@ -231,7 +222,6 @@ export async function consumeQuota(
   const limit = limitFor(action);
   const resetAt = nextDhakaMidnight();
 
-  if (hasBypass()) return { limit, remaining: limit, resetAt };
 
   const { assertNotBlocked, noteActivity, isCrawler } = await import("./abuse.server");
 
