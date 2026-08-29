@@ -189,6 +189,15 @@ function FirstScreen() {
   );
 }
 
+const POPULAR = [
+  { q: "led light", bn: "লেড লাইট" },
+  { q: "phone cover", bn: "ফোন কভার" },
+  { q: "shoes", bn: "জুতা" },
+  { q: "watch", bn: "ঘড়ি" },
+  { q: "bag", bn: "ব্যাগ" },
+  { q: "kitchen items", bn: "রান্নাঘরের জিনিস" },
+];
+
 /** The one thing a first-time visitor should see: a search box, on screen one. */
 function HeroSearch() {
   const { t } = useLang();
@@ -222,6 +231,20 @@ function HeroSearch() {
         <SearchGlyph />
         {t("খুঁজুন", "Search")}
       </button>
+
+      {/* Tapping beats typing for most of our visitors. */}
+      <div className="flex flex-wrap gap-2 sm:col-span-2">
+        {POPULAR.map((chip) => (
+          <Link
+            key={chip.q}
+            to="/sourcing"
+            search={{ q: chip.q, mode: "search" }}
+            className="font-bn rounded-full border border-foreground/12 bg-paper px-4 py-2 text-[15px] font-semibold"
+          >
+            {t(chip.bn, chip.q)}
+          </Link>
+        ))}
+      </div>
     </form>
   );
 }
