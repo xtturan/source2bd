@@ -74,3 +74,11 @@ export function BoxGlyph({ className }: { className?: string }) {
     </svg>
   );
 }
+
+export function PhoneGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={cn("h-6 w-6", className)} aria-hidden>
+      <path d="M6.5 3.5h3l1.4 3.6-2 1.4a12 12 0 0 0 5.6 5.6l1.4-2 3.6 1.4v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2z" />
+    </svg>
+  );
+}

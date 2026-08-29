@@ -122,24 +122,29 @@ function Searching() {
   }, []);
   const pct = Math.min(95, Math.round(95 * (1 - Math.exp(-sec / 12))));
   return (
-    <div className="panel matte rounded-[16px] p-4" role="status" aria-live="polite">
-      <div className="flex items-center gap-3">
-        <span className="h-3 w-3 animate-pulse rounded-full bg-accent" aria-hidden />
-        <span className="font-bn text-[17px] font-bold">{t("খুঁজছি…", "Searching…")}</span>
-        <span className="tnum ml-auto text-sm text-muted-foreground">{sec}s</span>
+    <div className="panel matte relative overflow-hidden rounded-[20px] p-6 text-center" role="status" aria-live="polite">
+      <div className="absolute inset-x-0 top-0 h-1 bg-accent/20">
+        <div 
+          className="h-full bg-accent transition-all duration-500" 
+          style={{ width: `${pct}%` }}
+        />
       </div>
-      <div
-        className="mt-3 h-2 w-full overflow-hidden rounded-full bg-foreground/10"
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={pct}
-      >
-        <div className="h-full rounded-full bg-accent transition-[width] duration-700 ease-out" style={{ width: `${pct}%` }} />
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative">
+          <div className="h-16 w-16 animate-spin rounded-full border-4 border-accent/20 border-t-accent" />
+          <SearchGlyph className="absolute inset-0 m-auto h-6 w-6 text-accent" />
+        </div>
+        <div>
+          <h3 className="font-bn text-xl font-black">{t("খুঁজছি… একটু অপেক্ষা করুন", "Searching... please wait")}</h3>
+          <p className="font-bn mt-1 text-[15px] font-bold text-muted-foreground">
+            {t("সরাসরি চীন থেকে দাম দেখছি", "Checking prices directly from China")}
+          </p>
+        </div>
+        <span className="tnum rounded-full bg-accent/10 px-3 py-1 text-sm font-bold text-accent">{sec}s</span>
       </div>
-      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="aspect-[3/4]" />
+          <div key={i} className="aspect-[3/4] animate-pulse rounded-[12px] bg-foreground/5" />
         ))}
       </div>
     </div>
@@ -731,6 +736,7 @@ type VoiceState = "idle" | "listening" | "processing" | "error" | "unsupported";
  * Mic sits beside the search box and fills the very same input.
  * Every state is spoken out loud in Bangla: idle, listening, heard, failed.
  */
+function VoiceSearch({
   onFinal: (text: string) => void;
   onInterim: (text: string) => void;
 }) {
@@ -954,24 +960,3 @@ async function shrinkImage(file: File): Promise<string> {
   return canvas.toDataURL("image/jpeg", 0.82);
 }
 
-
-      <path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.2l1.2-2h8.2l1.2 2h2.2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z" />
-      <circle cx="12" cy="13" r="3.6" />
-    </svg>
-  );
-}
-      <path d="M10 14a4 4 0 0 0 5.7 0l2.8-2.8a4 4 0 0 0-5.7-5.7L11.5 7" />
-      <path d="M14 10a4 4 0 0 0-5.7 0L5.5 12.8a4 4 0 0 0 5.7 5.7L12.5 17" />
-    </svg>
-  );
-}
-      <circle cx="11" cy="11" r="6.5" />
-      <path d="M20 20l-4.2-4.2" />
-    </svg>
-  );
-}
-      <rect x="9" y="3" width="6" height="11" rx="3" />
-      <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
-    </svg>
-  );
-}
