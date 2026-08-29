@@ -205,3 +205,57 @@ export async function readShowcase(limit = 4): Promise<ShowcaseRow[]> {
     return [];
   }
 }
+/**
+ * Free, login-free keyword lookup over what we have already paid for.
+ * Guests and first-time visitors see products instantly instead of a wall.
+ */
+export async function readCachedMatches(
+  q: string,
+  limit = 24,
+): Promise<CatalogueItem[]> {
+  const needle = q.trim().toLowerCase();
+  if (!needle) return [];
+  const words = needle.split(/\s+/).filter((w) => w.length > 1);
+  try {
+    const db = await admin();
+    const { data, error } = await db
+      .from("search_cache")
+      .select("query, results")
+      .gt("item_count", 0)
+      .order("hits", { ascending: false })
+      .order("updated_at", { ascending: false })
+      .limit(160);
+    if (error || !data) return [];
+
+    const seen = new Set<string>();
+    const scored: { score: number; item: CatalogueItem }[] = [];
+    for (const row of data) {
+      const query = ((row.query as string) ?? "").toLowerCase();
+      const items = row.results as unknown as ProductSummary[];
+      if (!Array.isArray(items)) continue;
+      const queryScore = query === needle ? 6 : query.includes(needle) ? 4 : 0;
+      for (const item of items) {
+        if (!item?.id) continue;
+        const k = `${item.marketplace}-${item.id}`;
+        if (seen.has(k)) continue;
+        const title = (item.title ?? "").toLowerCase();
+        let score = queryScore;
+        if (title.includes(needle)) score += 5;
+        for (const w of words) {
+          if (title.includes(w)) score += 2;
+          else if (query.includes(w)) score += 1;
+        }
+        if (score <= 0) continue;
+        seen.add(k);
+        scored.push({ score, item: { ...item, query: row.query as string } });
+      }
+    }
+    return scored
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map((s) => s.item);
+  } catch (err) {
+    console.error("cached match read failed", err);
+    return [];
+  }
+}
