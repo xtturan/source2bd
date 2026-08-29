@@ -284,6 +284,37 @@ export async function consumeQuota(
   }
 
   if (!userId) {
+    // Signed-out visitors get a small free trial per device per day so the
+    // first search never hits a login wall. Bots are already rejected above,
+    // and the site-wide credit fuse still applies to every paid call.
+    const trial = guestTrialLimit();
+    const key = trial > 0 ? await guestKey() : null;
+    if (key) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data, error } = await supabaseAdmin.rpc("consume_daily_usage", {
+          _visitor_key: key,
+          _day: dhakaDay(),
+          _limit: trial,
+          _cost: Math.max(1, Math.floor(cost)),
+        });
+        if (error) throw error;
+        const row = Array.isArray(data) ? data[0] : data;
+        if (row && row.allowed === true) {
+          grantGuestPass(key);
+          const state = {
+            limit: trial,
+            remaining: Math.max(0, trial - (row.used ?? 0)),
+            resetAt,
+          };
+          setHeaders(state);
+          noteActivity({ kind: action, userId: null, allowed: true, reason: "guest_trial", detail: label });
+          return state;
+        }
+      } catch (err) {
+        console.error("guest trial check failed", err);
+      }
+    }
     if (requireLogin) {
       noteActivity({ kind: action, userId: null, allowed: false, reason: "login_required", detail: label });
       throw new AuthRequiredError();
@@ -291,6 +322,7 @@ export async function consumeQuota(
     noteActivity({ kind: action, userId: null, allowed: true, detail: label });
     return { limit, remaining: limit, resetAt };
   }
+
 
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
