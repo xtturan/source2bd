@@ -216,7 +216,7 @@ function HeroSearch() {
       <label htmlFor="hero-q" className="sr-only">
         {t("পণ্যের নাম লিখুন", "Type a product name")}
       </label>
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-stretch gap-2 sm:col-span-1">
+      <div className="relative">
         <input
           id="hero-q"
           value={value}
@@ -226,15 +226,18 @@ function HeroSearch() {
             "কী লাগবে? যেমন: লেড লাইট, ফোন কভার",
             "What do you need? e.g. led light, phone cover",
           )}
-          className="font-bn h-20 min-w-0 flex-1 rounded-[20px] border-2 border-foreground/25 bg-paper px-5 text-[19px] font-bold shadow-[var(--shadow-2)] outline-none focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent"
+          className="font-bn h-20 w-full min-w-0 rounded-[20px] border-2 border-foreground/25 bg-paper pr-[76px] pl-5 text-[19px] font-bold shadow-[var(--shadow-2)] outline-none focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent"
         />
-        <VoiceButton
-          onFinal={(text) => {
-            setValue(text);
-            void navigate({ to: "/sourcing", search: { q: text, mode: "search" } });
-          }}
-          onInterim={(text) => setValue(text)}
-        />
+        <div className="absolute top-1/2 right-3.5 -translate-y-1/2">
+          <VoiceButton
+            inline
+            onFinal={(text) => {
+              setValue(text);
+              void navigate({ to: "/sourcing", search: { q: text, mode: "search" } });
+            }}
+            onInterim={(text) => setValue(text)}
+          />
+        </div>
       </div>
       <button
         type="submit"

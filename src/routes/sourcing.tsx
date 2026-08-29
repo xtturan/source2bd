@@ -325,10 +325,17 @@ function MarketDisclaimer() {
 }
 
 function Results({ items }: { items: ProductSummary[] }) {
+  const { t } = useLang();
   return (
     <div>
       <MarketDisclaimer />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <p className="font-bn mt-2 text-[15px] font-extrabold">
+        {t(
+          `${items.length}টি পণ্য পাওয়া গেছে · নিচে স্ক্রল করে সব দেখুন`,
+          `${items.length} products found · scroll down to see them all`,
+        )}
+      </p>
+      <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {items.map((p) => (
           <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
         ))}
@@ -613,6 +620,9 @@ function SearchPanel() {
   const [marketplace, setMarketplace] = useState<Marketplace>("1688");
   const [items, setItems] = useState<ProductSummary[] | null>(null);
   const [submitted, setSubmitted] = useState(initialQ ?? "");
+  // Anchor above the results grid; when results arrive on a small screen they
+  // land below the fold, so we scroll the shopper to them explicitly.
+  const resultsRef = useRef<HTMLDivElement | null>(null);
   const search = useServerFn(searchProducts);
   const cachedFn = useServerFn(cachedSearch);
   const suggestFn = useServerFn(searchSuggestions);
@@ -643,6 +653,10 @@ function SearchPanel() {
     onSuccess: (res) => {
       setItems(res.items);
       void qc.invalidateQueries({ queryKey: ["my-quota"] });
+      // Results render far below the form on phones; bring them on screen.
+      requestAnimationFrame(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     },
   });
 
@@ -678,44 +692,47 @@ function SearchPanel() {
         {t("কী লাগবে?", "What do you need?")}
       </label>
       <form
-        className="mt-2 grid gap-3"
+        className="mt-2 grid gap-2"
         onSubmit={(e) => {
           e.preventDefault();
           submit(q);
         }}
       >
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
-          <>
-            <input
-              id="q"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              enterKeyHint="search"
-              list="q-suggestions"
-              placeholder={t(
-                "কী লাগবে? যেমন: লেড লাইট, ফোন কভার",
-                "What do you need? e.g. led light, phone cover",
-              )}
-              className="font-bn h-16 min-w-0 flex-1 rounded-[16px] border border-input bg-paper px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            />
-            <datalist id="q-suggestions">
-              {(suggestions.data ?? []).map((s: string) => (
-                <option key={s} value={s} />
-              ))}
-            </datalist>
-          </>
-          <VoiceButton
-            onFinal={(text) => {
-              setQ(text);
-              submit(text);
-            }}
-            onInterim={(text) => setQ(text)}
+        {/* Field + mic + button read as ONE control: mic lives inside the
+            field on the right, the green search button hugs the field below. */}
+        <div className="relative">
+          <input
+            id="q"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            enterKeyHint="search"
+            list="q-suggestions"
+            placeholder={t(
+              "কী লাগবে? যেমন: লেড লাইট, ফোন কভার",
+              "What do you need? e.g. led light, phone cover",
+            )}
+            className="font-bn h-16 w-full min-w-0 rounded-[16px] border border-input bg-paper pr-16 pl-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
           />
+          <datalist id="q-suggestions">
+            {(suggestions.data ?? []).map((s: string) => (
+              <option key={s} value={s} />
+            ))}
+          </datalist>
+          <div className="absolute top-1/2 right-2 -translate-y-1/2">
+            <VoiceButton
+              inline
+              onFinal={(text) => {
+                setQ(text);
+                submit(text);
+              }}
+              onInterim={(text) => setQ(text)}
+            />
+          </div>
         </div>
         <button
           type="submit"
           disabled={!q.trim()}
-          className="font-bn flex min-h-[64px] items-center justify-center gap-2 rounded-full bg-accent text-xl font-bold text-accent-foreground disabled:opacity-60"
+          className="font-bn flex min-h-[60px] items-center justify-center gap-2 rounded-[16px] bg-accent text-xl font-black text-accent-foreground shadow-[var(--shadow-2)] transition-transform duration-150 active:scale-[0.98] disabled:opacity-60"
         >
           <SearchGlyph className="h-6 w-6" />
           {mutation.isPending ? t("খুঁজছি…", "Searching…") : t("খুঁজুন", "Search")}
@@ -762,7 +779,7 @@ function SearchPanel() {
         ))}
       </div>
 
-      <div className="mt-6">
+      <div ref={resultsRef} className="mt-6 scroll-mt-4">
         {/* Saved products appear immediately; the live search fills in after. */}
         {cachedItems.length && !items ? (
           <div className="mb-5">
