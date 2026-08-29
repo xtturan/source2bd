@@ -216,7 +216,7 @@ function HeroSearch() {
       <label htmlFor="hero-q" className="sr-only">
         {t("পণ্যের নাম লিখুন", "Type a product name")}
       </label>
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 sm:col-span-1">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-stretch gap-2 sm:col-span-1">
         <input
           id="hero-q"
           value={value}
@@ -226,7 +226,7 @@ function HeroSearch() {
             "কী লাগবে? যেমন: লেড লাইট, ফোন কভার",
             "What do you need? e.g. led light, phone cover",
           )}
-          className="font-bn h-16 min-w-0 flex-1 rounded-[18px] border border-input bg-paper px-5 text-[17px] outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="font-bn h-20 min-w-0 flex-1 rounded-[20px] border-2 border-foreground/25 bg-paper px-5 text-[19px] font-bold shadow-[var(--shadow-2)] outline-none focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent"
         />
         <VoiceButton
           onFinal={(text) => {
@@ -238,9 +238,9 @@ function HeroSearch() {
       </div>
       <button
         type="submit"
-        className="font-bn flex h-16 items-center justify-center gap-2 rounded-[18px] bg-accent px-7 text-[18px] font-bold text-accent-foreground"
+        className="font-bn flex h-20 items-center justify-center gap-2 rounded-[20px] bg-accent px-8 text-[19px] font-black text-accent-foreground shadow-[var(--shadow-2)] transition-transform duration-150 active:scale-[0.98]"
       >
-        <SearchGlyph />
+        <SearchGlyph className="h-6 w-6" />
         {t("খুঁজুন", "Search")}
       </button>
 
@@ -258,87 +258,6 @@ function HeroSearch() {
         ))}
       </div>
     </form>
-  );
-}
-
-type ActionProps = {
-  title: string;
-  sub: string;
-  icon: React.ReactNode;
-  tone: "accent" | "ink" | "paper";
-};
-
-const toneClass = {
-  accent: "bg-accent text-accent-foreground",
-  ink: "bg-foreground text-background",
-  paper: "panel matte",
-} as const;
-
-function ActionCard(
-  props: ActionProps &
-    (
-      | { as: "link"; to: string; search?: Record<string, string> }
-      | { as: "anchor"; href: string }
-      | { as: "button"; onClick: () => void; expanded: boolean }
-    ),
-) {
-  const { title, sub, icon, tone } = props;
-  const body = (
-    <>
-      <span
-        aria-hidden
-        className={cn(
-          "grid h-14 w-14 shrink-0 place-items-center rounded-[16px] sm:h-16 sm:w-16",
-          tone === "paper" ? "bg-accent/12 text-accent" : "bg-white/15",
-        )}
-      >
-        {icon}
-      </span>
-      <span className="min-w-0">
-        <span className="font-bn block text-[clamp(1.15rem,4.5vw,1.4rem)] font-extrabold leading-tight">
-          {title}
-        </span>
-        <span
-          className={cn(
-            "font-bn mt-1 block text-[14px] font-semibold leading-snug",
-            tone === "paper" ? "text-muted-foreground" : "opacity-85",
-          )}
-        >
-          {sub}
-        </span>
-      </span>
-    </>
-  );
-
-  const cls = cn(
-    "flex min-h-[104px] w-full items-center gap-4 rounded-[20px] p-4 text-left shadow-[var(--shadow-2)] transition-transform duration-150 active:scale-[0.99] sm:min-h-[168px] sm:flex-col sm:items-start sm:justify-center sm:gap-3 sm:p-6",
-    toneClass[tone],
-  );
-
-  if (props.as === "link") {
-    return (
-      <Link to={props.to} search={props.search as never} className={cls} aria-label={title}>
-        {body}
-      </Link>
-    );
-  }
-  if (props.as === "anchor") {
-    return (
-      <a href={props.href} className={cls} aria-label={title}>
-        {body}
-      </a>
-    );
-  }
-  return (
-    <button
-      type="button"
-      onClick={props.onClick}
-      aria-expanded={props.expanded}
-      className={cls}
-      aria-label={title}
-    >
-      {body}
-    </button>
   );
 }
 
