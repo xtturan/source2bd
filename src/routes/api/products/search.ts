@@ -6,7 +6,9 @@ import { canonicalQuery } from "@/lib/products/bn-keywords";
 
 const schema = z.object({
   q: z.string().trim().max(100).default(""),
-  marketplace: z.enum(["1688", "taobao", "alibaba", "aliexpress", "amazon", "global"]).default("1688"),
+  marketplace: z
+    .enum(["1688", "taobao", "alibaba", "aliexpress", "amazon", "global"])
+    .default("1688"),
   page: z.coerce.number().int().min(1).max(50).default(1),
 });
 

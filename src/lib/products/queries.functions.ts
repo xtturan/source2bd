@@ -16,7 +16,9 @@ export const searchProducts = createServerFn({ method: "POST" })
     z
       .object({
         q: z.string().trim().max(100).default(""),
-        marketplace: z.enum(["1688", "taobao", "alibaba", "aliexpress", "amazon", "global"]).default("1688"),
+        marketplace: z
+          .enum(["1688", "taobao", "alibaba", "aliexpress", "amazon", "global"])
+          .default("1688"),
         page: z.number().int().min(1).max(50).default(1),
         live: z.literal(true),
       })

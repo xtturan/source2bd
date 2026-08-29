@@ -33,76 +33,79 @@ const BN_PHRASES: Record<string, string> = {
   "ওয়্যারলেস ইয়ারবাড": "wireless earbuds",
   "ব্লুটুথ ইয়ারফোন": "bluetooth earphone",
   "পাওয়ার ব্যাংক": "power bank",
-  "গ্যাজেট": "gadget",
-  "ইলেকট্রনিক্স": "electronics",
+  গ্যাজেট: "gadget",
+  ইলেকট্রনিক্স: "electronics",
   "মোবাইল সামগ্রী": "mobile accessories",
   "ঘরের জিনিস": "household items",
-  "রান্নাঘর": "kitchen",
+  "ঘরের জিনিসপত্র": "household items",
+  রান্নাঘর: "kitchen",
   "রান্নাঘরের জিনিস": "kitchen accessories",
-  "পোশাক": "clothing",
+  পোশাক: "clothing",
   "নারীদের ব্যাগ": "women bag",
   "মহিলাদের ব্যাগ": "women bag",
-  "শাড়ি": "saree",
-  "জুতা": "shoes",
-  "ঘড়ি": "wrist watch",
-  "সানগ্লাস": "sunglasses",
-  "চশমা": "glasses",
-  "খেলনা": "toy",
-  "বই": "book",
-  "স্টেশনারি": "stationery",
+  শাড়ি: "saree",
+  জুতা: "shoes",
+  ঘড়ি: "wrist watch",
+  সানগ্লাস: "sunglasses",
+  চশমা: "glasses",
+  খেলনা: "toy",
+  বই: "book",
+  স্টেশনারি: "stationery",
   "স্কুলের ব্যাগ": "school bag",
+  স্কুল: "school",
+  স্কুলের: "school",
   "ওয়াচ ব্যান্ড": "watch band",
   "মোবাইল হোল্ডার": "phone holder",
   "রিং লাইট": "ring light",
-  "স্পিকার": "bluetooth speaker",
-  "ফ্যান": "electric fan",
-  "হিটার": "heater",
-  "ইস্ত্রি": "iron press",
-  "বালি": "sand toy",
-  "কসমেটিকস": "cosmetics",
-  "মেকআপ": "makeup",
-  "পারফিউম": "perfume",
-  "গয়না": "jewelry",
-  "ব্রেসলেট": "bracelet",
-  "আংটি": "ring",
+  স্পিকার: "bluetooth speaker",
+  ফ্যান: "electric fan",
+  হিটার: "heater",
+  ইস্ত্রি: "iron press",
+  বালি: "sand toy",
+  কসমেটিকস: "cosmetics",
+  মেকআপ: "makeup",
+  পারফিউম: "perfume",
+  গয়না: "jewelry",
+  ব্রেসলেট: "bracelet",
+  আংটি: "ring",
   "মোবাইল স্ট্যান্ড": "phone stand",
   "টিভি রিমোট": "tv remote control",
   "এসি রিমোট": "ac remote control",
   "গামিং মাউস": "gaming mouse",
-  "কীবোর্ড": "keyboard",
+  কীবোর্ড: "keyboard",
   "ল্যাপটপ ব্যাগ": "laptop bag",
   "টিফিন বক্স": "lunch box",
   "ওয়াটার বোতল": "water bottle",
-  "থার্মোস": "thermos flask",
-  "হাঁড়ি": "cooking pot",
-  "প্যান": "frying pan",
-  "ছুরি": "knife",
-  "কাঁচি": "scissors",
-  "ঝাড়ু": "broom",
-  "মপ": "mop",
-  "ডাস্টবিন": "trash can",
-  "পর্দা": "curtain",
-  "বালিশ": "pillow",
-  "চাদর": "bed sheet",
-  "কম্বল": "blanket",
+  থার্মোস: "thermos flask",
+  হাঁড়ি: "cooking pot",
+  প্যান: "frying pan",
+  ছুরি: "knife",
+  কাঁচি: "scissors",
+  ঝাড়ু: "broom",
+  মপ: "mop",
+  ডাস্টবিন: "trash can",
+  পর্দা: "curtain",
+  বালিশ: "pillow",
+  চাদর: "bed sheet",
+  কম্বল: "blanket",
   "টেবিল কাপড়": "table cloth",
   "স্টোরেজ বক্স": "storage box",
-  "আয়না": "mirror",
-  "টুথব্রাশ": "toothbrush",
-  "শ্যাম্পু": "shampoo",
-  "সাবান": "soap",
-  "তোয়ালে": "towel",
-  "আন্ডারওয়্যার": "underwear",
+  আয়না: "mirror",
+  টুথব্রাশ: "toothbrush",
+  শ্যাম্পু: "shampoo",
+  সাবান: "soap",
+  তোয়ালে: "towel",
+  আন্ডারওয়্যার: "underwear",
   "টি-শার্ট": "t-shirt",
-  "শার্ট": "shirt",
-  "প্যান্ট": "pants",
-  "জ্যাকেট": "jacket",
-  "টুপি": "cap",
-  "মোজা": "socks",
+  শার্ট: "shirt",
+  প্যান্ট: "pants",
+  জ্যাকেট: "jacket",
+  টুপি: "cap",
+  মোজা: "socks",
   "বেবি প্রোডাক্টস": "baby products",
   "বেবি ডায়াপার": "baby diaper",
   "ফিশ ট্যাংক": "fish tank",
-  "একুরিয়াম": "aquarium",
+  একুরিয়াম: "aquarium",
   "গাছের টব": "plant pot",
   "টুল বক্স": "tool box",
   "স্ক্রু ড্রাইভার": "screwdriver",
@@ -127,11 +130,14 @@ const BN_WORDS: Record<string, string> = {
   হলুদ: "yellow",
   গোলাপি: "pink",
   মহিলা: "women",
+  মহিলাদের: "women",
   নারী: "women",
+  নারীদের: "women",
   পুরুষ: "men",
   ছেলে: "boys",
   মেয়ে: "girls",
   বাচ্চা: "kids",
+  বাচ্চাদের: "kids",
   বেবি: "baby",
   ইয়ারবাড: "earbuds",
   চার্জার: "charger",
@@ -139,6 +145,8 @@ const BN_WORDS: Record<string, string> = {
   ক্যাবল: "cable",
   মোবাইল: "mobile",
   ফোন: "phone",
+  কভার: "cover",
+  কেস: "case",
   ল্যাপটপ: "laptop",
   কম্পিউটার: "computer",
   ব্যাগ: "bag",
@@ -162,7 +170,7 @@ const BN_WORDS: Record<string, string> = {
   ব্যাটারি: "battery",
   লেন্স: "lens",
   ক্যামেরা: "camera",
-  "সিলিকন": "silicone",
+  সিলিকন: "silicone",
   প্লাস্টিক: "plastic",
   স্টিল: "steel",
   কাচ: "glass",
@@ -185,7 +193,9 @@ function isBangla(text: string) {
  * match on. Bangla-free input is returned unchanged (trimmed).
  */
 export function toEnglishKeywords(rawQuery: string): string {
-  const query = rawQuery.trim().replace(/\s+/g, " ");
+  // NFC: some keyboards paste Bangla in NFD (vowel signs decomposed), which
+  // would silently miss every dictionary entry. Compose before matching.
+  const query = rawQuery.normalize("NFC").trim().replace(/\s+/g, " ");
   if (!query || !isBangla(query)) return query;
 
   let out = ` ${query} `;
@@ -203,11 +213,27 @@ export function toEnglishKeywords(rawQuery: string): string {
     if (!isBangla(tok)) return tok;
     const direct = BN_WORDS[tok] ?? BN_PHRASES[tok];
     if (direct) return direct;
-    const stem = tok.replace(/[টােিীুূংঃ্যর্খগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ়২-৯]+$/u, "");
+    // Strip common Bangla case-endings (suffix vowels/consonant signs) to find
+    // the dictionary stem. Split into allowed-suffix strips so no character
+    // class mixes combining marks (the lint rule no-misleading-character-class).
+    let stem = tok;
+    const suffixes = ["ের", "েরটা", "েদের", "েদেরটা", "টা", "টি", "র", "গুলো", "গুলি"];
+    for (const sfx of suffixes.sort((a, b) => b.length - a.length)) {
+      if (stem.length > sfx.length && stem.endsWith(sfx)) {
+        stem = stem.slice(0, -sfx.length);
+        break;
+      }
+    }
     return BN_WORDS[stem] ?? "";
   });
 
-  const result = mapped.filter(Boolean).join(" ").trim();
+  const result = mapped
+    .filter(Boolean)
+    // Collapse consecutive duplicates: "লাইট লাইট" would map to
+    // "light light" and marketplaces treat that as two separate intents.
+    .filter((w, i, arr) => i === 0 || w.toLowerCase() !== arr[i - 1].toLowerCase())
+    .join(" ")
+    .trim();
   // Never return blank: fall back to the original so the desk still sees intent.
   return result || query;
 }
