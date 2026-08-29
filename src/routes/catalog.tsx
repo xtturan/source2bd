@@ -38,10 +38,14 @@ export const Route = createFileRoute("/catalog")({
       },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { cat?: string; q?: string } => {
-    const out: { cat?: string; q?: string } = {};
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { cat?: string; q?: string; sort?: string } => {
+    const out: { cat?: string; q?: string; sort?: string } = {};
     if (typeof search["cat"] === "string" && search["cat"]) out.cat = search["cat"];
     if (typeof search["q"] === "string" && search["q"]) out.q = search["q"];
+    if (search["sort"] === "price-asc" || search["sort"] === "price-desc")
+      out.sort = search["sort"];
     return out;
   },
   loader: async (): Promise<CatalogueItem[]> => {
@@ -72,9 +76,10 @@ export const Route = createFileRoute("/catalog")({
 
 function CatalogPage() {
   const items = Route.useLoaderData() as CatalogueItem[];
-  const { cat = "", q = "" } = Route.useSearch();
+  const { cat = "", q = "", sort = "" } = Route.useSearch();
   const { t } = useLang();
   const [text, setText] = useState(q);
+  const [visibleCount, setVisibleCount] = useState(240);
 
   const tagged = useMemo<{ p: CatalogueItem; key: CategoryKey }[]>(
     () => items.map((p: CatalogueItem) => ({ p, key: categoryOfProduct(p, p.query) })),
@@ -97,28 +102,40 @@ function CatalogPage() {
   // With no category chosen, interleave categories so one popular keyword
   // cannot turn the whole grid into a single-product-type wall.
   const shown = useMemo(() => {
-    if (cat) return matched.slice(0, 240);
-    const buckets = new Map<CategoryKey, { p: CatalogueItem; key: CategoryKey }[]>();
-    for (const row of matched) {
-      const list = buckets.get(row.key) ?? [];
-      list.push(row);
-      buckets.set(row.key, list);
-    }
-    const out: { p: CatalogueItem; key: CategoryKey }[] = [];
-    let added = true;
-    while (added && out.length < 240) {
-      added = false;
-      for (const list of buckets.values()) {
-        const next = list.shift();
-        if (!next) continue;
-        out.push(next);
-        added = true;
-        if (out.length >= 240) break;
+    let out: { p: CatalogueItem; key: CategoryKey }[];
+    if (sort === "price-asc" || sort === "price-desc") {
+      const price = (p: CatalogueItem) => p.priceMin ?? p.priceMax ?? Number.MAX_SAFE_INTEGER;
+      const sorted = [...matched].sort((a, b) => {
+        const diff = price(a.p) - price(b.p);
+        return sort === "price-asc" ? diff : -diff;
+      });
+      out = sort === "price-asc" ? sorted : sorted.reverse();
+    } else if (cat) {
+      out = matched.slice(0, 240);
+    } else {
+      const buckets = new Map<CategoryKey, { p: CatalogueItem; key: CategoryKey }[]>();
+      for (const row of matched) {
+        const list = buckets.get(row.key) ?? [];
+        list.push(row);
+        buckets.set(row.key, list);
       }
+      const inter: { p: CatalogueItem; key: CategoryKey }[] = [];
+      let added = true;
+      while (added && inter.length < 240) {
+        added = false;
+        for (const list of buckets.values()) {
+          const next = list.shift();
+          if (!next) continue;
+          inter.push(next);
+          added = true;
+          if (inter.length >= 240) break;
+        }
+      }
+      out = inter;
     }
-    return out;
+    return out.slice(0, visibleCount);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tagged, cat, needle]);
+  }, [tagged, cat, needle, sort, visibleCount]);
 
   return (
     <Section className="py-6 sm:py-10">
@@ -174,6 +191,33 @@ function CatalogPage() {
             ))}
         </div>
 
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span className="font-bn text-[14px] font-bold text-muted-foreground">
+            {t("সাজান:", "Sort:")}
+          </span>
+          {(
+            [
+              ["", "জনপ্রিয়", "Popular"],
+              ["price-asc", "কম দাম আগে", "Price low-high"],
+              ["price-desc", "বেশি দাম আগে", "Price high-low"],
+            ] as const
+          ).map(([value, bn, en]) => (
+            <Link
+              key={value || "popular"}
+              to="/catalog"
+              search={{ cat: cat || undefined, q: q || undefined, sort: value || undefined }}
+              className={cn(
+                "font-bn flex min-h-[44px] items-center rounded-full px-4 text-[14px] font-bold",
+                sort === value
+                  ? "bg-foreground text-background"
+                  : "panel matte text-muted-foreground",
+              )}
+            >
+              {t(bn, en)}
+            </Link>
+          ))}
+        </div>
+
         {shown.length ? (
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {shown.map(({ p }: { p: CatalogueItem }) => (
@@ -215,6 +259,21 @@ function CatalogPage() {
             </Link>
           </div>
         )}
+
+        {matched.length > shown.length ? (
+          <div className="mt-6 flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setVisibleCount((n) => n + 240)}
+              className="font-bn flex min-h-[56px] items-center rounded-[14px] border border-border bg-paper px-6 text-[15px] font-bold"
+            >
+              {t("আরও দেখুন", "Load more")}
+            </button>
+            <p className="text-[13px] text-muted-foreground">
+              {shown.length} / {matched.length}
+            </p>
+          </div>
+        ) : null}
       </Container>
     </Section>
   );
