@@ -54,7 +54,7 @@ export class QuotaError extends Error {
 
 export class AuthRequiredError extends Error {
   readonly code = "LOGIN_REQUIRED";
-  readonly messageBn = "লাইভ তথ্য দেখতে লগইন করুন। আগে থেকে সংরক্ষিত পণ্য লগইন ছাড়াই দেখা যাবে।";
+  readonly messageBn = "ফ্রি খোঁজার সুযোগ শেষ। লগইন করলে দিনে ৩০ বার ফ্রি লাইভ খোঁজা যাবে। সংরক্ষিত পণ্য লগইন ছাড়াই দেখা যাবে।";
   constructor() {
     super("LOGIN_REQUIRED");
     this.name = "AuthRequiredError";
