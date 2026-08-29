@@ -315,14 +315,12 @@ function HelpBox({
 function MarketDisclaimer() {
   const { t } = useLang();
   return (
-    <div className="mb-4 rounded-[16px] border-2 border-accent/30 bg-accent/10 p-4">
-      <p className="font-bn text-[16px] font-bold leading-snug">
-        {t(
-          "এগুলো মার্কেট/সাপ্লায়ার দাম। বাংলাদেশে পৌঁছানোর পুরো দাম আলাদা — শিপিংসহ জানতে সবুজ বাটনে চাপুন। পণ্যে চাপ দিলে বিস্তারিত দেখা যাবে।",
-          "These are supplier prices. The Bangladesh total is separate — tap the green button for the shipping-inclusive price. Tap a product for details.",
-        )}
-      </p>
-    </div>
+    <p className="font-bn mb-3 text-[13px] font-semibold text-muted-foreground">
+      {t(
+        "দামগুলো চীনের দোকানের। বাংলাদেশে পুরো দাম (শিপিংসহ) জানতে সবুজ বাটনে চাপুন।",
+        "Prices are seller prices in China. Tap the green button for the full shipping-inclusive price.",
+      )}
+    </p>
   );
 }
 
@@ -613,7 +611,6 @@ function SearchPanel() {
   const { q: initialQ } = Route.useSearch();
   const [q, setQ] = useState(initialQ ?? "");
   const [marketplace, setMarketplace] = useState<Marketplace>("1688");
-  const [showOptions, setShowOptions] = useState(false);
   const [items, setItems] = useState<ProductSummary[] | null>(null);
   const [submitted, setSubmitted] = useState(initialQ ?? "");
   const search = useServerFn(searchProducts);
@@ -744,37 +741,26 @@ function SearchPanel() {
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setShowOptions((v) => !v)}
-        aria-expanded={showOptions}
-        className="font-bn mt-3 min-h-[48px] text-[15px] font-bold text-foreground/70 underline"
-      >
-        {t("আরও অপশন", "More options")}
-      </button>
-
-      {showOptions ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {markets.map((m) => (
-            <button
-              key={m.key}
-              type="button"
-              onClick={() => {
-                setMarketplace(m.key);
-                if (q.trim()) submit(q, m.key);
-              }}
-              className={cn(
-                "min-h-[48px] rounded-full px-5 text-[15px] font-bold transition-colors",
-                marketplace === m.key
-                  ? "bg-foreground text-background"
-                  : "border border-border text-foreground/70",
-              )}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
-      ) : null}
+      {/* Only show marketplace switch when more than one is meaningfully
+          different; it lives behind a small chip row, not a big panel. */}
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        {markets.map((m) => (
+          <button
+            key={m.key}
+            type="button"
+            onClick={() => {
+              setMarketplace(m.key);
+              if (q.trim()) submit(q, m.key);
+            }}
+            className={cn(
+              "min-h-[36px] rounded-full px-3 text-[12.5px] font-bold transition-colors",
+              marketplace === m.key ? "bg-foreground text-background" : "text-muted-foreground",
+            )}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
 
       <div className="mt-6">
         {/* Saved products appear immediately; the live search fills in after. */}

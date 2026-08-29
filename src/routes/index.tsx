@@ -2,7 +2,16 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Container, Section } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
-import { SearchGlyph, LinkGlyph, CameraGlyph, TagGlyph, TruckGlyph, CheckGlyph, BoxGlyph, PhoneGlyph } from "@/components/s2b/glyphs";
+import {
+  SearchGlyph,
+  LinkGlyph,
+  CameraGlyph,
+  TagGlyph,
+  TruckGlyph,
+  CheckGlyph,
+  BoxGlyph,
+  PhoneGlyph,
+} from "@/components/s2b/glyphs";
 import { VoiceButton } from "@/components/s2b/voice-button";
 import { QuotaBar } from "@/components/s2b/quota-bar";
 import { ProductCard } from "@/components/s2b/product-card";
@@ -23,8 +32,7 @@ export const Route = createFileRoute("/")({
       { title: "Source2BD, ছবি বা লিংক পাঠান, বাসায় পৌঁছে দেব" },
       {
         name: "description",
-        content:
-          `চীন বা যেকোনো দেশ থেকে পণ্য আনুন। ছবি বা লিংক পাঠান, আমরা বাংলাদেশে পৌঁছানোর পুরো দাম বলে দেব। ফোন ${siteConfig.phoneDisplay}, চকবাজার ঢাকা।`,
+        content: `চীন বা যেকোনো দেশ থেকে পণ্য আনুন। ছবি বা লিংক পাঠান, আমরা বাংলাদেশে পৌঁছানোর পুরো দাম বলে দেব। ফোন ${siteConfig.phoneDisplay}, চকবাজার ঢাকা।`,
       },
       { property: "og:title", content: "Source2BD, ছবি বা লিংক পাঠান, বাসায় পৌঁছে দেব" },
       {
@@ -83,8 +91,8 @@ function FirstScreen() {
 
   return (
     <Container className="pb-8 pt-4 sm:pt-6">
-      <h1 className="font-bn max-w-[16ch] text-[clamp(1.7rem,7vw,2.9rem)] font-extrabold leading-[1.2]">
-        {t("ছবি বা লিংক পাঠান", "Send a photo or a link")}
+      <h1 className="font-bn max-w-[20ch] text-[clamp(1.7rem,7vw,2.9rem)] font-extrabold leading-[1.2]">
+        {t("কী লাগবে? নাম লিখে খুঁজুন", "What do you need? Search it by name")}
         <br />
         <span className="text-accent">
           {t("বাংলাদেশে পৌঁছানোর পুরো দাম বলব", "we tell you the full Bangladesh door price")}
@@ -99,36 +107,26 @@ function FirstScreen() {
 
       <HeroSearch />
 
-      <div className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-3 sm:gap-4">
-        <ActionCard
-          as="link"
-          to="/sourcing"
-          search={{ mode: "search" }}
-          tone="accent"
-          title={t("নাম লিখে খুঁজুন", "Search by name")}
-          sub={t("যেমন: লেড লাইট, ফোন কভার", "e.g. led light, phone cover")}
-          icon={<SearchGlyph />}
-        />
-
-        <ActionCard
-          as="button"
+      {/* Link and photo remain reachable, but quiet: text row, not competing
+          cards. The search box above is the one obvious action. */}
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[15px] font-bold">
+        <button
+          type="button"
           onClick={() => setLinkOpen((v) => !v)}
-          expanded={linkOpen}
-          tone="ink"
-          title={t("লিংক দিন", "Paste a link")}
-          sub={t("১৬৮৮ / অ্যামাজন লিংক", "1688 or Amazon link")}
-          icon={<LinkGlyph />}
-        />
-
-        <ActionCard
-          as="link"
+          aria-expanded={linkOpen}
+          className="font-bn flex items-center gap-2 text-muted-foreground underline decoration-foreground/25 underline-offset-4"
+        >
+          <LinkGlyph className="h-4.5 w-4.5" />
+          {t("লিংক দিয়ে খুঁজবেন?", "Have a link instead?")}
+        </button>
+        <Link
           to="/sourcing"
           search={{ mode: "photo" }}
-          tone="paper"
-          title={t("ছবি পাঠান", "Send a photo")}
-          sub={t("পণ্যের ছবি তুলুন", "Take a picture of the item")}
-          icon={<CameraGlyph />}
-        />
+          className="font-bn flex items-center gap-2 text-muted-foreground underline decoration-foreground/25 underline-offset-4"
+        >
+          <CameraGlyph className="h-4.5 w-4.5" />
+          {t("ছবি দিয়ে খুঁজবেন?", "Search with a photo?")}
+        </Link>
       </div>
 
       <QuotaBar className="mt-4" />
@@ -224,7 +222,10 @@ function HeroSearch() {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           enterKeyHint="search"
-          placeholder={t("কী লাগবে? যেমন: লেড লাইট, ফোন কভার", "What do you need? e.g. led light, phone cover")}
+          placeholder={t(
+            "কী লাগবে? যেমন: লেড লাইট, ফোন কভার",
+            "What do you need? e.g. led light, phone cover",
+          )}
           className="font-bn h-16 min-w-0 flex-1 rounded-[18px] border border-input bg-paper px-5 text-[17px] outline-none focus-visible:ring-2 focus-visible:ring-accent"
         />
         <VoiceButton
@@ -329,7 +330,13 @@ function ActionCard(
     );
   }
   return (
-    <button type="button" onClick={props.onClick} aria-expanded={props.expanded} className={cls} aria-label={title}>
+    <button
+      type="button"
+      onClick={props.onClick}
+      aria-expanded={props.expanded}
+      className={cls}
+      aria-label={title}
+    >
       {body}
     </button>
   );
@@ -352,12 +359,20 @@ function ThreeSteps() {
         </h2>
         <ol className="mt-5 grid gap-3 sm:grid-cols-3 sm:gap-4">
           {steps.map((s) => (
-            <li key={s.en} className="panel matte flex items-center gap-4 rounded-[18px] p-5 sm:flex-col sm:items-start">
-              <span className="grid h-16 w-16 shrink-0 place-items-center rounded-[18px] bg-accent/12 text-accent" aria-hidden>
+            <li
+              key={s.en}
+              className="panel matte flex items-center gap-4 rounded-[18px] p-5 sm:flex-col sm:items-start"
+            >
+              <span
+                className="grid h-16 w-16 shrink-0 place-items-center rounded-[18px] bg-accent/12 text-accent"
+                aria-hidden
+              >
                 {s.icon}
               </span>
               <span>
-                <span className="font-bn block text-sm font-bold text-accent">{t(s.n, `Step ${s.n}`)}</span>
+                <span className="font-bn block text-sm font-bold text-accent">
+                  {t(s.n, `Step ${s.n}`)}
+                </span>
                 <span className="font-bn mt-1 block text-[17px] font-bold leading-snug">
                   {t(s.bn, s.en)}
                 </span>
@@ -410,7 +425,10 @@ function Categories() {
               search={{ q: c.q } as never}
               className="panel matte flex min-h-[88px] flex-col items-center justify-center gap-2 rounded-[18px] p-4 text-center"
             >
-              <span className="grid h-12 w-12 place-items-center rounded-[14px] bg-accent/12 text-accent" aria-hidden>
+              <span
+                className="grid h-12 w-12 place-items-center rounded-[14px] bg-accent/12 text-accent"
+                aria-hidden
+              >
                 <BoxGlyph />
               </span>
               <span className="font-bn text-[16px] font-bold">{t(c.bn, c.en)}</span>
@@ -466,7 +484,9 @@ function CategoryRails({ items }: { items: CatalogueItem[] }) {
             <div key={category.key}>
               <div className="flex items-center justify-between gap-3">
                 <h3 className="font-bn text-[18px] font-extrabold">
-                  <span aria-hidden className="mr-1.5">{category.emoji}</span>
+                  <span aria-hidden className="mr-1.5">
+                    {category.emoji}
+                  </span>
                   {t(category.bn, category.en)}
                 </h3>
                 <Link
@@ -492,7 +512,9 @@ function CategoryRails({ items }: { items: CatalogueItem[] }) {
           className="panel matte font-bn mt-8 flex min-h-[64px] items-center justify-between gap-3 rounded-[18px] px-5 text-[16px] font-bold"
         >
           <span>{t("সব ক্যাটাগরি ও পণ্য দেখুন", "Browse every category and product")}</span>
-          <span aria-hidden className="text-accent">→</span>
+          <span aria-hidden className="text-accent">
+            →
+          </span>
         </Link>
       </Container>
     </Section>
@@ -547,6 +569,3 @@ function HowToSend() {
     </Section>
   );
 }
-
-
-
