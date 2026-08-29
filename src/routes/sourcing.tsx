@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Container, Section, Skeleton } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
 import { ProductCard } from "@/components/s2b/product-card";
-import { searchProducts, productByUrl, productsByPhoto } from "@/lib/products/queries.functions";
+import { searchProducts, productByUrl, productsByPhoto, cachedSearch } from "@/lib/products/queries.functions";
 import type { Marketplace, ProductSummary } from "@/lib/products/types";
 import { generalInquiry, linkInquiry, photoInquiry, telLink, voiceInquiry } from "@/lib/whatsapp";
 import { siteConfig } from "@/config/site";
@@ -171,6 +171,34 @@ function LoginWall() {
       >
         {t("লগইন / রেজিস্টার", "Log in or sign up")}
       </Link>
+    </div>
+  );
+}
+
+/** Results exist from cache; the live upgrade just needs an account. */
+function SoftLoginNote({ quota }: { quota?: boolean }) {
+  const { t } = useLang();
+  return (
+    <div className="panel matte mt-4 flex flex-col gap-3 rounded-[18px] p-4 sm:flex-row sm:items-center">
+      <p className="font-bn text-[15px] font-semibold text-muted-foreground">
+        {quota
+          ? t(
+              "আজকের নতুন খোঁজার সীমা শেষ। উপরের সংরক্ষিত পণ্য দেখতে পারেন।",
+              "Today's live search limit is used up. The saved products above are still available.",
+            )
+          : t(
+              "আরও নতুন পণ্য দেখতে লগইন করুন · দিনে ৩০ বার ফ্রি",
+              "Log in to pull fresh listings. 30 free live searches a day.",
+            )}
+      </p>
+      {quota ? null : (
+        <Link
+          to="/auth"
+          className="font-bn flex min-h-[52px] shrink-0 items-center justify-center rounded-full bg-foreground px-6 text-[16px] font-bold text-background sm:ml-auto"
+        >
+          {t("লগইন / রেজিস্টার", "Log in or sign up")}
+        </Link>
+      )}
     </div>
   );
 }
