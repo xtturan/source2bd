@@ -95,6 +95,8 @@ function FirstScreen() {
         {t(siteConfig.parentLineBn, siteConfig.parentLineEn)}
       </p>
 
+      <HeroSearch />
+
       <div className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-3 sm:gap-4">
         <ActionCard
           as="link"
