@@ -491,7 +491,19 @@ function SearchPanel() {
   const [marketplace, setMarketplace] = useState<Marketplace>("1688");
   const [showOptions, setShowOptions] = useState(false);
   const [items, setItems] = useState<ProductSummary[] | null>(null);
+  const [submitted, setSubmitted] = useState(initialQ ?? "");
   const search = useServerFn(searchProducts);
+  const cachedFn = useServerFn(cachedSearch);
+
+  // Free, login-free results from what we have already paid for. These paint
+  // in well under a second so nobody stares at an empty screen.
+  const cachedQuery = useQuery({
+    queryKey: ["cached-search", submitted],
+    queryFn: () => cachedFn({ data: { q: submitted } }),
+    enabled: submitted.trim().length > 1,
+    staleTime: 5 * 60 * 1000,
+  });
+  const cachedItems = (cachedQuery.data ?? []) as ProductSummary[];
 
   const qc = useQueryClient();
   const mutation = useMutation({
@@ -505,7 +517,10 @@ function SearchPanel() {
 
   const run = mutation.mutate;
   useEffect(() => {
-    if (initialQ) run({ q: initialQ, marketplace: "1688" });
+    if (initialQ) {
+      setSubmitted(initialQ);
+      run({ q: initialQ, marketplace: "1688" });
+    }
   }, [initialQ, run]);
 
   function submit(value: string, market = marketplace) {
@@ -513,6 +528,8 @@ function SearchPanel() {
     if (!text) return;
     // Keeps the query in the URL so back navigation restores the last search.
     void navigate({ search: { q: text, mode: "search" }, replace: true });
+    setItems(null);
+    setSubmitted(text);
     mutation.mutate({ q: text, marketplace: market });
   }
 
