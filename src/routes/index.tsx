@@ -192,12 +192,12 @@ function FirstScreen() {
 }
 
 const POPULAR = [
-  { q: "led light", bn: "লেড লাইট" },
-  { q: "phone cover", bn: "ফোন কভার" },
-  { q: "shoes", bn: "জুতা" },
-  { q: "watch", bn: "ঘড়ি" },
-  { q: "bag", bn: "ব্যাগ" },
-  { q: "kitchen items", bn: "রান্নাঘরের জিনিস" },
+  { q: "led light", bn: "💡 লেড লাইট" },
+  { q: "phone cover", bn: "📱 ফোন কভার" },
+  { q: "shoes", bn: "👟 জুতা" },
+  { q: "watch", bn: "⌚ ঘড়ি" },
+  { q: "bag", bn: "👜 ব্যাগ" },
+  { q: "kitchen items", bn: "🍳 রান্নাঘর" },
 ];
 
 /** The one thing a first-time visitor should see: a search box, on screen one. */
@@ -208,7 +208,7 @@ function HeroSearch() {
 
   return (
     <form
-      className="mt-6 grid gap-2 sm:mt-8 sm:grid-cols-[minmax(0,1fr)_auto]"
+      className="mt-6 grid gap-2 sm:mt-8 sm:grid-cols-[minmax(0,1fr)_auto_auto]"
       onSubmit={(e) => {
         e.preventDefault();
         const q = value.trim();
@@ -218,14 +218,23 @@ function HeroSearch() {
       <label htmlFor="hero-q" className="sr-only">
         {t("পণ্যের নাম লিখুন", "Type a product name")}
       </label>
-      <input
-        id="hero-q"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        enterKeyHint="search"
-        placeholder={t("কী লাগবে? যেমন: লেড লাইট, ফোন কভার", "What do you need? e.g. led light, phone cover")}
-        className="font-bn h-16 min-w-0 rounded-[18px] border border-input bg-paper px-5 text-[17px] outline-none focus-visible:ring-2 focus-visible:ring-accent"
-      />
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 sm:col-span-1">
+        <input
+          id="hero-q"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          enterKeyHint="search"
+          placeholder={t("কী লাগবে? যেমন: লেড লাইট, ফোন কভার", "What do you need? e.g. led light, phone cover")}
+          className="font-bn h-16 min-w-0 flex-1 rounded-[18px] border border-input bg-paper px-5 text-[17px] outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        />
+        <VoiceButton
+          onFinal={(text) => {
+            setValue(text);
+            void navigate({ to: "/sourcing", search: { q: text, mode: "search" } });
+          }}
+          onInterim={(text) => setValue(text)}
+        />
+      </div>
       <button
         type="submit"
         className="font-bn flex h-16 items-center justify-center gap-2 rounded-[18px] bg-accent px-7 text-[18px] font-bold text-accent-foreground"
@@ -589,3 +598,4 @@ function HowToSend() {
     </svg>
   );
 }
+
