@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { rateLimited, tooMany } from "@/lib/api/guard.server";
 import { readSearchCache } from "@/lib/products/search-cache.server";
+import { canonicalQuery } from "@/lib/products/bn-keywords";
 
 const schema = z.object({
   q: z.string().trim().max(100).default(""),
@@ -23,7 +24,9 @@ export const Route = createFileRoute("/api/products/search")({
         if (!parsed.success) return Response.json({ error: "Invalid query" }, { status: 400 });
 
         const { q, marketplace, page } = parsed.data;
-        const data = await readSearchCache(q, marketplace, page);
+        // Same canonical form the search function writes, so Bangla queries
+        // hit the cache entry their English equivalent already warmed.
+        const data = await readSearchCache(canonicalQuery(q), marketplace, page);
         return data
           ? Response.json(data, { headers: { "Cache-Control": "public, max-age=300" } })
           : Response.json({ ok: false, code: "CACHE_MISS" }, { status: 404 });
