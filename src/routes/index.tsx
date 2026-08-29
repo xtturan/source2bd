@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Container, Section } from "@/components/s2b/primitives";
 import { WhatsAppIcon } from "@/components/s2b/button";
@@ -186,6 +186,43 @@ function FirstScreen() {
         </a>
       </div>
     </Container>
+  );
+}
+
+/** The one thing a first-time visitor should see: a search box, on screen one. */
+function HeroSearch() {
+  const { t } = useLang();
+  const navigate = useNavigate();
+  const [value, setValue] = useState("");
+
+  return (
+    <form
+      className="mt-6 grid gap-2 sm:mt-8 sm:grid-cols-[minmax(0,1fr)_auto]"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const q = value.trim();
+        void navigate({ to: "/sourcing", search: q ? { q, mode: "search" } : { mode: "search" } });
+      }}
+    >
+      <label htmlFor="hero-q" className="sr-only">
+        {t("পণ্যের নাম লিখুন", "Type a product name")}
+      </label>
+      <input
+        id="hero-q"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        enterKeyHint="search"
+        placeholder={t("কী লাগবে? যেমন: লেড লাইট, ফোন কভার", "What do you need? e.g. led light, phone cover")}
+        className="font-bn h-16 min-w-0 rounded-[18px] border border-input bg-paper px-5 text-[17px] outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      />
+      <button
+        type="submit"
+        className="font-bn flex h-16 items-center justify-center gap-2 rounded-[18px] bg-accent px-7 text-[18px] font-bold text-accent-foreground"
+      >
+        <SearchGlyph />
+        {t("খুঁজুন", "Search")}
+      </button>
+    </form>
   );
 }
 
