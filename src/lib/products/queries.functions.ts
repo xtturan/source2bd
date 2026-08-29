@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { ProductDetail, ProductSummary, SearchResult } from "./types";
 import type { CatalogueItem, ShowcaseRow } from "./search-cache.server";
+import { canonicalQuery } from "./bn-keywords";
 
 /** Shape the UI reads to render "আজকের বাকি খোঁজা: X/30". */
 export interface QuotaInfo {
@@ -28,26 +29,30 @@ export const searchProducts = createServerFn({ method: "POST" })
     const { writeProductSummariesCache } = await import("./product-cache.server");
     const { consumeQuota, readQuota } = await import("@/lib/api/quota.server");
 
+    // Bangla input ("ফোন কভার") is rewritten to the English keywords the
+    // marketplaces match on, so Bangla and English shoppers share one cache.
+    const q = canonicalQuery(data.q);
+
     let quota: { limit: number; remaining: number; resetAt: string } | null = null;
 
-    const result = await cached(`fn-search:v5:${data.marketplace}:${data.q}:${data.page}`, async () => {
-      const stored = await readSearchCache(data.q, data.marketplace, data.page);
+    const result = await cached(`fn-search:v6:${data.marketplace}:${q}:${data.page}`, async () => {
+      const stored = await readSearchCache(q, data.marketplace, data.page);
       // Cache hit never burns the daily allowance.
       if (stored) return stored;
-      quota = await consumeQuota("search", 1, `${data.marketplace}: ${data.q}`);
+      quota = await consumeQuota("search", 1, `${data.marketplace}: ${q}`);
       try {
-        const fresh = await getProductProvider().search(data.q, {
+        const fresh = await getProductProvider().search(q, {
           marketplace: data.marketplace,
           page: data.page,
         });
         await Promise.all([
-          writeSearchCache(data.q, data.marketplace, data.page, fresh),
+          writeSearchCache(q, data.marketplace, data.page, fresh),
           writeProductSummariesCache(fresh.items),
         ]);
         return fresh;
       } catch (err) {
         const { noteIncident } = await import("@/lib/api/error-log.server");
-        noteIncident("search.keyword", err, `${data.marketplace} · "${data.q}" · page ${data.page}`);
+        noteIncident("search.keyword", err, `${data.marketplace} · "${q}" · page ${data.page}`);
         throw err;
       }
     });
@@ -88,7 +93,7 @@ export const cachedSearch = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<CatalogueItem[]> => {
     if (!data.q) return [];
     const { readCachedMatches } = await import("./search-cache.server");
-    return readCachedMatches(data.q, 24);
+    return readCachedMatches(canonicalQuery(data.q), 24);
   });
 
 /** Popular saved searches, used to fill the homepage with real listings. */
