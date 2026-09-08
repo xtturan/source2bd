@@ -33,11 +33,11 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 transition-colors duration-200",
-        scrolled ? "glass border-x-0 border-t-0 shadow-none" : "border-b border-transparent",
+        "sticky top-0 z-50 border-b transition-colors duration-200",
+        scrolled ? "glass border-x-0 border-t-0" : "border-border bg-paper",
       )}
     >
-      <Container className="flex h-16 items-center gap-2 sm:gap-3">
+      <Container className="flex h-[72px] items-center gap-2 sm:gap-3">
         <Link
           to="/"
           className="mr-auto rounded-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
@@ -47,12 +47,12 @@ export function Header() {
         </Link>
 
         <nav aria-label={t("প্রধান মেনু", "Main menu")} className="mr-auto hidden lg:block">
-          <ul className="flex items-center gap-1">
+          <ul className="flex items-center gap-0.5">
             {navLinks.map((l) => (
               <li key={l.to}>
                 <Link
                   to={l.to}
-                  className="font-bn flex min-h-[44px] items-center rounded-full px-4 text-[15px] font-bold text-muted-foreground transition-colors hover:bg-foreground/[0.06] hover:text-foreground [&.active]:text-accent"
+                  className="font-bn flex min-h-[44px] items-center rounded-[10px] px-4 text-[14px] font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground [&.active]:bg-secondary [&.active]:text-primary"
                 >
                   {t(l.bn, l.en)}
                 </Link>
@@ -62,7 +62,7 @@ export function Header() {
         </nav>
 
         <div
-          className="flex h-11 items-center rounded-full bg-foreground/[0.06] p-1 text-sm font-bold"
+          className="flex h-10 items-center rounded-[10px] bg-secondary p-1 text-sm font-bold"
           role="group"
           aria-label={t("ভাষা", "Language")}
         >
@@ -73,7 +73,7 @@ export function Header() {
               onClick={() => setLang(l)}
               aria-pressed={lang === l}
               className={cn(
-                "h-9 rounded-full px-3 transition-colors",
+                "h-8 rounded-[8px] px-3 transition-colors",
                 l === "bn" ? "font-bn" : "",
                 lang === l ? "bg-foreground text-background" : "text-muted-foreground",
               )}
@@ -88,7 +88,7 @@ export function Header() {
         <Link
           to={user ? "/account" : "/auth"}
           aria-label={user ? t("আমার অ্যাকাউন্ট", "My account") : t("লগইন", "Log in")}
-          className="font-bn grid h-12 min-w-12 place-items-center rounded-full border border-foreground/12 px-3 text-[14px] font-bold text-foreground"
+          className="font-bn grid h-10 min-w-10 place-items-center rounded-[10px] border border-border bg-paper px-3 text-[14px] font-bold text-foreground"
         >
           {user ? (
             <svg
@@ -114,7 +114,7 @@ export function Header() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={t("হোয়াটসঅ্যাপে লিখুন", "Message on WhatsApp")}
-          className="grid h-12 w-12 place-items-center rounded-full bg-wa text-wa-foreground shadow-[var(--shadow-1)]"
+          className="grid h-10 w-10 place-items-center rounded-[10px] bg-wa text-wa-foreground shadow-[var(--shadow-1)]"
         >
           <WhatsAppIcon className="h-6 w-6" />
         </a>
@@ -122,7 +122,7 @@ export function Header() {
         <a
           href={telLink}
           aria-label={`${t("ফোন করুন", "Call")} ${siteConfig.phoneDisplay}`}
-          className="grid h-12 w-12 place-items-center rounded-full bg-foreground text-background shadow-[var(--shadow-1)]"
+          className="grid h-10 w-10 place-items-center rounded-[10px] bg-primary text-primary-foreground shadow-[var(--shadow-1)]"
         >
           <svg
             viewBox="0 0 24 24"

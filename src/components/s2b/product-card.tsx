@@ -33,7 +33,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
   if (isProhibitedTitle(product.title)) return null;
 
   return (
-    <article className="panel matte group relative flex flex-col overflow-hidden rounded-[18px] transition-transform duration-150 focus-within:ring-2 focus-within:ring-accent active:scale-[0.995]">
+    <article className="panel group relative flex flex-col overflow-hidden rounded-[14px] transition-[transform,box-shadow] duration-200 focus-within:ring-2 focus-within:ring-accent hover:-translate-y-1 hover:shadow-[var(--shadow-3)] active:scale-[0.995]">
       <div className="relative block aspect-square overflow-hidden bg-stone-1">
         {product.imageUrl ? (
           <img
@@ -47,7 +47,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
             className="h-full w-full object-cover"
           />
         ) : null}
-        <span className="absolute right-2 top-2 rounded-full bg-foreground/75 px-2 py-0.5 text-[10.5px] font-bold text-background">
+        <span className="absolute left-2 top-2 rounded-[6px] bg-primary px-2 py-1 text-[10.5px] font-bold text-primary-foreground shadow-[var(--shadow-1)]">
           {marketplaceLabels[product.marketplace]}
         </span>
       </div>
@@ -62,7 +62,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         </Link>
 
         <div>
-          <div className="tnum text-[22px] font-black text-accent leading-tight tracking-tight">
+        <div className="tnum text-[21px] font-black text-primary leading-tight">
             {product.priceMin != null ? (
               <span className="font-bn text-[13px] font-bold text-muted-foreground">
                 {t("আনুমানিক", "approx.")}{" "}
@@ -85,7 +85,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           })}
           target="_blank"
           rel="noopener noreferrer"
-          className="relative z-10 mt-auto flex min-h-[40px] items-center justify-center gap-1.5 rounded-[10px] bg-[#25D366] hover:bg-[#20ba5a] px-2 text-wa-foreground transition-transform duration-150 active:scale-[0.98]"
+          className="relative z-10 mt-auto flex min-h-[42px] items-center justify-center gap-1.5 rounded-[9px] bg-wa px-2 text-wa-foreground transition-[transform,background-color] duration-150 hover:bg-wa-600 active:scale-[0.98]"
         >
           <span className="font-bn flex items-center gap-1.5 text-[12.5px] font-bold leading-tight">
             <WhatsAppIcon className="h-4 w-4" />
