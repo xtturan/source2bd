@@ -93,9 +93,9 @@ function SourcingPage() {
   ];
 
   return (
-    <Section className="py-6 sm:py-10">
+    <Section className="bg-secondary py-8 sm:py-12">
       <Container>
-        <h1 className="font-bn text-[clamp(1.5rem,6vw,2.2rem)] font-extrabold leading-tight">
+        <h1 className="font-bn text-[clamp(1.8rem,6vw,3rem)] font-extrabold leading-tight text-primary">
           {t("পণ্য খুঁজুন", "Find your product")}
         </h1>
         <p className="font-bn mt-2 text-[16px] font-semibold text-muted-foreground">
@@ -108,7 +108,7 @@ function SourcingPage() {
         <div
           role="tablist"
           aria-label={t("খোঁজার উপায়", "Search method")}
-          className="mt-5 grid grid-cols-3 gap-2"
+          className="mt-6 grid grid-cols-3 gap-2 rounded-[14px] border border-border bg-paper p-2 shadow-[var(--shadow-1)]"
         >
           {tabs.map((tab) => (
             <button
@@ -117,10 +117,10 @@ function SourcingPage() {
               aria-selected={mode === tab.key}
               onClick={() => setMode(tab.key)}
               className={cn(
-                "flex min-h-[84px] flex-col items-center justify-center gap-1.5 rounded-[16px] px-1 text-center transition-colors",
+                "flex min-h-[78px] flex-col items-center justify-center gap-1.5 rounded-[10px] px-1 text-center transition-colors",
                 mode === tab.key
-                  ? "bg-foreground text-background"
-                  : "panel matte text-muted-foreground",
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-secondary",
               )}
             >
               {tab.icon}
@@ -134,7 +134,7 @@ function SourcingPage() {
         <Link
           to="/catalog"
           search={{}}
-          className="panel matte font-bn mt-3 flex min-h-[56px] items-center justify-between gap-3 rounded-[16px] px-4 text-[15px] font-bold"
+          className="font-bn mt-3 flex min-h-[52px] items-center justify-between gap-3 rounded-[10px] border border-border bg-paper px-4 text-[15px] font-bold"
         >
           <span>
             {t(
@@ -171,7 +171,7 @@ function Searching() {
   const pct = Math.min(95, Math.round(95 * (1 - Math.exp(-sec / 12))));
   return (
     <div
-      className="panel matte relative overflow-hidden rounded-[20px] p-6 text-center"
+      className="relative overflow-hidden rounded-[14px] border border-border bg-secondary p-6 text-center"
       role="status"
       aria-live="polite"
     >
@@ -221,7 +221,7 @@ function isLoginRequired(err: unknown) {
 function LoginWall() {
   const { t } = useLang();
   return (
-    <div className="panel matte rounded-[18px] p-5 text-center">
+    <div className="panel rounded-[14px] p-5 text-center">
       <p className="font-bn text-[19px] font-extrabold">
         {t("খুঁজতে আগে লগইন করুন", "Please log in to search")}
       </p>
@@ -245,7 +245,7 @@ function LoginWall() {
 function SoftLoginNote({ quota }: { quota?: boolean }) {
   const { t } = useLang();
   return (
-    <div className="panel matte mt-4 flex flex-col gap-3 rounded-[18px] p-4 sm:flex-row sm:items-center">
+    <div className="panel mt-4 flex flex-col gap-3 rounded-[14px] p-4 sm:flex-row sm:items-center">
       <p className="font-bn text-[15px] font-semibold text-muted-foreground">
         {quota
           ? t(
@@ -280,7 +280,7 @@ function HelpBox({
 }) {
   const { t } = useLang();
   return (
-    <div className="panel matte rounded-[18px] p-5 text-center">
+    <div className="panel rounded-[14px] p-5 text-center">
       <p className="font-bn text-[18px] font-bold">{title}</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {onRetry ? (
@@ -410,7 +410,7 @@ function PhotoPanel() {
           if (f) void pickFile(f);
         }}
         className={cn(
-          "flex min-h-[200px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[20px] border-2 border-dashed px-5 py-8 text-center transition-colors",
+          "flex min-h-[200px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[14px] border-2 border-dashed px-5 py-8 text-center transition-colors",
           dragging ? "border-accent bg-accent/10" : "border-foreground/25 bg-paper",
         )}
       >
@@ -552,7 +552,7 @@ function LinkPanel() {
           "পণ্যের লিংক পেস্ট করুন (১৬৮৮ / অ্যামাজন / অন্য)",
           "Paste the product link (1688 / Amazon / other)",
         )}
-        className="mt-2 h-16 w-full rounded-[16px] border border-input bg-paper px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="mt-2 h-16 w-full rounded-[10px] border border-input bg-paper px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
       />
 
       {error ? <p className="font-bn mt-3 text-[16px] font-bold text-accent">{error}</p> : null}
@@ -711,7 +711,7 @@ function SearchPanel() {
               "কী লাগবে? যেমন: লেড লাইট, ফোন কভার",
               "What do you need? e.g. led light, phone cover",
             )}
-            className="font-bn h-16 w-full min-w-0 rounded-[16px] border border-input bg-paper pr-16 pl-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="font-bn h-16 w-full min-w-0 rounded-[10px] border border-input bg-paper pr-16 pl-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
           />
           <datalist id="q-suggestions">
             {(suggestions.data ?? []).map((s: string) => (
@@ -732,7 +732,7 @@ function SearchPanel() {
         <button
           type="submit"
           disabled={!q.trim()}
-          className="font-bn flex min-h-[60px] items-center justify-center gap-2 rounded-[16px] bg-accent text-xl font-black text-accent-foreground shadow-[var(--shadow-2)] transition-transform duration-150 active:scale-[0.98] disabled:opacity-60"
+          className="font-bn flex min-h-[58px] items-center justify-center gap-2 rounded-[10px] bg-accent text-xl font-black text-accent-foreground shadow-[var(--shadow-2)] transition-transform duration-150 hover:bg-clay-600 active:scale-[0.98] disabled:opacity-60"
         >
           <SearchGlyph className="h-6 w-6" />
           {mutation.isPending ? t("খুঁজছি…", "Searching…") : t("খুঁজুন", "Search")}
