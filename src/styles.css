@@ -3,10 +3,10 @@
 @source "../src";
 
 @theme {
-  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
-  --font-bn: "Noto Sans Bengali", "Geist", sans-serif;
+  --font-bn: "Noto Sans Bengali", "DM Sans", sans-serif;
 
   /* Brand kit: TWT green, deep navy, signal red, steel, stone ground. */
   --color-stone-0: #f4f1ec;
@@ -30,7 +30,7 @@
   --color-wa-foreground: #ffffff;
 
   /* Radius rule: surfaces 18, controls 12, primary buttons pill */
-  --radius-card: 18px;
+  --radius-card: 16px;
   --radius-control: 12px;
 
   /* Elevation: three levels only, tinted to the ground */
@@ -71,7 +71,7 @@
 :root {
   --radius: 1.125rem;
 
-  --background: #f1eee8;
+  --background: #fcf9f3;
   --foreground: #141414;
   --card: #fcfbf9;
   --card-foreground: #141414;
@@ -79,10 +79,10 @@
   --popover-foreground: #141414;
   --primary: #0a2540;
   --primary-foreground: #fcfbf9;
-  --secondary: #eae5dd;
+  --secondary: #f0eee8;
   --secondary-foreground: #141414;
-  --muted: #eae5dd;
-  --muted-foreground: #5a6570;
+  --muted: #f0eee8;
+  --muted-foreground: #43474d;
   --accent: #1fa64a;
   --accent-foreground: #ffffff;
   --destructive: #c41e3a;
@@ -91,7 +91,7 @@
   --input: rgb(10 37 64 / 0.16);
   --ring: #1fa64a;
 
-  --glass-blur: 18px;
+  --glass-blur: 14px;
 }
 
 @layer base {
@@ -111,17 +111,14 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Plaster ground: soft light fall plus a faint warm bloom */
+  /* Calm paper ground from the supplied Source2BD design system. */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background:
-      radial-gradient(60rem 40rem at 12% -10%, rgb(255 255 255 / 0.9), transparent 60%),
-      radial-gradient(46rem 32rem at 92% 4%, rgb(31 166 74 / 0.08), transparent 62%),
-      linear-gradient(180deg, #f6f3ee 0%, #ece8e1 60%, #e8e3da 100%);
+    background: var(--color-background);
   }
 
   h1,
@@ -129,12 +126,12 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.03em;
+    letter-spacing: 0;
   }
 
   ::selection {
     background: var(--color-clay);
-    color: #fff;
+    color: var(--color-accent-foreground);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -166,18 +163,18 @@
 
 /* Raised paper surface on the plaster ground */
 @utility glass {
-  background-color: rgb(252 251 249 / 0.72);
+  background-color: rgb(255 255 255 / 0.9);
   backdrop-filter: blur(var(--glass-blur)) saturate(115%);
-  border: 1px solid rgb(23 23 26 / 0.08);
-  box-shadow: var(--shadow-2), inset 0 1px 0 rgb(255 255 255 / 0.75);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-1);
 }
 
 /* Solid paper card */
 @utility panel {
   background-color: var(--color-paper);
   color: var(--color-ink);
-  border: 1px solid rgb(23 23 26 / 0.08);
-  box-shadow: var(--shadow-2);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-1);
 }
 
 /* Ink block for inverted sections */

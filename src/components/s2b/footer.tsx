@@ -43,11 +43,11 @@ const columns = [
 export function Footer() {
   const { t } = useLang();
   return (
-    <footer className="mt-12 border-t border-border bg-paper/60">
+    <footer className="mt-0 border-t border-primary-foreground/10 bg-primary text-primary-foreground">
       <Container className="grid gap-8 py-10 lg:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,0.8fr))]">
         <div>
           <Logo />
-          <p className="font-bn mt-3 max-w-[38ch] text-[15px] font-semibold leading-relaxed text-muted-foreground">
+          <p className="font-bn mt-3 max-w-[38ch] text-[15px] font-semibold leading-relaxed text-primary-foreground/65">
             {t(
               "যেকোনো দেশ থেকে পণ্য এনে বাংলাদেশে পৌঁছে দিই। ছবি বা লিংক পাঠালেই হবে।",
               "We buy from anywhere in the world and deliver it in Bangladesh. A photo or a link is enough.",
@@ -59,40 +59,40 @@ export function Footer() {
               href={generalInquiry()}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-bn flex min-h-[56px] items-center justify-center gap-2 rounded-full bg-wa text-[17px] font-bold text-wa-foreground"
+               className="font-bn flex min-h-[52px] items-center justify-center gap-2 rounded-[10px] bg-wa text-[16px] font-bold text-wa-foreground"
             >
               <WhatsAppIcon className="h-5 w-5" />
               {t("হোয়াটসঅ্যাপ", "WhatsApp")} {siteConfig.phoneDisplay}
             </a>
             <a
               href={telLink}
-              className="font-bn flex min-h-[56px] items-center justify-center rounded-full bg-primary text-[17px] font-bold text-primary-foreground"
+              className="font-bn flex min-h-[52px] items-center justify-center rounded-[10px] border border-primary-foreground/20 bg-primary-foreground/10 text-[16px] font-bold text-primary-foreground"
             >
               {t("ফোন করুন", "Call")} {siteConfig.phoneDisplay}
             </a>
           </div>
 
-          <ul className="font-bn mt-5 space-y-1.5 text-[15px] font-semibold text-muted-foreground">
+          <ul className="font-bn mt-5 space-y-1.5 text-[15px] font-semibold text-primary-foreground/65">
             <li>
-              <a href={siteConfig.mapUrl} target="_blank" rel="noopener noreferrer" className="text-foreground underline">
+                <a href={siteConfig.mapUrl} target="_blank" rel="noopener noreferrer" className="text-primary-foreground underline">
                 {t(siteConfig.officeBn, siteConfig.office)}
               </a>
             </li>
             <li>{t(siteConfig.hoursBn, siteConfig.hours)}</li>
-            <li className="font-bold text-foreground">{t(siteConfig.policyBn, siteConfig.policy)}</li>
+            <li className="font-bold text-primary-foreground">{t(siteConfig.policyBn, siteConfig.policy)}</li>
             <li>{t("দাম দেখে আপনি রাজি হলে তবেই পেমেন্ট।", "You pay only after you see the price and agree.")}</li>
           </ul>
         </div>
 
         {columns.map((col) => (
           <nav key={col.en} aria-label={t(col.bn, col.en)}>
-            <p className="font-bn text-[13px] font-extrabold uppercase tracking-[0.08em] text-foreground">
+            <p className="font-bn text-[13px] font-extrabold uppercase text-primary-foreground">
               {t(col.bn, col.en)}
             </p>
-            <ul className="font-bn mt-3 space-y-2 text-[15px] font-semibold text-muted-foreground">
+            <ul className="font-bn mt-3 space-y-2 text-[15px] font-semibold text-primary-foreground/65">
               {col.links.map((l) => (
                 <li key={l.to}>
-                  <Link to={l.to} className="hover:text-foreground">
+                  <Link to={l.to} className="hover:text-primary-foreground">
                     {t(l.bn, l.en)}
                   </Link>
                 </li>
@@ -102,8 +102,8 @@ export function Footer() {
         ))}
       </Container>
 
-      <div className="border-t border-border">
-        <Container className="flex flex-col gap-2 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-t border-primary-foreground/10">
+        <Container className="flex flex-col gap-2 py-5 text-xs text-primary-foreground/55 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} {siteConfig.name} · {t("একটি", "a")} {siteConfig.parent}{" "}
             {t("প্রতিষ্ঠান", "product")}

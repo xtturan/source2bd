@@ -38,21 +38,21 @@ export function QuotaBar({ className }: { className?: string }) {
     return (
       <div
         className={cn(
-          "rounded-[16px] border-2 border-accent/40 bg-accent/10 p-4",
+          "rounded-[10px] border border-primary-foreground/20 bg-primary-foreground/10 p-4",
           className,
         )}
       >
         <p className="font-bn text-[16px] font-bold leading-snug">
           {t(
-            "সংরক্ষিত পণ্য লগইন ছাড়াই দেখুন · নতুন খোঁজার জন্য লগইন (দিনে ৩০ বার ফ্রি)",
-            "Browse saved products without an account. Log in for fresh searches, 30 free a day.",
+            "সংরক্ষিত পণ্য এখনই দেখুন · নতুন পণ্যের জন্য ৩টি ফ্রি গেস্ট খোঁজ আছে",
+            "Browse saved products now. You also get 3 free guest searches for new products.",
           )}
         </p>
         <Link
           to="/auth"
-          className="font-bn mt-3 flex min-h-[52px] items-center justify-center rounded-full bg-foreground text-[16px] font-bold text-background"
+          className="font-bn mt-3 flex min-h-[48px] items-center justify-center rounded-[9px] border border-primary-foreground/20 bg-primary-foreground/10 text-[16px] font-bold text-primary-foreground"
         >
-          {t("লগইন / রেজিস্টার", "Log in or sign up")}
+          {t("আরও খুঁজতে লগইন করুন", "Log in for more searches")}
         </Link>
       </div>
     );

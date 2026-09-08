@@ -60,10 +60,10 @@ function HomePage() {
     <>
       <FirstScreen />
       <ThreeSteps />
-      <TrustRow />
-      <PriceHonesty />
       <Categories />
       <CategoryRails items={items} />
+      <TrustRow />
+      <PriceHonesty />
       <HowToSend />
     </>
   );
@@ -90,31 +90,33 @@ function FirstScreen() {
   }
 
   return (
-    <Container className="pb-8 pt-4 sm:pt-6">
-      <h1 className="font-bn max-w-[20ch] text-[clamp(1.7rem,7vw,2.9rem)] font-extrabold leading-[1.2]">
-        {t("কী লাগবে? নাম লিখে খুঁজুন", "What do you need? Search it by name")}
-        <br />
-        <span className="text-accent">
-          {t("বাংলাদেশে পৌঁছানোর পুরো দাম বলব", "we tell you the full Bangladesh door price")}
-        </span>
-      </h1>
-      <p className="font-bn mt-3 text-[clamp(1rem,4vw,1.2rem)] font-semibold text-muted-foreground">
-        {t("শিপিং চার্জসহ · কোনো ইংরেজি জানার দরকার নেই", "Shipping included. No English needed.")}
-      </p>
-      <p className="font-bn mt-2 text-[13px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
-        {t(siteConfig.parentLineBn, siteConfig.parentLineEn)}
-      </p>
+    <section className="relative overflow-hidden bg-primary py-12 text-center text-primary-foreground sm:py-20 lg:py-24">
+      <Container>
+      <div className="mx-auto max-w-3xl">
+        <p className="font-bn mb-4 text-[13px] font-bold text-primary-foreground/70">
+          {t(siteConfig.parentLineBn, siteConfig.parentLineEn)}
+        </p>
+        <h1 className="font-bn text-[clamp(2rem,6vw,3.8rem)] font-extrabold leading-[1.14]">
+          {t("চীন থেকে পণ্য খুঁজুন", "Find products from China")}
+          <span className="mt-1 block text-accent">
+            {t("সহজে, বাংলায়", "simply, in your language")}
+          </span>
+        </h1>
+        <p className="font-bn mx-auto mt-4 max-w-2xl text-[clamp(1rem,2vw,1.2rem)] font-semibold text-primary-foreground/72">
+          {t("নাম লিখুন, ছবি বা লিংক দিন। আমরা দাম থেকে বাংলাদেশে ডেলিভারি পর্যন্ত সব দেখব।", "Search by name, photo, or link. We handle everything through delivery in Bangladesh.")}
+        </p>
+      </div>
 
       <HeroSearch />
 
       {/* Link and photo remain reachable, but quiet: text row, not competing
           cards. The search box above is the one obvious action. */}
-      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[15px] font-bold">
+      <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[15px] font-bold">
         <button
           type="button"
           onClick={() => setLinkOpen((v) => !v)}
           aria-expanded={linkOpen}
-          className="font-bn flex items-center gap-2 text-muted-foreground underline decoration-foreground/25 underline-offset-4"
+          className="font-bn flex items-center gap-2 text-primary-foreground/75 underline decoration-primary-foreground/30 underline-offset-4"
         >
           <LinkGlyph className="h-4.5 w-4.5" />
           {t("লিংক দিয়ে খুঁজবেন?", "Have a link instead?")}
@@ -122,17 +124,17 @@ function FirstScreen() {
         <Link
           to="/sourcing"
           search={{ mode: "photo" }}
-          className="font-bn flex items-center gap-2 text-muted-foreground underline decoration-foreground/25 underline-offset-4"
+          className="font-bn flex items-center gap-2 text-primary-foreground/75 underline decoration-primary-foreground/30 underline-offset-4"
         >
           <CameraGlyph className="h-4.5 w-4.5" />
           {t("ছবি দিয়ে খুঁজবেন?", "Search with a photo?")}
         </Link>
       </div>
 
-      <QuotaBar className="mt-4" />
+      <QuotaBar className="mx-auto mt-5 max-w-3xl text-left" />
 
       {linkOpen ? (
-        <div className="panel matte mt-3 rounded-[18px] p-4">
+        <div className="mx-auto mt-4 max-w-3xl rounded-[14px] border border-primary-foreground/20 bg-primary-foreground/10 p-4 text-left backdrop-blur-sm">
           <label htmlFor="home-link" className="font-bn block text-base font-bold">
             {t("পণ্যের লিংক পেস্ট করুন", "Paste the product link")}
           </label>
@@ -145,7 +147,7 @@ function FirstScreen() {
             }}
             inputMode="url"
             placeholder="https://detail.1688.com/..."
-            className="mt-2 h-14 w-full rounded-[14px] border border-input bg-background/70 px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="mt-2 h-14 w-full rounded-[10px] border border-primary-foreground/20 bg-paper px-4 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
           />
           {urlError ? (
             <p className="font-bn mt-2 text-sm font-bold text-accent">
@@ -155,7 +157,7 @@ function FirstScreen() {
           <button
             type="button"
             onClick={sendLink}
-            className="mt-3 flex min-h-[60px] w-full flex-col items-center justify-center rounded-full bg-wa text-wa-foreground"
+            className="mt-3 flex min-h-[56px] w-full flex-col items-center justify-center rounded-[10px] bg-wa text-wa-foreground"
           >
             <span className="font-bn flex items-center gap-2 text-[17px] font-bold leading-tight">
               <WhatsAppIcon className="h-5 w-5" />
@@ -168,24 +170,25 @@ function FirstScreen() {
         </div>
       ) : null}
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div className="mx-auto mt-5 grid max-w-3xl grid-cols-2 gap-3">
         <a
           href={generalInquiry()}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-bn flex min-h-[52px] items-center justify-center gap-2 rounded-full border border-foreground/12 bg-paper text-[15px] font-bold"
+          className="font-bn flex min-h-[48px] items-center justify-center gap-2 rounded-[10px] border border-primary-foreground/20 bg-primary-foreground/10 text-[15px] font-bold"
         >
           <WhatsAppIcon className="h-5 w-5 text-wa" />
           {t("WhatsApp-এ পাঠান", "Message us")}
         </a>
         <a
           href={telLink}
-          className="font-bn flex min-h-[52px] items-center justify-center rounded-full border border-foreground/12 bg-paper text-[15px] font-bold"
+          className="font-bn flex min-h-[48px] items-center justify-center rounded-[10px] border border-primary-foreground/20 bg-primary-foreground/10 text-[15px] font-bold"
         >
           {t("ফোন করুন", "Call")} {siteConfig.phoneDisplay}
         </a>
       </div>
-    </Container>
+      </Container>
+    </section>
   );
 }
 
@@ -206,7 +209,7 @@ function HeroSearch() {
 
   return (
     <form
-      className="mt-6 grid gap-2 sm:mt-8 sm:grid-cols-[minmax(0,1fr)_auto_auto]"
+      className="mx-auto mt-7 grid max-w-4xl gap-2 rounded-[16px] border border-primary-foreground/20 bg-primary-foreground/10 p-2 shadow-[var(--shadow-3)] backdrop-blur-sm sm:mt-9 sm:grid-cols-[minmax(0,1fr)_auto]"
       onSubmit={(e) => {
         e.preventDefault();
         const q = value.trim();
@@ -226,7 +229,7 @@ function HeroSearch() {
             "কী লাগবে? যেমন: লেড লাইট, ফোন কভার",
             "What do you need? e.g. led light, phone cover",
           )}
-          className="font-bn h-20 w-full min-w-0 rounded-[20px] border-2 border-foreground/25 bg-paper pr-[76px] pl-5 text-[19px] font-bold shadow-[var(--shadow-2)] outline-none focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent"
+          className="font-bn h-16 w-full min-w-0 rounded-[11px] border border-primary-foreground/15 bg-paper pr-[68px] pl-5 text-[17px] font-bold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent sm:h-[68px] sm:text-[18px]"
         />
         <div className="absolute top-1/2 right-3.5 -translate-y-1/2">
           <VoiceButton
@@ -241,20 +244,20 @@ function HeroSearch() {
       </div>
       <button
         type="submit"
-        className="font-bn flex h-20 items-center justify-center gap-2 rounded-[20px] bg-accent px-8 text-[19px] font-black text-accent-foreground shadow-[var(--shadow-2)] transition-transform duration-150 active:scale-[0.98]"
+        className="font-bn flex h-16 items-center justify-center gap-2 rounded-[11px] bg-accent px-8 text-[18px] font-black text-accent-foreground shadow-[var(--shadow-2)] transition-transform duration-150 hover:bg-clay-600 active:scale-[0.98] sm:h-[68px]"
       >
         <SearchGlyph className="h-6 w-6" />
         {t("খুঁজুন", "Search")}
       </button>
 
       {/* Tapping beats typing for most of our visitors. */}
-      <div className="flex flex-wrap gap-2 sm:col-span-2">
+      <div className="flex flex-wrap justify-center gap-2 pt-1 sm:col-span-2">
         {POPULAR.map((chip) => (
           <Link
             key={chip.q}
             to="/sourcing"
             search={{ q: chip.q, mode: "search" }}
-            className="font-bn rounded-full border border-foreground/12 bg-paper px-5 py-2.5 text-[16px] font-semibold"
+            className="font-bn rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-4 py-2 text-[14px] font-semibold text-primary-foreground/80 hover:bg-primary-foreground/15"
           >
             {t(chip.bn, chip.q)}
           </Link>
@@ -274,19 +277,19 @@ function ThreeSteps() {
     { n: "৩", bn: "বাসায় ডেলিভারি", en: "Delivered to your home", icon: <TruckGlyph /> },
   ];
   return (
-    <Section className="py-10 sm:py-14">
+    <Section className="border-b border-border bg-secondary py-12 sm:py-16">
       <Container>
-        <h2 className="font-bn text-[clamp(1.4rem,5vw,2rem)] font-extrabold">
+        <h2 className="font-bn text-center text-[clamp(1.6rem,5vw,2.5rem)] font-extrabold text-primary">
           {t("৩ ধাপে কাজ", "Three simple steps")}
         </h2>
-        <ol className="mt-5 grid gap-3 sm:grid-cols-3 sm:gap-4">
+        <ol className="mt-8 grid gap-4 sm:grid-cols-3 sm:gap-5">
           {steps.map((s) => (
             <li
               key={s.en}
-              className="panel matte flex items-center gap-4 rounded-[18px] p-5 sm:flex-col sm:items-start"
+              className="panel flex items-center gap-4 rounded-[14px] p-5 sm:min-h-[210px] sm:flex-col sm:items-center sm:justify-center sm:text-center"
             >
               <span
-                className="grid h-16 w-16 shrink-0 place-items-center rounded-[18px] bg-accent/12 text-accent"
+                className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-accent/12 text-accent"
                 aria-hidden
               >
                 {s.icon}
@@ -316,11 +319,11 @@ function TrustRow() {
     { bn: "শুধু বৈধ পণ্য আনি", en: "Legal goods only" },
   ];
   return (
-    <Section className="py-0">
+    <Section className="border-y border-border bg-secondary py-10">
       <Container>
-        <ul className="grid grid-cols-2 gap-3">
+        <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {items.map((i) => (
-            <li key={i.en} className="panel matte flex items-start gap-2.5 rounded-[16px] p-4">
+            <li key={i.en} className="flex items-start gap-2.5 rounded-[12px] border border-border bg-paper p-4">
               <CheckGlyph />
               <span className="font-bn text-[15px] font-bold leading-snug">{t(i.bn, i.en)}</span>
             </li>
@@ -334,21 +337,21 @@ function TrustRow() {
 function Categories() {
   const { t } = useLang();
   return (
-    <Section className="py-10 sm:py-14">
+    <Section className="py-12 sm:py-16">
       <Container>
-        <h2 className="font-bn text-[clamp(1.4rem,5vw,2rem)] font-extrabold">
+        <h2 className="font-bn text-center text-[clamp(1.6rem,5vw,2.5rem)] font-extrabold text-primary">
           {t("কী আনতে চান?", "What do you want to bring in?")}
         </h2>
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-5">
           {quickCategories.map((c) => (
             <Link
               key={c.q}
               to="/sourcing"
               search={{ q: c.q } as never}
-              className="panel matte flex min-h-[88px] flex-col items-center justify-center gap-2 rounded-[18px] p-4 text-center"
+              className="panel flex min-h-[132px] flex-col items-center justify-center gap-3 rounded-[14px] p-4 text-center transition-[transform,box-shadow] hover:-translate-y-1 hover:shadow-[var(--shadow-3)]"
             >
               <span
-                className="grid h-12 w-12 place-items-center rounded-[14px] bg-accent/12 text-accent"
+                className="grid h-12 w-12 place-items-center rounded-full bg-accent/12 text-accent"
                 aria-hidden
               >
                 <BoxGlyph />
@@ -389,9 +392,9 @@ function CategoryRails({ items }: { items: CatalogueItem[] }) {
   if (!rails.length) return null;
 
   return (
-    <Section className="py-0">
+    <Section className="border-t border-border bg-secondary py-12 sm:py-16">
       <Container>
-        <h2 className="font-bn text-[clamp(1.4rem,5vw,2rem)] font-extrabold">
+        <h2 className="font-bn text-[clamp(1.6rem,5vw,2.5rem)] font-extrabold text-primary">
           {t("ক্যাটাগরি ধরে দেখুন", "Browse by category")}
         </h2>
         <p className="font-bn mt-2 max-w-[46ch] text-[15px] font-semibold text-muted-foreground">
@@ -419,7 +422,7 @@ function CategoryRails({ items }: { items: CatalogueItem[] }) {
                   {t("আরও দেখুন", "See more")}
                 </Link>
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-5">
                 {products.map((p) => (
                   <ProductCard key={`${p.marketplace}-${p.id}`} product={p} />
                 ))}
@@ -431,7 +434,7 @@ function CategoryRails({ items }: { items: CatalogueItem[] }) {
         <Link
           to="/catalog"
           search={{}}
-          className="panel matte font-bn mt-8 flex min-h-[64px] items-center justify-between gap-3 rounded-[18px] px-5 text-[16px] font-bold"
+          className="font-bn mt-8 flex min-h-[56px] items-center justify-center gap-3 rounded-[10px] bg-primary px-5 text-[16px] font-bold text-primary-foreground"
         >
           <span>{t("সব ক্যাটাগরি ও পণ্য দেখুন", "Browse every category and product")}</span>
           <span aria-hidden className="text-accent">
@@ -448,7 +451,7 @@ function HowToSend() {
   return (
     <Section className="py-12 sm:py-16">
       <Container>
-        <div className="panel matte overflow-hidden rounded-[20px]">
+        <div className="panel overflow-hidden rounded-[16px]">
           <img
             src={deskQuote}
             alt={t("পণ্যের ছবি ও কার্টন", "A product listing beside packed cartons")}
@@ -472,14 +475,14 @@ function HowToSend() {
                 href={photoInquiry()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-bn flex min-h-[60px] items-center justify-center gap-2 rounded-full bg-wa text-lg font-bold text-wa-foreground"
+                className="font-bn flex min-h-[56px] items-center justify-center gap-2 rounded-[10px] bg-wa text-lg font-bold text-wa-foreground"
               >
                 <WhatsAppIcon className="h-6 w-6" />
                 {t("হোয়াটসঅ্যাপে পাঠান", "Send on WhatsApp")}
               </a>
               <a
                 href={telLink}
-                className="font-bn flex min-h-[60px] items-center justify-center gap-2 rounded-full bg-foreground text-lg font-bold text-background"
+                className="font-bn flex min-h-[56px] items-center justify-center gap-2 rounded-[10px] bg-primary text-lg font-bold text-primary-foreground"
               >
                 <PhoneGlyph className="h-6 w-6" />
                 {siteConfig.phoneDisplay}

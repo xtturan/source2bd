@@ -21,11 +21,11 @@ export function MobileDock() {
     <>
       <div className="fixed inset-x-0 bottom-0 z-40 pb-[env(safe-area-inset-bottom)] lg:hidden">
         {/* Always reachable: one tap to call, one tap to WhatsApp. */}
-        <div className="grid grid-cols-2 gap-px bg-border">
+        <div className="grid grid-cols-2 gap-px bg-primary-foreground/10">
           <a
             href={telLink}
             aria-label={`${t("কল", "Call")} ${siteConfig.phoneDisplay}`}
-            className="font-bn flex min-h-[52px] items-center justify-center gap-2 bg-primary text-[16px] font-extrabold text-primary-foreground"
+            className="font-bn flex min-h-[48px] items-center justify-center gap-2 bg-primary text-[15px] font-extrabold text-primary-foreground"
           >
             {t("কল", "Call")}
           </a>
@@ -34,7 +34,7 @@ export function MobileDock() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={t("হোয়াটসঅ্যাপ", "WhatsApp")}
-            className="font-bn flex min-h-[52px] items-center justify-center gap-2 bg-wa text-[16px] font-extrabold text-wa-foreground"
+            className="font-bn flex min-h-[48px] items-center justify-center gap-2 bg-wa text-[15px] font-extrabold text-wa-foreground"
           >
             <WhatsAppIcon className="h-5 w-5" />
             {t("হোয়াটসঅ্যাপ", "WhatsApp")}
@@ -48,7 +48,7 @@ export function MobileDock() {
               to={i.to}
               activeOptions={{ exact: i.to === "/" }}
               aria-label={t(i.bn, i.en)}
-              className="flex min-h-[66px] flex-col items-center justify-center gap-1 px-1 py-2 text-muted-foreground [&.active]:text-accent [&.active]:font-bold"
+               className="flex min-h-[62px] flex-col items-center justify-center gap-1 px-1 py-2 text-muted-foreground [&.active]:font-bold [&.active]:text-primary"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -68,7 +68,7 @@ export function MobileDock() {
         </div>
         </nav>
       </div>
-      <div className="h-[124px] lg:hidden" aria-hidden />
+       <div className="h-[116px] lg:hidden" aria-hidden />
     </>
   );
 }
